@@ -30,7 +30,7 @@ export default function LoginPage() {
     }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-green-50 px-4 py-0 my-0 ">
+    <div className="flex min-h-screen items-center justify-center bg-orange-100 px-4 py-0 my-0 ">
       <Card className="w-full max-w-md pb-6 pt-0 font-sans">
             <CardHeader>
               <CardTitle className="text-2xl  mt-4 pb-0 mb-0">Sign In</CardTitle>
