@@ -1,7 +1,8 @@
 "use client"
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useState, useEffect } from "react"
+import { Loader2 } from "lucide-react"
+import { toast } from 'react-hot-toast';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,30 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link";
 
 export default function SignupPage() {  
+    const [loading, setLoading]=useState<boolean>(false);
+    const [name, setName]=useState<string>("");
+    const [email, setEmail]=useState<string>("");
+    const [password, setPassword]=useState<string>("");
+    const [rePassword, setRePassword]=useState<string>("");
+
+    const handleSignup=async()=>{
+        if(!name || !email || !password || !rePassword){
+            toast.error("Please fill all the fields");
+            return;
+        }
+        if(password!==rePassword){
+            toast.error("Passwords dont match!");
+            return;
+        }
+        const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+        if(!emailRegex.test(email)){
+            toast.error("Invalid email");
+            return;
+        }
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        setLoading(false);
+    }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-green-50 px-4 py-0 my-0 ">
@@ -21,24 +46,24 @@ export default function SignupPage() {
             <form className="space-y-4 pb-2">
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="name">Name</Label>
-                    <Input className="py-3" id="name" type="name" placeholder="Enter your name" required />
+                    <Input value={name} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setName(e.target.value)}} className="py-3" id="name" type="name" placeholder="Enter your name" required />
                 </div>
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="email">Email</Label>
-                    <Input className="py-3" id="email" type="email" placeholder="Enter your email" required />
+                    <Input value={email} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setEmail(e.target.value)}} className="py-3" id="email" type="email" placeholder="Enter your email" required />
                 </div>
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="password">Password</Label>
-                    <Input className="py-3" id="password" type="password" placeholder="Create your password" required />
+                    <Input value={password} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setPassword(e.target.value)}} className="py-3" id="password" type="password" placeholder="Create your password" required />
                 </div>
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="re-password">Confirm Password</Label>
-                    <Input className="py-3" id="re-password" type="password" placeholder="Re-enter your password" required />
+                    <Input value={rePassword} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setRePassword(e.target.value)}} className="py-3" id="re-password" type="password" placeholder="Re-enter your password" required />
                 </div>
             </form>
 
-              <Button className="w-full">
-                Create Account
+              <Button className="w-full" onClick={handleSignup} disabled={loading}>
+                {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Create Account"}
               </Button>
 
             </CardContent>

@@ -1,14 +1,33 @@
 "use client"
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
+import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import Link from "next/link";
 
 export default function LoginPage() {  
+    const [loading, setLoading]=useState<boolean>(false);
+    const [email, setEmail]=useState<string>("");
+    const [password, setPassword]=useState<string>("");
+
+    const handleLogin=async()=>{
+        if(!email || !password ){
+            toast.error("Please fill all the fields");
+            return;
+        }
+        const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+        if(!emailRegex.test(email)){
+            toast.error("Invalid email");
+            return;
+        }
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        setLoading(false);
+    }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-green-50 px-4 py-0 my-0 ">
@@ -21,16 +40,16 @@ export default function LoginPage() {
             <form className="space-y-4 pb-2">
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="email">Email</Label>
-                    <Input className="py-3" id="email" type="email" placeholder="Enter your email" required />
+                    <Input value={email} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setEmail(e.target.value)}} className="py-3" id="email" type="email" placeholder="Enter your email" required />
                 </div>
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="password">Password</Label>
-                    <Input className="py-3" id="password" type="password" placeholder="Enter your password" required />
+                    <Input value={password} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setPassword(e.target.value)}} className="py-3" id="password" type="password" placeholder="Enter your password" required />
                 </div>
             </form>
 
-              <Button className="w-full">
-                Log In
+              <Button className="w-full" onClick={handleLogin} disabled={loading}>  
+                {loading?  <Loader2 className="animate-spin w-5 h-5" /> : "Log In"}
               </Button>
 
             </CardContent>
