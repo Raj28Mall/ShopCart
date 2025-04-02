@@ -1,6 +1,9 @@
 Tasks:
 
+Auth Page
+    1. Login signup form validation
+
+
 1. Landing page
-2. Auth page
-3. Products page
-4. Individual product page
+2. Products page
+3. Individual product page

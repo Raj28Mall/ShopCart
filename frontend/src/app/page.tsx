@@ -1,8 +1,10 @@
+"use client";
+import { Navbar } from "@/components/navbar";
 
 export default function Home() {
   return (
-    <div>
-      Hello World
+    <div className="flex flex-col min-h-screen bg-white">
+      <Navbar />
     </div>
   );
 }
