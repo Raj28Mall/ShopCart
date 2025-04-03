@@ -103,7 +103,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen max-w-screen bg-slate-100 overflow-x-hidden">
       <Navbar />
       <AspectRatio ratio={1920/650}>
-        <Image src="/hero.png" alt="Hero Image" fill/>
+        <Image src="/hero.png" alt="Hero Image" fill priority={true}/>
       </AspectRatio>
       <div className="category-shopping w-[100vw] flex flex-col justify-center items-center py-10">
         <div className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl pb-3">Shop by Category</div>

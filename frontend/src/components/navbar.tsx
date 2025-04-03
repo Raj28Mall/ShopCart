@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 export const Navbar=()=>{
-    const [isLogged, setIsLogged] = useState(true);
+    const [isLogged, setIsLogged] = useState<boolean>(true);
     return(
         <div className="sticky top-0 z-50 w-full font-sans border-b bg-slate-100 flex flex-row py-2 justify-between">
             <div className='flex flex-row justify-between items-center space-x-4'>
