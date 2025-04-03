@@ -36,7 +36,7 @@ export default function SignupPage() {
     }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-orange-100 px-4 py-0 my-0 ">
+    <div className="flex min-h-screen items-center justify-center bg-blue-100 px-4 py-0 my-0 ">
       <Card className="w-full max-w-md pb-6 pt-0 font-sans">
             <CardHeader>
               <CardTitle className="text-2xl  mt-4 pb-0 mb-0">Sign Up</CardTitle>
@@ -62,7 +62,7 @@ export default function SignupPage() {
                 </div>
             </form>
 
-              <Button className="w-full" onClick={handleSignup} disabled={loading}>
+              <Button className="w-full bg-slate-600" onClick={handleSignup} disabled={loading}>
                 {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Create Account"}
               </Button>
 
