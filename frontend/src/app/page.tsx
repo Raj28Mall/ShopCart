@@ -443,7 +443,7 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-12 mt-8 w-[70vw] lg:w-[100vw] lg:flex lg:flex-wrap lg:justify-center px-3 lg:px-15 mx-auto">
             {(categories.slice(0,6)).map((category) => ( // to limit to 6
               <Link key={category.id} href={`/products?category=${category.slug}`}>
-                <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 w-[17vw]">
+                <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 w-[21vw]">
                   <div className="relative h-[200px] w-full">
                       <Image
                         src={category.image || "/placeholder.svg"}

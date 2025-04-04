@@ -426,6 +426,14 @@ export default function Products(){
       );
     };
 
+    const handleSort=()=>{
+      if (sortOption === 'price-low') {
+        setDisplayProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
+      } else if (sortOption === 'price-high') {
+        setDisplayProducts((prev) => [...prev].sort((a, b) => b.price - a.price));
+      }
+    }
+
     useEffect(() => {
       setDisplayProducts(products.filter((product) => {
         if (selected.length === 0) return true; 
@@ -446,6 +454,9 @@ export default function Products(){
                         <Button variant={'ghost'} size={'xs'} className='ml-2' onClick={() => toggleSelection(item)}><X/></Button>
                     </div>
                 ))}
+                {selected.length>1 ? (
+                    <Button variant={'outline'} size={'xs'} className='ml-2 px-2 py-1' onClick={() => setSelected([])}>Clear All <X/></Button>
+                ) : null}
             </div>
             <div className='flex flex-row space-x-2'>
               <Popover>
@@ -476,9 +487,9 @@ export default function Products(){
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 rounded-md shadow-md">
                 <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value="featured">Featured</SelectItem>
-                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value="newest">Newest</SelectItem>
-                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value="price-low">Price: Low to High</SelectItem>
-                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value="price-high">Price: High to Low</SelectItem>
+                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100"  value="newest" onClick={()=>{setSortOption("newest"); handleSort();}}>Newest</SelectItem>
+                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100"  value="price-low" onClick={()=>{setSortOption("price-low"); handleSort();}}>Price: Low to High</SelectItem>
+                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100"  value="price-high" onClick={()=>{setSortOption("price-high"); handleSort();}}>Price: High to Low</SelectItem>
               </SelectContent>
             </Select>
             </div>

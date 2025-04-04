@@ -15,15 +15,15 @@ interface Product {
 }
 
 interface CartStore {
-  products: Product[]
-  setCart: (products: Product[]) => void
+  cartItems: Product[]
+  setCartItems: (cartItems: Product[]) => void
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set) => ({
-      products: [],
-      setCart: (products: Product[]) => set({ products }),
+      cartItems: [],
+      setCartItems: (cartItems: Product[]) => set({ cartItems }),
     }),
     {
       name: 'cart-store', 
