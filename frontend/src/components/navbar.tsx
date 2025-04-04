@@ -22,7 +22,7 @@ export const Navbar=()=>{
                 </Link>
 
                 <div className="flex flex-row justify-center items-center space-x-4">
-                    <Input id='search' className="max-w-md md:w-96" placeholder="Search for products" />
+                    <Input id='search' className="max-w-md hidden md:block md:w-96 " placeholder="Search for products" />
                     <Label htmlFor='search' className='cursor-pointer'><Search /></Label>
                 </div>
             </div>
