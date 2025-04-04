@@ -6,12 +6,11 @@ import { Search, ShoppingCart, User } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 
 export const Navbar=()=>{
     const [isLogged, setIsLogged] = useState<boolean>(true);
     return(
-        <div className="sticky top-0 z-50 w-full font-sans border-b bg-slate-100 flex flex-row py-2 justify-between">
+        <div className="sticky z-50 top-0 w-full font-sans border-b bg-slate-100 flex flex-row py-2 justify-between">
             <div className='flex flex-row justify-between items-center space-x-4'>
                 <Link href="/" className="flex flex-row justify-center items-center space-x-2 px-10 mr-5">
                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="40" height="40" viewBox="0 0 48 48">
