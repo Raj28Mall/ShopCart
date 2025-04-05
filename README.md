@@ -8,7 +8,10 @@
     - Have to check responsiveness
 
 ### **Product Listing Page**  
-- A page to showcase available products with sorting and filtering options.  
+- A page to showcase available products with sorting and filtering options. 
+    - Loading page left
+    - Sorting and filtering implemented
+    - Responsiveness pending
 
 ### **Product Details Page**  
 - A page that displays detailed information about individual products.  
