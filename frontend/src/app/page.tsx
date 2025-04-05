@@ -7,7 +7,6 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingBag } from "lucide-react";
 
-
 export default function Home() {
   const categories = [
     {

@@ -12,21 +12,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import { useProductStore } from '@/store/productStore';
-interface Products{
-    id: number;
-    name: string;
-    price: number;
-    image: string;
+interface Product {
+  id: number
+  name: string
+  price: number
+  image: string
+  category: string
+  description: string
+  rating: number
+  // reviews: number
+  inStock: boolean
+  details: string
 }
 
 const FILTERS=["Clothes", "Electronics", "Kitchen Appliances", "Sports", "Beauty"];
+const SORT_BY=[ {name: "Rating", value:"rating"}, {name:"Newest", value:"newest"}, {name: "Price: Low to High", value:"price-low"}, {name: "Price: High to Low", value:"price-high"}];
 
 export default function Products(){
-    const [sortOption, setSortOption] = useState("featured");
+    const [sortOption, setSortOption] = useState<string>();
     const [displayCount, setDisplayCount]=useState<number>(15);
     const products= useProductStore((state) => state.products);
     const setProducts= useProductStore((state) => state.setProducts);
-    const [displayProducts, setDisplayProducts]= useState<Products[]>(products);
+    const [displayProducts, setDisplayProducts]= useState<Product[]>([]);
 
     useEffect(() => {
       setProducts([
@@ -417,6 +424,11 @@ export default function Products(){
         }
       ]); 
     }, [setProducts]);
+
+    useEffect(() => {
+      setDisplayProducts(products);
+    }, [products]);
+    
     
     const [selected, setSelected]=useState<string[]>([]);
 
@@ -426,21 +438,55 @@ export default function Products(){
       );
     };
 
-    const handleSort=()=>{
-      if (sortOption === 'price-low') {
+    const handleSort=(sortMethod : string)=>{
+      if( !sortMethod ){
+        setDisplayProducts(products);
+        return;
+      }
+
+      if (sortMethod === 'price-low') {
         setDisplayProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
-      } else if (sortOption === 'price-high') {
+      } else if (sortMethod === 'price-high') {
         setDisplayProducts((prev) => [...prev].sort((a, b) => b.price - a.price));
+      } else if (sortMethod === 'rating') {
+        setDisplayProducts((prev) => [...prev].sort((a, b) => b.rating - a.rating));
+      }
+      else if (sortMethod === 'newest') {
+        setDisplayProducts((prev) => [...prev].sort((a, b) => b.id - a.id));
       }
     }
 
     useEffect(() => {
-      setDisplayProducts(products.filter((product) => {
-        if (selected.length === 0) return true; 
-        return selected.includes(product.category); 
+      if (!sortOption) return;
+      handleSort(sortOption);
+    }, [sortOption]);
+
+
+    useEffect(() => {
+      let updatedProducts= [];
+      updatedProducts = products.filter((product) => {
+        if (selected.length === 0) return true; // no filters selected, show all products
+        return selected.includes(product.category);
+      });
+      
+      if( !sortOption ){
+        setDisplayProducts(updatedProducts);
+        return;
       }
-      ));
-    }, [selected, products]);
+
+      if (sortOption === 'price-low') {
+        setDisplayProducts(updatedProducts.sort((a, b) => a.price - b.price));
+      } else if (sortOption === 'price-high') {
+        setDisplayProducts(updatedProducts.sort((a, b) => b.price - a.price));
+      } else if (sortOption === 'rating') {
+        setDisplayProducts(updatedProducts.sort((a, b) => b.rating - a.rating));
+      }
+      else if (sortOption === 'newest') {
+        setDisplayProducts(updatedProducts.sort((a, b) => b.id - a.id));
+      }
+
+    }, [selected, products, sortOption]);
+
     
     return(
       <div className='overflow-x-hidden min-h-screen'>
@@ -475,7 +521,7 @@ export default function Products(){
                       <label key={option} className="flex items-center gap-2 text-sm text-gray-700">
                         <Checkbox checked={selected.includes(option)} onCheckedChange={() => toggleSelection(option)} />
                         {option}
-                      </label>
+                      </label>  
                     ))}
                   </div>
                 </PopoverContent>
@@ -486,10 +532,11 @@ export default function Products(){
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 rounded-md shadow-md">
-                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value="featured">Featured</SelectItem>
-                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100"  value="newest" onClick={()=>{setSortOption("newest"); handleSort();}}>Newest</SelectItem>
-                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100"  value="price-low" onClick={()=>{setSortOption("price-low"); handleSort();}}>Price: Low to High</SelectItem>
-                <SelectItem className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100"  value="price-high" onClick={()=>{setSortOption("price-high"); handleSort();}}>Price: High to Low</SelectItem>
+                {SORT_BY.map((option) => (
+                  <SelectItem key={option.value} className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value={option.value} onClick={()=> setSortOption(option.value)}>
+                    {option.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             </div>
