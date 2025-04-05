@@ -9,8 +9,8 @@ interface Product {
   category: string
   description: string
   rating: number
+  variant?: string
   // reviews: number
-  inStock: boolean
   details: string
 }
 

@@ -8,11 +8,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {  
     const [loading, setLoading]=useState<boolean>(false);
     const [email, setEmail]=useState<string>("");
     const [password, setPassword]=useState<string>("");
+    const router=useRouter();
 
     const handleLogin=async()=>{
         if(!email || !password ){
@@ -26,7 +28,8 @@ export default function LoginPage() {
         }
         setLoading(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        setLoading(false);
+        router.push('/');
+        toast.success("Login successful");
     }
 
   return (

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SignupPage() {  
@@ -15,6 +16,7 @@ export default function SignupPage() {
     const [email, setEmail]=useState<string>("");
     const [password, setPassword]=useState<string>("");
     const [rePassword, setRePassword]=useState<string>("");
+    const router=useRouter();
 
     const handleSignup=async()=>{
         if(!name || !email || !password || !rePassword){
@@ -32,7 +34,8 @@ export default function SignupPage() {
         }
         setLoading(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        setLoading(false);
+        router.push('/');
+        toast.success("Signup successful");
     }
 
   return (
