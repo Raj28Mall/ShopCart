@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import { useProductStore } from '@/store/productStore';
+import { ProductCard } from '@/components/productCard';
 interface Product {
   id: number
   name: string
@@ -539,26 +540,7 @@ export default function Products(){
               ) : displayProducts.length > 0 ? (
                 displayProducts.slice(0, displayCount).map((product) => (
                   <Link key={product.id} href={`/products/${product.id}`}>
-                    <Card className="overflow-hidden transition-all hover:shadow-lg pt-0">
-                      <div className="relative h-[250px] w-full">
-                        <Image
-                          src={product.image || "/placeholder.svg"}
-                          alt={product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <CardContent className="px-4">
-                        <h3 className="font-semibold h-12 overflow-hidden text-ellipsis">{product.name}</h3>
-                        <div className="flex flex-col 2xl:flex-row items-center justify-between mt-2 xl:mt-0">
-                          <span className="font-bold">₹{product.price.toFixed(2)}</span>
-                          <Button size="sm" variant="outline">
-                            <ShoppingBag className="h-4 w-4 mr-2" />
-                            Add to Cart
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <ProductCard name={product.name} image={product.image} price={product.price}/>
                   </Link>
                 ))
               ) : (

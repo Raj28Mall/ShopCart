@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingBag } from "lucide-react";
+import { ProductCard } from "@/components/productCard";
 import { useProductStore } from "@/store/productStore";
 
 export default function Home() {
@@ -436,21 +437,7 @@ export default function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 gap-6 my-8 px-5 md:px-10 xl:px-25 w-[100vw]">
             {((products.sort((a,b)=>b.rating-a.rating)).slice(0,15)).map((product) => (
               <Link key={product.id} href={`/products/${product.id}`}>
-                <Card className="overflow-hidden transition-all hover:shadow-lg pt-0">
-                  <div className="relative h-[250px] w-full">
-                    <Image src={product.image || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
-                  </div>
-                  <CardContent className="flex flex-col px-4">
-                    <h3 className="font-semibold h-12 overflow-hidden text-ellipsis">{product.name}</h3>
-                    <div className="flex flex-col 2xl:flex-row items-center justify-between mt-2 xl:mt-0">
-                      <span className="font-bold">₹{product.price.toFixed(2)}</span>
-                      <Button size="sm" variant={'outline'} className="">
-                        <ShoppingBag className="h-4 w-4 mr-2" />
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ProductCard name={product.name} image={product.image} price={product.price}/>
               </Link>
             ))}
           </div>

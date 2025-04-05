@@ -36,14 +36,14 @@ export const Navbar=()=>{
                     </Link>
                 ) : (
                     <div className='flex flex-row justify-between items-center space-x-4 '>
-                        <Button variant={'ghost'} className='flex flex-row space-x-1 h-full'>
+                        <Link href="/cart" className='flex flex-row space-x-1 h-full'>
                             <ShoppingCart className="h-6 w-6" />
                             <h3 className='text-sm'>Cart</h3>
-                        </Button>
-                        <Button variant={'ghost'} className='flex flex-row space-x-1 h-full'>
+                        </Link>
+                        <Link href="/" className='flex flex-row space-x-1 h-full'>
                             <User className="h-6 w-6" />
                             <h3 className='text-sm'>Profile</h3>
-                        </Button>
+                        </Link>
                     </div>
                 )}
             </div>
