@@ -5,12 +5,13 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
 import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface CartItem{
   id: number
@@ -98,6 +99,8 @@ export default function Cart(){
       }
     ]);
     const [couponCode, setCouponCode]=useState<string>("");
+    const [loading, setLoading]=useState<boolean>(false);
+    const router=useRouter();
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = subtotal>0 ? 20.00 : 0;
@@ -118,6 +121,14 @@ export default function Cart(){
       setCartItems(cartItems.filter((item) => item.id !== id))
     }
 
+    const handleSale = async () => {
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      toast.success("Purchase successful");
+      setCartItems([]);
+      setLoading(false);
+      router.push('/');
+    }
     return(
         <div className="overflow-x-hidden min-h-screen">
             <Navbar/>
@@ -241,8 +252,8 @@ export default function Cart(){
                     </div>
                   </div>
 
-                  <Button className="w-full mt-6" size="lg">
-                    Proceed to Checkout
+                  <Button variant={'outline'} className="w-full mt-6 bg-black text-white hover:bg-slate-800" size="lg" onClick={handleSale} disabled={loading}>
+                  {loading?  <Loader2 className="animate-spin w-5 h-5" /> : "Buy Now"}
                   </Button>
 
                   <div className="mt-6 space-y-4">
@@ -259,7 +270,7 @@ export default function Cart(){
                       <div className="flex items-center">
                         <Input placeholder="Coupon code" className="rounded-r-none" value={couponCode}
                          onChange={(e: React.ChangeEvent<HTMLInputElement>)=>setCouponCode(e.target.value)}/>
-                        <Button variant="outline" className="rounded-l-none" onClick={()=>{if(couponCode.length>4){toast.success("Coupon applied");} else{toast.error("Invalid coupon code");} setCouponCode("");}}>
+                        <Button variant={'outline'} className="rounded-l-none hover:bg-slate-100" onClick={()=>{if(couponCode.length>4){toast.success("Coupon applied");} else{toast.error("Invalid coupon code");} setCouponCode("");}}>
                           Apply
                         </Button>
                       </div>
