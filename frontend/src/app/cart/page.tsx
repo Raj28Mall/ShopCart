@@ -138,7 +138,7 @@ export default function Cart(){
                   <ArrowLeft className="h-4 w-4 mr-1" />
                   Continue Shopping
                 </Link>
-                <Button variant="outline" onClick={() => setCartItems([])}>
+                <Button variant="outline" onClick={() => setCartItems([])} disabled={cartItems.length<=0} hidden={cartItems.length<=0} className="text-sm">
                   Clear Cart
                 </Button>
             </div>

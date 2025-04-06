@@ -21,6 +21,7 @@ interface Product {
   category: string
   description: string
   rating: number
+  quantity: number
   // reviews: number
   details: string
 }
@@ -49,6 +50,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Clothes",
             rating: 4.4,
+            quantity: 0,
             description: "Soft, breathable cotton tee for everyday wear.",
             details: "Made from 100% premium cotton. Machine washable. Available in multiple colors."
           },
@@ -59,6 +61,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.6,
+            quantity: 0,
             description: "High-fidelity sound with noise isolation.",
             details: "Bluetooth 5.0, 20-hour battery, foldable design, built-in mic for calls."
           },
@@ -69,6 +72,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Kitchen Appliances",
             rating: 4.2,
+            quantity: 0,
             description: "Minimalist mug for hot and cold beverages.",
             details: "12oz capacity, microwave and dishwasher safe. Matte ceramic finish."
           },
@@ -79,6 +83,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.1,
+            quantity: 0,
             description: "Recyclable notebook with smooth pages.",
             details: "80 ruled pages. Made with recycled paper. A5 size."
           },
@@ -89,6 +94,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.5,
+            quantity: 0,
             description: "Loud, portable sound with deep bass.",
             details: "10W output, water-resistant, 12-hour playtime, supports TWS pairing."
           },
@@ -99,6 +105,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Sports",
             rating: 4.3,
+            quantity: 0,
             description: "Lightweight and breathable athletic shoes.",
             details: "Mesh upper, EVA sole, arch support. Ideal for daily runs and training."
           },
@@ -109,6 +116,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Kitchen Appliances",
             rating: 4.7,
+            quantity: 0,
             description: "Keeps drinks cold for 24 hrs, hot for 12 hrs.",
             details: "Double-wall insulated, BPA-free, 750ml capacity, leak-proof lid."
           },
@@ -119,6 +127,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.5,
+            quantity: 0,
             description: "Elegant and simple analog wristwatch.",
             details: "Stainless steel body, leather strap, water resistant, quartz movement."
           },
@@ -129,6 +138,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.4,
+            quantity: 0,
             description: "Ergonomic stand for better posture.",
             details: "Aluminum alloy, adjustable height, supports up to 17\" laptops."
           },
@@ -139,6 +149,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.2,
+            quantity: 0,
             description: "Declutter your workspace in style.",
             details: "5-piece set, includes pen holder, tray, sticky note box, and more."
           },
@@ -149,6 +160,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.6,
+            quantity: 0,
             description: "Eye-friendly lighting with adjustable brightness.",
             details: "Touch controls, 3 color modes, USB charging port, foldable design."
           },
@@ -159,6 +171,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.3,
+            quantity: 0,
             description: "Flexible tripod for mobile photography.",
             details: "360° ball head, remote shutter, compatible with all phones."
           },
@@ -169,6 +182,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.5,
+            quantity: 0,
             description: "Compact buds with immersive sound.",
             details: "ANC, 8-hour playtime, fast charging, sweat-proof design."
           },
@@ -179,6 +193,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Electronics",
             rating: 4.4,
+            quantity: 0,
             description: "Charge your devices on the go.",
             details: "Dual USB output, slim design, LED battery indicator."
           },
@@ -189,6 +204,7 @@ export default function Products(){
             image: "/placeholder.svg?height=250&width=250",
             category: "Clothes",
             rating: 4.2,
+            quantity: 0,
             description: "Stylish wallet with multiple card slots.",
             details: "Genuine leather, RFID blocking, 8 card slots + coin pocket."
           },
@@ -199,6 +215,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.6,
+            "quantity": 0,
             "description": "High precision gaming mouse with RGB lighting.",
             "details": "Ergonomic design, 16000 DPI sensor, 6 programmable buttons, ideal for FPS games."
           },
@@ -209,6 +226,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.8,
+            "quantity": 0,
             "description": "Tactile wireless keyboard with RGB lighting.",
             "details": "Customizable keys, Bluetooth and USB-C connectivity, perfect for productivity and gaming."
           },
@@ -219,6 +237,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.5,
+            "quantity": 0,
             "description": "Ultra HD webcam for streaming and conferencing.",
             "details": "4K resolution, dual noise-canceling mics, wide-angle lens, USB plug-and-play."
           },
@@ -229,6 +248,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.7,
+            "quantity": 0,
             "description": "Mesh-back chair with lumbar support.",
             "details": "Adjustable height, headrest, and armrests, promotes good posture for long work sessions."
           },
@@ -239,6 +259,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.3,
+            "quantity": 0,
             "description": "Voice-controlled RGB light strips.",
             "details": "Compatible with Alexa/Google, 16M colors, music sync, app-controlled."
           },
@@ -249,6 +270,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.4,
+            "quantity": 0,
             "description": "Multi-port hub for laptops.",
             "details": "Includes HDMI, USB-A/C, Ethernet, SD card reader; ideal for work-from-home setups."
           },
@@ -259,6 +281,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.8,
+            "quantity": 0,
             "description": "Electric height-adjustable desk.",
             "details": "Programmable presets, smooth motor lift, enhances productivity and posture."
           },
@@ -269,6 +292,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.6,
+            "quantity": 0,
             "description": "Pro-grade mic for streaming and calls.",
             "details": "Cardioid pattern, shock mount, pop filter included, USB plug-and-play."
           },
@@ -279,6 +303,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.4,
+            "quantity": 0,
             "description": "Portable stand for laptops up to 17 inches.",
             "details": "Adjustable angles, aluminum build, improves ergonomics and cooling."
           },
@@ -289,6 +314,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Sports",
             "rating": 4.5,
+            "quantity": 0,
             "description": "All-day fitness and health tracking.",
             "details": "Heart rate, sleep monitoring, waterproof, long battery life, syncs with mobile apps."
           },
@@ -299,6 +325,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.2,
+            "quantity": 0,
             "description": "Matte film reduces reflections on screens.",
             "details": "Scratch-resistant, fingerprint-proof, easy installation for laptops/tablets."
           },
@@ -309,6 +336,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.4,
+            "quantity": 0,
             "description": "Keyless smart lock with app control.",
             "details": "Supports passcodes, remote access, activity logs, integrates with smart home systems."
           },
@@ -319,6 +347,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.3,
+            "quantity": 0,
             "description": "Fast wireless charger with sleek design.",
             "details": "Qi-certified, supports 15W fast charging, anti-slip base, LED status indicator."
           },
@@ -329,6 +358,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.5,
+            "quantity": 0,
             "description": "Compact 10000mAh power bank.",
             "details": "Dual output, USB-C and micro-USB input, LED display, airline safe."
           },
@@ -339,6 +369,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Kitchen Appliances",
             "rating": 4.6,
+            "quantity": 0,
             "description": "Make café-style foam at home.",
             "details": "One-button operation, stainless steel whisk, ideal for lattes and cappuccinos."
           },
@@ -349,6 +380,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.3,
+            "quantity": 0,
             "description": "Compact projector for movies and gaming.",
             "details": "HD resolution, HDMI/USB input, portable design, built-in speakers."
           },
@@ -359,6 +391,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.4,
+            "quantity": 0,
             "description": "Smart surveillance for home security.",
             "details": "1080p recording, motion detection, two-way audio, app access."
           },
@@ -369,6 +402,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.1,
+            "quantity": 0,
             "description": "Bluetooth barcode scanner for POS and inventory.",
             "details": "Supports 1D/2D codes, long battery life, plug-and-play USB receiver."
           },
@@ -379,6 +413,7 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Electronics",
             "rating": 4.4,
+            "quantity": 0,
             "description": "Expand your laptop's connectivity.",
             "details": "4 USB 3.0 ports, compact aluminum body, ideal for accessories and storage."
           },
@@ -389,17 +424,17 @@ export default function Products(){
             "image": "/placeholder.svg?height=250&width=250",
             "category": "Kitchen Appliances",
             "rating": 4.3,
+            "quantity": 0,
             "description": "Portable vacuum cleaner for home and car.",
             "details": "Rechargeable battery, HEPA filter, lightweight, great for quick cleanups."
           }
         ]);
       };
-      load();
+      load(); 
     }, []);
 
 
     useEffect(() => {
-      console.log(products.slice(0,5));
       setDisplayProducts(products);
     }, [products]);
     
@@ -539,9 +574,7 @@ export default function Products(){
                 ))
               ) : displayProducts.length > 0 ? (
                 displayProducts.slice(0, displayCount).map((product) => (
-                  <Link key={product.id} href={`/products/${product.id}`}>
-                    <ProductCard name={product.name} image={product.image} price={product.price}/>
-                  </Link>
+                  <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={product.price} quantity={product.quantity}/>
                 ))
               ) : (
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">

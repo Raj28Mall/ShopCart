@@ -436,9 +436,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 gap-6 my-8 px-5 md:px-10 xl:px-25 w-[100vw]">
             {((products.sort((a,b)=>b.rating-a.rating)).slice(0,15)).map((product) => (
-              <Link key={product.id} href={`/products/${product.id}`}>
-                <ProductCard name={product.name} image={product.image} price={product.price}/>
-              </Link>
+              <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={product.price} quantity={0}/>
             ))}
           </div>
 

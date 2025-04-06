@@ -9,7 +9,7 @@ interface Product {
   category: string
   description: string
   rating: number
-  variant?: string
+  quantity: number
   // reviews: number
   details: string
 }
