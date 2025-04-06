@@ -4,8 +4,8 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2, Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog"
+import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2, Loader2, Check, Download, Home, Package, } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
@@ -100,8 +100,15 @@ export default function Cart(){
     ]);
     const [couponCode, setCouponCode]=useState<string>("");
     const [loading, setLoading]=useState<boolean>(false);
+    const [isOpen, setIsOpen]=useState<boolean>(false);
+    const [paymentDone, setPaymentDone]= useState<boolean>(false);
     const router=useRouter();
-
+    const orderNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+    const orderDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });  
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = subtotal>0 ? 20.00 : 0;
     const tax = subtotal * 0.07;
@@ -115,20 +122,30 @@ export default function Cart(){
         return;
       } 
       setCartItems(cartItems.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)))
-    }
+    };
   
     const removeItem = (id: number) => {
       setCartItems(cartItems.filter((item) => item.id !== id))
-    }
+    };
 
     const handleSale = async () => {
+      if (cartItems.length === 0) {
+        toast.error("Your cart is empty");
+        return;
+      }
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      toast.success("Purchase successful");
-      setCartItems([]);
+      await new Promise((resolve) => setTimeout(resolve, 2000)); //simulate payment processing
+      setPaymentDone(true);
       setLoading(false);
-      router.push('/');
-    }
+      handleOpenChange(true);
+      // await new Promise((resolve) => setTimeout(resolve, 1000));    //add this to clear cart once payment is done
+      // setCartItems([]); 
+    };
+
+    const handleOpenChange = (open: boolean) => {
+      setIsOpen(open);
+    };
+
     return(
         <div className="overflow-x-hidden min-h-screen">
             <Navbar/>
@@ -252,11 +269,11 @@ export default function Cart(){
                     </div>
                   </div>
 
-                  <Button variant={'outline'} className="w-full mt-6 bg-black text-white hover:bg-slate-800" size="lg" onClick={handleSale} disabled={loading}>
-                  {loading?  <Loader2 className="animate-spin w-5 h-5" /> : "Buy Now"}
+                  <Button variant={paymentDone?'ghost':'outline'} className={paymentDone?"w-full mt-6 text-white hover:bg-slate-800" :"w-full mt-6 bg-black text-white hover:bg-slate-800"} size="lg" onClick={handleSale} disabled={loading || paymentDone}>
+                  {loading ? <Loader2 className="animate-spin w-5 h-5" /> : paymentDone ? <div className="flex justify-center items-center rounded-full bg-emerald-100 p-3 w-fit"><Check className="!h-6 !w-6 text-center text-green-500 mx-1" size={1} /><span className="text-black">Payment Completed</span></div> : "Buy Now"}
                   </Button>
 
-                  <div className="mt-6 space-y-4">
+                  <div className="mt-6 space-y-4" hidden={paymentDone}>
                     <div className="relative">
                       <div className="absolute inset-0 flex items-center">
                         <span className="w-full border-t" />
@@ -266,7 +283,7 @@ export default function Cart(){
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2" hidden={paymentDone}>
                       <div className="flex items-center">
                         <Input placeholder="Coupon code" className="rounded-r-none" value={couponCode}
                          onChange={(e: React.ChangeEvent<HTMLInputElement>)=>setCouponCode(e.target.value)}/>
@@ -288,10 +305,94 @@ export default function Cart(){
           <h2 className="text-2xl font-semibold mb-2">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">Looks like you haven&apos;t added anything to your cart yet.</p>
           <Link href="/products">
-            <Button size="lg">Start Shopping</Button>
+            <Button variant={'outline'} size="lg">Start Shopping</Button>
           </Link>
         </div>
         )}
+
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+          <DialogContent className="sm:max-w-md md:max-w-lg bg-white h-[80vh] overflow-y-scroll">
+            <DialogHeader className="flex flex-col items-center text-center">
+              <div className="rounded-full bg-emerald-100 p-3 mb-4">
+                <Check className="h-8 w-8 text-emerald-600" />
+              </div>
+              <DialogTitle className="text-2xl">Payment Successful!</DialogTitle>
+              <DialogDescription>Your order has been placed and will be processed soon.</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Order Number</p>
+                  <p className="font-medium">{orderNumber}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-muted-foreground">Date</p>
+                  <p className="font-medium">{orderDate}</p>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <h4 className="font-medium">Order Summary</h4>
+                <div className="max-h-[200px] overflow-auto space-y-3 pr-2">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <div className="relative h-14 w-14 rounded-md overflow-hidden border flex-shrink-0">
+                        <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{item.name}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {item.quantity} × ${item.price.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Total Amount</span>
+                <span className="font-bold text-lg">${total.toFixed(2)}</span>
+              </div>
+
+              <div className="bg-muted p-3 rounded-lg text-sm">
+                <div className="flex items-start gap-2">
+                  <Package className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+                  <p>
+                    Your order will be processed and shipped within 1-2 days. You will receive a notification once your order is on its way
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="flex flex-col sm:flex-row gap-2">
+              <Button variant="outline" className="sm:flex-1" onClick={() => handleOpenChange(false)} asChild>
+                <Link href="/">
+                  <Home className="h-4 w-4 mr-2" />
+                  Continue Shopping
+                </Link>
+              </Button>
+              <Button variant="outline" className="sm:flex-1" onClick={() => handleOpenChange(false)} asChild>
+                {/* Add actual route to accounts/orders */}
+                <Link href="/comingSoon">      
+                  <Download  className="h-4 w-4 mr-2" />
+                  View Order Details
+                </Link>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         </div>
+
+        
     );
 }

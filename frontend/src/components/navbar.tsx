@@ -35,7 +35,7 @@ export const Navbar=()=>{
                         </Button>
                     </Link>
                 ) : (
-                    <div className='flex flex-row justify-between items-center space-x-4 '>
+                    <div className='flex flex-row justify-between items-center space-x-10 lg:space-x-10 '>
                         <Link href="/cart" className='flex flex-row space-x-1 h-full'>
                             <ShoppingCart className="h-6 w-6" />
                             <h3 className='text-sm'>Cart</h3>

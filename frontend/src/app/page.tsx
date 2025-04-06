@@ -401,7 +401,7 @@ export default function Home() {
   
 
   return (
-    <div className="flex flex-col min-h-screen max-w-screen bg-slate-100 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen max-w-screen bg-white overflow-x-hidden">
       <Navbar />
       <AspectRatio className="" ratio={1920/650}>
         <Image src="/hero.png" alt="Hero Image" fill priority={true}/>

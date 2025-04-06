@@ -40,7 +40,7 @@ export default function Products(){
 
     useEffect(() => {
       const load = async ()=>{
-        await sleep(500);
+        await sleep(1000);
         setLoading(false);
         setProducts([
           {
@@ -498,7 +498,7 @@ export default function Products(){
 
     
     return(
-      <div className='overflow-x-hidden min-h-screen'>
+      <div className='overflow-x-hidden min-h-screen bg-white'>
         <Navbar/> 
         <div className='flex flex-row justify-between items-center px-12 py-4 mt-5 mx-5 w-[100vw] overflow-x-hidden'>
             <h1 className='text-3xl font-bold'>All Products</h1>

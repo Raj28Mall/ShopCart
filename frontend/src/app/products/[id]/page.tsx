@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState, useEffect, use } from 'react';
 import { useProductStore } from '@/store/productStore';
+import { Navbar } from '@/components/navbar';
 
 export default function ProductPage({ params }: { params: Promise<{ id: number }> }) {
     const [loading, setLoading] = useState<boolean>(false);
@@ -9,6 +10,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: number }
     const product= useProductStore((state) => state.products.find((product) => product.id === id));
 
     return(
-        <div>Hello you are on product ID page</div>
+        <div className='overflow-x-hidden min-h-screen'>
+            <Navbar/>
+        </div>
     );
 }
