@@ -1,14 +1,28 @@
 "use client";
 import * as React from 'react';
 import { useState } from 'react';
-import Link from "next/link"
-import { Search, ShoppingCart, User } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Search, ShoppingCart, User } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useProductStore } from '@/store/productStore';
+import { useRouter } from 'next/navigation';
 
 export const Navbar=()=>{
     const [isLogged, setIsLogged] = useState<boolean>(true);
+    const searchQuery= useProductStore((state)=>state.searchQuery);
+    const setSearchQuery= useProductStore((state)=>state.setSearchQuery);
+    const router=useRouter();
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            router.push("/products");
+        }
+    };
+    const handleClick=()=>{
+        router.push("/products");
+    }
     return(
         <div className="sticky z-50 top-0 w-full font-sans border-b bg-slate-100 flex flex-row py-2 justify-between">
             <div className='flex flex-row justify-between items-center space-x-4'>
@@ -22,8 +36,8 @@ export const Navbar=()=>{
                 </Link>
 
                 <div className="flex flex-row justify-center items-center space-x-4">
-                    <Input id='search' className="max-w-md hidden md:block md:w-96 " placeholder="Search for products" />
-                    <Label htmlFor='search' className='cursor-pointer'><Search /></Label>
+                    <Input value={searchQuery} onKeyDown={handleKeyDown} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>setSearchQuery(e.target.value)} id='search' className="max-w-md hidden md:block md:w-96 " placeholder="Search for products" />
+                    <Label htmlFor='search' className='cursor-pointer' onClick={handleClick}><Search /></Label>
                 </div>
             </div>
 

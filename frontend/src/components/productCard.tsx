@@ -33,7 +33,7 @@ export const ProductCard = ({ id,  name, image, price, quantity }: ProductCardPr
             <CardContent className="flex flex-col px-4">
                 <h3 className="font-semibold h-12 overflow-hidden text-ellipsis cursor-text" onClick={(e)=>e.stopPropagation()}>{name}</h3>
                 <div className="flex flex-col 2xl:flex-row items-center justify-between mt-2 xl:mt-0">
-                    <span className="font-bold cursor-text" onClick={(e)=> e.stopPropagation()}>₹{price.toFixed(2)}</span>
+                    <span className="font-bold cursor-text py-2" onClick={(e)=> e.stopPropagation()}>₹{price.toFixed(2)}</span>
                     {qty <= 0 ? (
                         <Button size="sm" variant="outline" onClick={(e : React.MouseEvent<HTMLButtonElement>) => {e.stopPropagation(); setQty(1);}}>
                             <ShoppingBag className="h-4 w-4 mr-2" />

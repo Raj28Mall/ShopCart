@@ -474,7 +474,6 @@ export default function Home() {
       setProducts(products);
     }, [products]);
     
-  
 
   return (
     <div className="flex flex-col min-h-screen max-w-screen bg-white overflow-x-hidden">

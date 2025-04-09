@@ -17,6 +17,8 @@ interface Product {
 interface ProductStore {
   products: Product[]
   setProducts: (products: Product[]) => void
+  searchQuery: string
+  setSearchQuery: (query: string) => void
 }
 
 export const useProductStore = create<ProductStore>()(
@@ -24,9 +26,11 @@ export const useProductStore = create<ProductStore>()(
     (set) => ({
       products: [],
       setProducts: (products: Product[]) => set({ products }),
+      searchQuery: '',
+      setSearchQuery: (query: string) => set({ searchQuery: query }),
     }),
     {
-      name: 'product-store', //localstorage key
+      name: 'product-store', // localStorage key
     }
   )
 )

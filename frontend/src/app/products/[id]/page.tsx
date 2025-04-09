@@ -51,7 +51,7 @@ export default function ProductPage() {
       <div className="container px-4 py-8 md:px-6 md:py-10">
         <div className="-mt-20 flex flex-col lg:flex-row p-8 justify-around items-center">
           <div className="w-1/2 lg:w-[70%] max-w-xl mx-auto lg:ml-10">
-            <div className="aspect-[1/1] relative rounded-lg overflow-hidden border">
+            <div className="sticky top-20 aspect-[1/1] rounded-lg overflow-hidden border">
               <Image
                 src={product.image || "/placeholder.svg"}
                 alt={product.name}

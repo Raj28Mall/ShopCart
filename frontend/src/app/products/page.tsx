@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import * as React from 'react';
+import Fuse from 'fuse.js';
 import { useState, useEffect } from 'react';
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
@@ -35,11 +36,11 @@ const SORT_BY=[ {name: "Rating", value:"rating"}, {name:"Newest", value:"newest"
 export default function Products(){
     const [sortOption, setSortOption] = useState<string>();
     const [displayCount, setDisplayCount]=useState<number>(15);
-    const products= useProductStore((state) => state.products);
-    const setProducts= useProductStore((state) => state.setProducts);
     const [displayProducts, setDisplayProducts]= useState<Product[]>([]);
     const [loading, setLoading]= useState<boolean>(true);
-
+    const products= useProductStore((state) => state.products);
+    const setProducts= useProductStore((state) => state.setProducts);
+    const searchQuery= useProductStore((state) => state.searchQuery);
     useEffect(() => {
       const load = async ()=>{
         await sleep(1000);
@@ -509,29 +510,36 @@ export default function Products(){
 
 
     useEffect(() => {
-      let updatedProducts= [];
-      updatedProducts = products.filter((product) => {
-        if (selected.length === 0) return true; // no filters selected, show all products
-        return selected.includes(product.category);
-      });
-      
-      if( !sortOption ){
-        setDisplayProducts(updatedProducts);
-        return;
+      let updatedProducts = [...products];
+    
+      // Semantic Search
+      if (searchQuery.trim() !== '') {
+        const fuse = new Fuse(updatedProducts, {
+          keys: ['name', 'category', 'shortDescription', 'longDescription'],
+          threshold: 0.3,
+        });
+        const results = fuse.search(searchQuery);
+        updatedProducts = results.map((result) => result.item);
       }
-
+    
+      if (selected.length > 0) {
+        updatedProducts = updatedProducts.filter((product) =>
+          selected.includes(product.category)
+        );
+      }
+  
       if (sortOption === 'price-low') {
-        setDisplayProducts(updatedProducts.sort((a, b) => a.price - b.price));
+        updatedProducts.sort((a, b) => a.price - b.price);
       } else if (sortOption === 'price-high') {
-        setDisplayProducts(updatedProducts.sort((a, b) => b.price - a.price));
+        updatedProducts.sort((a, b) => b.price - a.price);
       } else if (sortOption === 'rating') {
-        setDisplayProducts(updatedProducts.sort((a, b) => b.rating - a.rating));
+        updatedProducts.sort((a, b) => b.rating - a.rating);
+      } else if (sortOption === 'newest') {
+        updatedProducts.sort((a, b) => b.id - a.id);
       }
-      else if (sortOption === 'newest') {
-        setDisplayProducts(updatedProducts.sort((a, b) => b.id - a.id));
-      }
-
-    }, [selected, products, sortOption]);
+    
+      setDisplayProducts(updatedProducts);
+    }, [selected, products, sortOption, searchQuery]);
 
     
     return(
