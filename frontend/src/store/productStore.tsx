@@ -7,11 +7,11 @@ interface Product {
   price: number
   image: string
   category: string
-  description: string
+  shortDescription: string
+  longDescription: string
   rating: number
   quantity: number
-  // reviews: number
-  details: string
+  details: string[]
 }
 
 interface ProductStore {

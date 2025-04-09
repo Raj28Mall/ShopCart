@@ -1,6 +1,6 @@
 "use client";
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from "next/link"
 import { Search, ShoppingCart, User } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -35,12 +35,12 @@ export const Navbar=()=>{
                         </Button>
                     </Link>
                 ) : (
-                    <div className='flex flex-row justify-between items-center space-x-10 lg:space-x-10 '>
+                    <div className='flex flex-row justify-between items-center space-x-10 '>
                         <Link href="/cart" className='flex flex-row space-x-1 h-full'>
                             <ShoppingCart className="h-6 w-6" />
                             <h3 className='text-sm'>Cart</h3>
                         </Link>
-                        <Link href="/" className='flex flex-row space-x-1 h-full'>
+                        <Link href="/comingSoon" className='flex flex-row space-x-1 h-full'>
                             <User className="h-6 w-6" />
                             <h3 className='text-sm'>Profile</h3>
                         </Link>

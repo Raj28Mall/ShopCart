@@ -65,7 +65,7 @@ export default function SignupPage() {
                 </div>
             </form>
 
-              <Button className="w-full bg-slate-600" onClick={handleSignup} disabled={loading}>
+              <Button className="w-full bg-slate-500 text-white" onClick={handleSignup} disabled={loading}>
                 {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Create Account"}
               </Button>
 

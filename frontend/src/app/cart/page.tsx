@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Navbar } from "@/components/navbar";
 import * as React from 'react';
@@ -346,9 +347,9 @@ export default function Cart(){
                         <p className="font-medium text-sm truncate">{item.name}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-sm font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {item.quantity} × ${item.price.toFixed(2)}
+                          {item.quantity} × ₹{item.price.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -360,7 +361,7 @@ export default function Cart(){
 
               <div className="flex justify-between items-center">
                 <span className="font-medium">Total Amount</span>
-                <span className="font-bold text-lg">${total.toFixed(2)}</span>
+                <span className="font-bold text-lg">₹{total.toFixed(2)}</span>
               </div>
 
               <div className="bg-muted p-3 rounded-lg text-sm">
