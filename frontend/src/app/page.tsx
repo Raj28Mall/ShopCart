@@ -10,37 +10,40 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/productCard";
 import { useProductStore } from "@/store/productStore";
 
+const CATEGORY_COUNT=6;
+const PRODUCT_COUNT=10;
+
 export default function Home() {
   const categories = [
     {
       id: 1,
       name: "Clothing",
       slug: "clothing",
-      image: "/placeholder.svg?height=200&width=400",
+      image: "/products/clothes/clothing.jpg",
     },
     {
       id: 2,
       name: "Electronics",
       slug: "electronics",
-      image: "/placeholder.svg?height=200&width=400",
+      image: "/products/electronics/electronics.jpg",
     },
     {
       id: 3,
       name: "Home & Kitchen",
       slug: "home-kitchen",
-      image: "/placeholder.svg?height=200&width=400",
+      image: "/products/kitchen/kitchen.avif",
     },
     {
       id: 4,
       name: "Sports",
       slug: "sports",
-      image: "/placeholder.svg?height=200&width=400",
+      image: "/products/sports/sports.avif",
     },
     {
       id: 5,
       name: "Beauty",
       slug: "beauty",
-      image: "/placeholder.svg?height=200&width=400",
+      image: "/products/beauty/beauty.jpeg",
     },
   ];
   
@@ -64,7 +67,7 @@ export default function Home() {
       id: 2,
       name: "Wireless Headphones",
       price: 129.99,
-      image: "/headphones.webp",
+      image: "/products/electronics/headphones.webp",
       category: "Electronics",
       rating: 4.6,
       quantity: 0,
@@ -100,7 +103,7 @@ export default function Home() {
       id: 5,
       name: "Bluetooth Speaker",
       price: 49.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/electronics/bluetooth_speaker.webp",
       category: "Electronics",
       rating: 4.5,
       quantity: 0,
@@ -124,7 +127,7 @@ export default function Home() {
       id: 7,
       name: "Stainless Steel Water Bottle",
       price: 24.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/kitchen/steel_bottle.webp",
       category: "Kitchen Appliances",
       rating: 4.7,
       quantity: 0,
@@ -172,7 +175,7 @@ export default function Home() {
       id: 11,
       name: "LED Desk Lamp",
       price: 34.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/kitchen/desk_lamp.jpg",
       category: "Electronics",
       rating: 4.6,
       quantity: 0,
@@ -232,7 +235,7 @@ export default function Home() {
       id: 16,
       name: "Gaming Mouse",
       price: 59.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/electronics/gaming_mouse.webp",
       category: "Electronics",
       rating: 4.6,
       quantity: 0,
@@ -244,7 +247,7 @@ export default function Home() {
       id: 17,
       name: "Wireless Mechanical Keyboard",
       price: 109.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/electronics/wireless_keyboard.jpg",
       category: "Electronics",
       rating: 4.8,
       quantity: 0,
@@ -268,7 +271,7 @@ export default function Home() {
       id: 19,
       name: "Ergonomic Office Chair",
       price: 249.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/kitchen/office_chair.jpg",
       category: "Electronics",
       rating: 4.7,
       quantity: 0,
@@ -304,7 +307,7 @@ export default function Home() {
       id: 22,
       name: "Adjustable Standing Desk",
       price: 399.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/electronics/standing_desk.jpg",
       category: "Electronics",
       rating: 4.8,
       quantity: 0,
@@ -316,7 +319,7 @@ export default function Home() {
       id: 23,
       name: "Noise-Isolating Microphone",
       price: 119.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/electronics/microphone.png",
       category: "Electronics",
       rating: 4.6,
       quantity: 0,
@@ -400,7 +403,7 @@ export default function Home() {
       id: 30,
       name: "Electric Milk Frother",
       price: 19.99,
-      image: "/placeholder.svg?height=250&width=250",
+      image: "/products/kitchen/milk_frother.jpeg",
       category: "Kitchen Appliances",
       rating: 4.6,
       quantity: 0,
@@ -485,7 +488,7 @@ export default function Home() {
         <div className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl pb-3 ">Shop by Category</div>
           <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed px-4">Check out our most popular items handpicked for you</p>
           <div className="grid grid-cols-2 gap-12 mt-8 w-[70vw] lg:w-[100vw] lg:flex lg:flex-wrap lg:justify-center px-3 lg:px-15 mx-auto">
-            {(categories.slice(0,6)).map((category) => ( // to limit to 6
+            {(categories.slice(0,CATEGORY_COUNT)).map((category) => ( // to limit to 6
               <Link key={category.id} href={`/products?category=${category.slug}`}>
                 <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 w-[21vw]">
                   <div className="relative h-[200px] w-full">
@@ -497,7 +500,7 @@ export default function Home() {
                       />
                   </div>
                   <CardContent className="px-4">
-                    <h3 className="text-xl font-semibold h-10">{category.name}</h3>
+                    <h3 className="text-xl font-semibold h-7">{category.name}</h3>
                   </CardContent>
                 </Card>
               </Link>
@@ -510,7 +513,7 @@ export default function Home() {
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">Choose from our most popular products</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 gap-6 my-8 px-5 md:px-10 xl:px-25 w-[100vw]">
-            {((products.sort((a,b)=>b.rating-a.rating)).slice(0,15)).map((product) => (
+            {((products.sort((a,b)=>b.rating-a.rating)).slice(0,PRODUCT_COUNT)).map((product) => (
               <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={product.price} quantity={product.quantity}/>
             ))}
           </div>

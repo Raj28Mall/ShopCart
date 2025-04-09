@@ -20,11 +20,12 @@ interface CartItem{
   price: number
   image: string
   category: string
-  description: string
+  shortDescription: string
+  longDescription: string
   rating: number
   quantity: number
   // reviews: number
-  details: string
+  details: string[]
 }
 
 export default function Cart(){
@@ -34,71 +35,41 @@ export default function Cart(){
     const [cartItems, setCartItems] = useState<CartItem[]>([
       {
         id: 1,
-        name: "Premium Cotton T-Shirt",
-        price: 29.99,
-        image: "/placeholder.svg?height=250&width=250",
-        category: "Clothes",
-        rating: 4.4,
-        description: "Soft, breathable cotton tee for everyday wear.",
-        details: "Made from 100% premium cotton. Machine washable. Available in multiple colors.",
-        quantity: 7
+        name: "Smart LED Light Strips",
+        price: 34.99,
+        image: "/products/electronics/led_strips.jpg",
+        category: "Electronics",
+        rating: 4.3,
+        quantity: 3,
+        shortDescription: "Customizable LED strips with app control and voice command support.",
+        longDescription: "Transform any space with our Smart LED Light Strips that combine sophisticated illumination technology with intuitive controls. Each strip contains individually addressable RGB LEDs capable of displaying 16 million distinct colors, allowing you to precisely match existing décor or create dramatic contrasts. The advanced controller interprets audio input through frequency analysis algorithms, synchronizing light patterns with your music. The modular design allows you to connect multiple strips seamlessly while maintaining perfect color uniformity. The smartphone app provides unprecedented control from simple color selection to complex dynamic scenes simulating natural phenomena like ocean waves or sunrise progressions.",
+        details: ["Compatible with Alexa/Google", "16M colors", "Music sync", "App-controlled"]
       },
       {
         id: 2,
-        name: "Wireless Headphones",
-        price: 129.99,
-        image: "/placeholder.svg?height=250&width=250",
+        name: "Ergonomic Office Chair",
+        price: 249.99,
+        image: "/products/kitchen/office_chair.jpg",
         category: "Electronics",
-        rating: 4.6,
-        description: "High-fidelity sound with noise isolation.",
-        details: "Bluetooth 5.0, 20-hour battery, foldable design, built-in mic for calls.",
-        quantity: 3
+        rating: 4.7,
+        quantity: 2,
+        shortDescription: "Adjustable office chair designed for comfort during long work hours.",
+        longDescription: "Transform your work experience with our Ergonomic Office Chair, developed with orthopedic specialists. The dynamically adaptive lumbar support automatically adjusts to your movements, providing continuous support for proper spinal alignment. The breathable mesh back features varying tension zones mapped to different areas of your back. The waterfall-edge seat cushion utilizes high-resilience foam with temperature-responsive properties, distributing weight evenly to eliminate pressure points. The precision-engineered synchronous tilt mechanism maintains ideal angles between torso and legs throughout different recline positions, allowing posture changes throughout the day to reduce muscle fatigue.",
+        details: ["Adjustable height", "Headrest", "And armrests", "Promotes good posture for long work sessions"]
       },
       {
         id: 3,
-        name: "Ceramic Coffee Mug",
-        price: 19.99,
-        image: "/placeholder.svg?height=250&width=250",
-        category: "Kitchen Appliances",
-        rating: 4.2,
-        description: "Minimalist mug for hot and cold beverages.",
-        details: "12oz capacity, microwave and dishwasher safe. Matte ceramic finish.",
-        quantity: 9
-      },
-      {
-        id: 4,
-        name: "Eco-Friendly Notebook",
-        price: 9.99,
-        image: "/placeholder.svg?height=250&width=250",
+        name: "Wireless Mechanical Keyboard",
+        price: 109.99,
+        image: "/products/electronics/wireless_keyboard.jpg",
         category: "Electronics",
-        rating: 4.1,
-        description: "Recyclable notebook with smooth pages.",
-        details: "80 ruled pages. Made with recycled paper. A5 size.",
-        quantity: 2
+        rating: 4.8,
+        quantity: 5,
+        shortDescription: "Premium wireless keyboard with tactile mechanical switches.",
+        longDescription: "Experience typing perfection with our Wireless Mechanical Keyboard. Each key houses an individual German-manufactured switch with gold-plated contact points providing consistent actuation force and satisfying tactile feedback. The keycaps are crafted from double-shot PBT plastic that will never fade even after years of use, with a subtly textured surface for excellent finger positioning. The aircraft-grade aluminum top plate provides exceptional rigidity that eliminates flex and creaking. Advanced Bluetooth implementation features adaptive frequency hopping to avoid interference, while 1000Hz polling rate delivers wired-like responsiveness for demanding gamers.",
+        details: ["Customizable keys", "Bluetooth and USB-C connectivity", "Perfect for productivity and gaming"]
       },
-      {
-        id: 5,
-        name: "Bluetooth Speaker",
-        price: 49.99,
-        image: "/placeholder.svg?height=250&width=250",
-        category: "Electronics",
-        rating: 4.5,
-        description: "Loud, portable sound with deep bass.",
-        details: "10W output, water-resistant, 12-hour playtime, supports TWS pairing.",
-        quantity: 6
-      },
-      {
-        id: 6,
-        name: "Running Shoes",
-        price: 89.99,
-        image: "/placeholder.svg?height=250&width=250",
-        category: "Sports",
-        rating: 4.3,
-        description: "Lightweight and breathable athletic shoes.",
-        details: "Mesh upper, EVA sole, arch support. Ideal for daily runs and training.",
-        quantity: 10
-      }
-    ]);
+  ]);
     const [couponCode, setCouponCode]=useState<string>("");
     const [loading, setLoading]=useState<boolean>(false);
     const [isOpen, setIsOpen]=useState<boolean>(false);
