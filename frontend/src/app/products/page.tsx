@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import { useProductStore } from '@/store/productStore';
 import { ProductCard } from '@/components/productCard';
+import { useSearchStore } from '@/store/searchStore';
 
 interface Product {
   id: number
@@ -40,7 +41,7 @@ export default function Products(){
     const [loading, setLoading]= useState<boolean>(true);
     const products= useProductStore((state) => state.products);
     const setProducts= useProductStore((state) => state.setProducts);
-    const searchQuery= useProductStore((state) => state.searchQuery);
+    const searchQuery= useSearchStore((state) => state.searchQuery);
     useEffect(() => {
       const load = async ()=>{
         await sleep(1000);
