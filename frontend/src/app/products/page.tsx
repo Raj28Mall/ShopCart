@@ -550,7 +550,7 @@ export default function Products(){
 
     
     return(
-      <div className='overflow-x-hidden min-h-screen bg-white'>
+      <div className='overflow-x-hidden min-h-screen bg-slate-100'>
         <Navbar/> 
         <div className='flex flex-row justify-between items-center px-12 py-4 mt-5 mx-5 w-[100vw] overflow-x-hidden'>
             <h1 className='text-3xl font-bold'>All Products</h1>
@@ -570,7 +570,7 @@ export default function Products(){
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-[180px] flex justify-between items-center px-4 py-2 text-sm font-medium"
+                    className="w-[180px] bg-white flex justify-between items-center px-4 py-2 text-sm font-medium"
                   >
                     <span>{selected[0]? selected[0] : "Filter"}</span>
                     <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
@@ -591,7 +591,7 @@ export default function Products(){
                 <DropdownMenuTrigger asChild>
                   <Button
                   variant="outline"
-                  className="w-[180px] flex justify-between items-center px-4 py-2 text-sm font-medium"
+                  className="w-[180px] bg-white flex justify-between items-center px-4 py-2 text-sm font-medium"
                   >
                   <span>{sortOption ? SORT_BY.find(option => option.value === sortOption)?.name : 'Sort by'}</span>
                   <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />

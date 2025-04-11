@@ -54,7 +54,7 @@ export const Navbar=()=>{
                             <ShoppingCart className="h-6 w-6" />
                             <h3 className='text-sm'>Cart</h3>
                         </Button>
-                        <Button onClick={()=>{router.push('/comingSoon')}} variant={'ghost'} className='flex flex-row space-x-1 h-full'>
+                        <Button onClick={()=>{router.push('/account')}} variant={'ghost'} className='flex flex-row space-x-1 h-full'>
                             <User className="h-6 w-6" />
                             <h3 className='text-sm'>Profile</h3>
                         </Button>
