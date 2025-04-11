@@ -145,12 +145,12 @@ export default function ProductPage() {
             
             <div className="w-full">
               <Tabs defaultValue="description" className="mt-8 w-full">
-                <TabsList className="grid grid-cols-2 w-full bg-gray-200 dark:bg-gray-800 rounded-full">
+                <TabsList className="grid grid-cols-2 w-full bg-gray-200 rounded-full">
                   <TabsTrigger
                     value="description"
                     className="text-sm font-medium rounded-full transition-all
-                              data-[state=active]:bg-white data-[state=active]:dark:bg-gray-900 
-                              data-[state=active]:text-black data-[state=active]:dark:text-white
+                              data-[state=active]:bg-white 
+                              data-[state=active]:text-black
                               data-[state=active]:shadow-none"
                   >
                     Description
@@ -158,8 +158,8 @@ export default function ProductPage() {
                   <TabsTrigger
                     value="details"
                     className="text-sm font-medium rounded-full transition-all
-                              data-[state=active]:bg-white data-[state=active]:dark:bg-gray-900 
-                              data-[state=active]:text-black data-[state=active]:dark:text-white
+                              data-[state=active]:bg-white 
+                              data-[state=active]:text-black
                               data-[state=active]:shadow-none"
                   >
                     Details

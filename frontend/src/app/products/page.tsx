@@ -10,11 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, ShoppingBag, ArrowDown, ChevronDown, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from '@/components/ui/checkbox';
-import { Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioItem, DropdownMenuTrigger, DropdownMenuRadioGroup, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
+import { RadioGroupItem } from '@/components/ui/radio-group';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useProductStore } from '@/store/productStore';
 import { ProductCard } from '@/components/productCard';
 import { useSearchStore } from '@/store/searchStore';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Product {
   id: number
@@ -39,9 +42,11 @@ export default function Products(){
     const [displayCount, setDisplayCount]=useState<number>(15);
     const [displayProducts, setDisplayProducts]= useState<Product[]>([]);
     const [loading, setLoading]= useState<boolean>(true);
+    const [imagesLoaded, setImagesLoaded]= useState<number>(0);
     const products= useProductStore((state) => state.products);
     const setProducts= useProductStore((state) => state.setProducts);
     const searchQuery= useSearchStore((state) => state.searchQuery);
+    const totalImages=displayProducts.length;
     useEffect(() => {
       const load = async ()=>{
         await sleep(1000);
@@ -516,7 +521,7 @@ export default function Products(){
       // Semantic Search
       if (searchQuery.trim() !== '') {
         const fuse = new Fuse(updatedProducts, {
-          keys: ['name', 'category', 'shortDescription', 'longDescription'],
+          keys: ['name', 'category', 'shortDescription'],
           threshold: 0.3,
         });
         const results = fuse.search(searchQuery);
@@ -560,75 +565,74 @@ export default function Products(){
                 ) : null}
             </div>
             <div className='flex flex-row space-x-2'>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    className="w-[180px] flex flex-row justify-between items-center px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100"
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-[180px] flex justify-between items-center px-4 py-2 text-sm font-medium"
                   >
-                    <span>Filters</span>
-                    <ChevronDown className="text-gray-500" />
+                    <span>{selected[0]? selected[0] : "Filter"}</span>
+                    <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="bg-white w-fit rounded-md border border-gray-200 shadow-md">
-                  <div className="flex flex-col gap-2 p-2">
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent className="w-48 bg-white flex flex-col gap-1 p-2">
                     {FILTERS.map((option) => (
                       <label key={option} className="flex items-center gap-2 text-sm text-gray-700">
                         <Checkbox checked={selected.includes(option)} onCheckedChange={() => toggleSelection(option)} />
                         {option}
                       </label>  
                     ))}
-                  </div>
-                </PopoverContent>
-            </Popover>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            <Select value={sortOption} onValueChange={setSortOption}>
-              <SelectTrigger className="w-[180px] px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border border-gray-200 rounded-md shadow-md">
-                {SORT_BY.map((option) => (
-                  <SelectItem key={option.value} className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value={option.value} onClick={()=> setSortOption(option.value)}>
-                    {option.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={sortOption} onValueChange={setSortOption}>
+                <SelectTrigger className="w-[180px] px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-200 rounded-md shadow-md">
+                  {SORT_BY.map((option) => (
+                    <SelectItem key={option.value} className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value={option.value} onClick={()=> setSortOption(option.value)}>
+                      {option.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
         </div>
-          <div className="flex flex-col justify-center items-center font-sans overflow-x-hidden">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 gap-6 my-8 px-5 md:px-10 xl:px-25 w-[100vw] ">
-              {loading ? (
-                Array.from({ length: displayCount }).map((_, i) => (
-                  <Card key={i} className="overflow-hidden animate-pulse pt-0">
-                    <div className="relative h-[250px] w-full bg-gray-200">
-                    <Image
-                          src={"/placeholder.svg"}
-                          alt={"Loading..."}
-                          fill
-                          className="object-cover"
-                        />
-                    </div>
-                    <CardContent className="px-4">
-                      <div className="h-6 bg-gray-300 rounded mb-2" />
-                      <div className="flex justify-between items-center mt-2">
-                        <div className="h-4 w-16 bg-gray-300 rounded" />
-                        <div className="h-8 w-24 bg-gray-300 rounded" />
+            <div className="flex flex-col justify-center items-center font-sans overflow-x-hidden">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 gap-6 my-8 px-5 md:px-10 xl:px-25 w-[100vw] ">
+                {loading ? (
+                  Array.from({ length: displayCount }).map((_, i) => (
+                    <Card key={i} className="overflow-hidden animate-pulse pt-0">
+                      <div className="relative h-[250px] w-full bg-gray-200">
+                      <Image
+                            src={"/placeholder.svg"}
+                            alt={"Loading..."}
+                            fill
+                            className="object-cover"
+                          />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : displayProducts.length > 0 ? (
-                displayProducts.slice(0, displayCount).map((product) => (
-                  <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={product.price} quantity={product.quantity}/>
-                ))
-              ) : (
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                  <p className="text-3xl font-bold text-gray-700 animate-pulse">🚧 Coming Soon!</p>
-                  <p className="text-sm text-gray-500 mt-2">We&apos;ve got something amazing coming for you!</p>
-                </div>
-              )}
-          </div>
+                      <CardContent className="px-4">
+                        <div className="h-6 bg-gray-300 rounded mb-2" />
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="h-4 w-16 bg-gray-300 rounded" />
+                          <div className="h-8 w-24 bg-gray-300 rounded" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : displayProducts.length > 0 ? (
+                  displayProducts.slice(0, displayCount).map((product) => (
+                    <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={product.price} quantity={product.quantity}/>
+                  ))
+                ) : (
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                    <p className="text-3xl font-bold text-gray-700 animate-pulse">🚧 Coming Soon!</p>
+                    <p className="text-sm text-gray-500 mt-2">We&apos;ve got something amazing coming for you!</p>
+                  </div>
+                )}
+            </div>
 
           <div className="flex justify-center mb-12 mt-6" hidden={displayCount>=displayProducts.length}>
             <Button size={'xl'} disabled={displayCount>=displayProducts.length} className="text-white mx-auto bg-slate-600 hover:bg-slate-800" onClick={() => {setDisplayCount(displayCount + 15);}}>
