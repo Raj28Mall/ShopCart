@@ -26,7 +26,7 @@ export const ProductCard = ({ id,  name, image, price, quantity }: ProductCardPr
     };
 
     return (
-        <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 cursor-pointer" onClick={handleCardClick}>
+        <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 cursor-pointer bg-white" onClick={handleCardClick}>
             <div className="relative h-[250px] w-full">
                 <Image src={image || "/placeholder.svg"} alt={name} fill className="object-cover" />
             </div>

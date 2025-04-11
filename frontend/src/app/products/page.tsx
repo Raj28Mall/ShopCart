@@ -18,6 +18,7 @@ import { ProductCard } from '@/components/productCard';
 import { useSearchStore } from '@/store/searchStore';
 import { RadioGroup } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
 
 interface Product {
   id: number
@@ -576,7 +577,7 @@ export default function Products(){
                   </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="w-48 bg-white flex flex-col gap-1 p-2">
+                <DropdownMenuContent className="w-48 bg-white flex flex-col gap-2 p-2">
                     {FILTERS.map((option) => (
                       <label key={option} className="flex items-center gap-2 text-sm text-gray-700">
                         <Checkbox checked={selected.includes(option)} onCheckedChange={() => toggleSelection(option)} />
@@ -586,18 +587,30 @@ export default function Products(){
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Select value={sortOption} onValueChange={setSortOption}>
-                <SelectTrigger className="w-[180px] px-4 py-2 text-sm font-medium bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-200 rounded-md shadow-md">
+                <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                  variant="outline"
+                  className="w-[180px] flex justify-between items-center px-4 py-2 text-sm font-medium"
+                  >
+                  <span>{sortOption ? SORT_BY.find(option => option.value === sortOption)?.name : 'Sort by'}</span>
+                  <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent className="w-48 bg-white flex flex-col p-2 list-none">
                   {SORT_BY.map((option) => (
-                    <SelectItem key={option.value} className="text-sm text-gray-700 px-3 py-2 hover:bg-gray-100" value={option.value} onClick={()=> setSortOption(option.value)}>
+                    <DropdownMenuItem
+                      key={option.value}
+                      onSelect={()=>setSortOption(option.value)}
+                      className="list-none text-sm text-gray-700 px-3 py-2 hover:bg-gray-100 rounded-md cursor-pointer"
+                      style={{ listStyleType: 'none' }}>
                       {option.name}
-                    </SelectItem>
+                    </DropdownMenuItem>
                   ))}
-                </SelectContent>
-              </Select>
+                </DropdownMenuContent>
+                </DropdownMenu>
+
             </div>
         </div>
             <div className="flex flex-col justify-center items-center font-sans overflow-x-hidden">
