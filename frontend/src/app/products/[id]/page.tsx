@@ -49,18 +49,19 @@ export default function ProductPage() {
           Back to Products
       </Link>
       <div className="container px-4 py-8 md:px-6 md:py-10">
-        <div className="-mt-20 flex flex-col lg:flex-row p-8 justify-around items-center">
-          <div className="w-1/2 lg:w-[70%] max-w-xl mx-auto lg:ml-10">
-            <div className="sticky top-20 aspect-[1/1] rounded-lg overflow-hidden border">
+        <div className="-mt-15 lg:-mt-24 flex flex-col lg:gap-x-16 lg:flex-row flex-wrap gap-y-10 items-start justify-center p-4 sm:p-6 md:p-8 lg:p-10">
+          <div className="w-full lg:basis-[50%] max-w-md lg:max-w-xl">
+            <div className="aspect-[1/1] rounded-lg overflow-hidden border relative max-w-full">
               <Image
                 src={product.image || "/placeholder.svg"}
                 alt={product.name}
                 fill
-                className="object-cover"  
+                className="object-cover"
               />
             </div>
           </div>
-          <div className="w-1/2 mx-15 relative bottom-6">
+
+          <div className="w-full lg:basis-[45%] max-w-2xl">
             <h1 className="text-4xl font-bold pb-4">{product.name}</h1>
             <div className="flex items-center space-x-2 my-2">
               <div className="flex">
@@ -91,13 +92,9 @@ export default function ProductPage() {
                     size="lg"
                     className="w-full text-white bg-black"
                     variant="outline"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                      e.stopPropagation();
-                      setQuantity(1);
-                    }}
-                  >
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); setQuantity(1);}}>
                     <ShoppingBag className="h-4 w-4 mr-2" />
-                    Add to Cart
+                    Add to Cart 
                   </Button>
                 ) : (
                   <div
@@ -148,20 +145,12 @@ export default function ProductPage() {
                 <TabsList className="grid grid-cols-2 w-full bg-gray-200 rounded-full">
                   <TabsTrigger
                     value="description"
-                    className="text-sm font-medium rounded-full transition-all
-                              data-[state=active]:bg-white 
-                              data-[state=active]:text-black
-                              data-[state=active]:shadow-none"
-                  >
+                    className="text-sm font-medium rounded-full transition-all  data-[state=active]:bg-white   data-[state=active]:text-black  data-[state=active]:shadow-none">
                     Description
                   </TabsTrigger>
                   <TabsTrigger
                     value="details"
-                    className="text-sm font-medium rounded-full transition-all
-                              data-[state=active]:bg-white 
-                              data-[state=active]:text-black
-                              data-[state=active]:shadow-none"
-                  >
+                    className="text-sm font-medium rounded-full transition-all  data-[state=active]:bg-white   data-[state=active]:text-black data-[state=active]:shadow-none">
                     Details
                   </TabsTrigger>
                 </TabsList>

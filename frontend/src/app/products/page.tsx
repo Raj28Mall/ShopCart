@@ -2,7 +2,7 @@
 "use client";
 import * as React from 'react';
 import Fuse from 'fuse.js';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import Image from "next/image";
@@ -19,6 +19,8 @@ import { useSearchStore } from '@/store/searchStore';
 import { RadioGroup } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 interface Product {
   id: number
@@ -44,10 +46,12 @@ export default function Products(){
     const [displayProducts, setDisplayProducts]= useState<Product[]>([]);
     const [loading, setLoading]= useState<boolean>(true);
     const [imagesLoaded, setImagesLoaded]= useState<number>(0);
+    const initializedRef = useRef(false);
     const products= useProductStore((state) => state.products);
     const setProducts= useProductStore((state) => state.setProducts);
     const searchQuery= useSearchStore((state) => state.searchQuery);
     const totalImages=displayProducts.length;
+    const router = useRouter();
     useEffect(() => {
       const load = async ()=>{
         await sleep(1000);
@@ -94,7 +98,7 @@ export default function Products(){
             name: "Eco-Friendly Notebook",
             price: 9.99,
             image: "/products/kitchen/notebook.jpg",
-            category: "Electronics",
+            category: "kitchen-home",
             rating: 4.1,
             quantity: 0,
             shortDescription: "Sustainable notebook made from recycled materials.",
@@ -166,7 +170,7 @@ export default function Products(){
             name: "Desk Organizer Set",
             price: 17.99,
             image: "/products/electronics/desk_organizer.jpg",
-            category: "Electronics",
+            category: "home-kitchen",
             rating: 4.2,
             quantity: 0,
             shortDescription: "Multi-piece desk organization system for efficient workspace management.",
@@ -309,8 +313,8 @@ export default function Products(){
             id: 22,
             name: "Adjustable Standing Desk",
             price: 399.99,
-            image: "/products/electronics/standing_desk.jpg",
-            category: "Electronics",
+            image: "/products/kitchen/standing_desk.webp",
+            category: "kitchen-home",
             rating: 4.8,
             quantity: 0,
             shortDescription: "Motorized desk that transitions between sitting and standing positions.",
@@ -548,9 +552,23 @@ export default function Products(){
       setDisplayProducts(updatedProducts);
     }, [selected, products, sortOption, searchQuery]);
 
+
+    const searchParams = useSearchParams();
+
+
+    useEffect(() => {
+      if (initializedRef.current) return; // prevent re-running
     
+      const categoryFromQuery = searchParams.get('category');
+      if (categoryFromQuery && FILTERS.includes(categoryFromQuery)) {
+        setSelected([categoryFromQuery]);
+      }
+    
+      initializedRef.current = true;
+    }, []);
+
     return(
-      <div className='overflow-x-hidden min-h-screen bg-slate-100'>
+      <div className='overflow-x-hidden min-h-screen bg-white'>
         <Navbar/> 
         <div className='flex flex-row justify-between items-center px-12 py-4 mt-5 mx-5 w-[100vw] overflow-x-hidden'>
             <h1 className='text-3xl font-bold'>All Products</h1>

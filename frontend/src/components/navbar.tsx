@@ -49,12 +49,12 @@ export const Navbar=()=>{
                         </Button>
                     </Link>
                 ) : (
-                    <div className='flex flex-row justify-between items-center space-x-10 '>
-                        <Button onClick={()=>{router.push('/cart')}} variant={'ghost'} className='flex flex-row space-x-1 h-full'>
+                    <div className='flex flex-row justify-between items-center space-x-5 '>
+                        <Button onClick={()=>{router.push('/cart')}} variant={'ghost'} className='flex flex-row h-full'>
                             <ShoppingCart className="h-6 w-6" />
                             <h3 className='text-sm'>Cart</h3>
                         </Button>
-                        <Button onClick={()=>{router.push('/account')}} variant={'ghost'} className='flex flex-row space-x-1 h-full'>
+                        <Button onClick={()=>{router.push('/account')}} variant={'ghost'} className='flex flex-row h-full'>
                             <User className="h-6 w-6" />
                             <h3 className='text-sm'>Profile</h3>
                         </Button>

@@ -479,7 +479,7 @@ export default function Home() {
     
 
   return (
-    <div className="flex flex-col min-h-screen max-w-screen bg-slate-100 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen max-w-screen bg-white overflow-x-hidden">
       <Navbar />
       <AspectRatio className="" ratio={1920/650}>
         <Image src="/hero.png" alt="Hero Image" fill priority={true}/>
@@ -487,10 +487,11 @@ export default function Home() {
       <div className="category-shopping w-[100vw] flex flex-col justify-center items-center py-10">
         <div className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl pb-3 ">Shop by Category</div>
           <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed px-4">Check out our most popular items handpicked for you</p>
-          <div className="grid grid-cols-2 gap-12 mt-8 w-[70vw] lg:w-[100vw] lg:flex lg:flex-wrap lg:justify-center px-3 lg:px-15 mx-auto">
+          <div className="flex flex-wrap gap-3 lg:gap-12 mt-8 w-[80vw] lg:w-[100vw] lg:flex lg:flex-wrap justify-center sm:px-10 lg:px-15 lg:mx-auto">
             {(categories.slice(0,CATEGORY_COUNT)).map((category) => ( // to limit to 6
-              <Link key={category.id} href={`/products?category=${category.slug}`}>
-                <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 w-[21vw] bg-white">
+              <Link key={category.id} href={`/products?category=${category.slug}`} className=''>
+                <Card className="shrink-0 overflow-hidden transition-all hover:shadow-lg pt-0 bg-white w-full sm:w-[18vw] md:w-[31vw] xl:w-[23vw] 2xl:w-[21vw] cursor-pointer">
+
                   <div className="relative h-[200px] w-full">
                       <Image
                         src={category.image || "/placeholder.svg"}
