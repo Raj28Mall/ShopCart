@@ -17,11 +17,6 @@ interface ProductCardProps {
     price: number;
 }
 
-interface CartItem {   
-    id: number;
-    quantity: number;
-}
-
 export const ProductCard = ({ id,  name, image, price }: ProductCardProps) => {
     const setCartItems = useCartStore((state) => state.setCartItems);
     const cartItems = useCartStore((state) => state.cartItems);
@@ -54,7 +49,7 @@ export const ProductCard = ({ id,  name, image, price }: ProductCardProps) => {
             ? cartItems.filter(item => item.id !== id)
             : cartItems.map(item =>
                 item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-            );
+        );
     
         setCartItems(newItems);
         if (qty > 1) {

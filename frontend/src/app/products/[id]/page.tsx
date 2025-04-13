@@ -14,18 +14,51 @@ import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'react-hot-toast';
+import { useCartStore } from "@/store/cartStore";
 
 export default function ProductPage() {
     const params= useParams();
     const id= params.id;
     const products = useProductStore((state)=>state.products);
     const product=products.find((product) => product.id === Number(id));
-    console.log(products);
-    console.log(product);
-    const [quantity, setQuantity] = useState<number>(product?.quantity || 0);
+    const cartItems = useCartStore((state) => state.cartItems);
+    const setCartItems = useCartStore((state) => state.setCartItems);
+    const [quantity, setQuantity] = useState<number>(cartItems.find((item)=>item.id===Number(id))?.quantity || 0);
     const [loading, setLoading] = useState<boolean>(true);
     const [wishList, setWishList] = useState<boolean>(false);
     const router = useRouter();
+
+    const handleAddToCart = () => {
+      setQuantity(quantity + 1);
+      const existingItem = cartItems.find((item) => item.id === Number(id));
+      let newItems;
+      if (existingItem) {
+          newItems = cartItems.map(item =>
+              item.id === Number(id) ? { ...item, quantity: item.quantity + 1 } : item
+          );
+      } else {
+          newItems = [...cartItems, { "id": Number(id), quantity: 1 }];
+      }
+      setCartItems(newItems);
+  };
+
+    const handleRemoveFromCart = () => {
+        const existingItem = cartItems.find((item) => item.id === Number(id));
+        if (!existingItem) return;
+    
+        const newItems = existingItem.quantity === 1
+            ? cartItems.filter(item => item.id !== Number(id))
+            : cartItems.map(item =>
+                item.id === Number(id) ? { ...item, quantity: item.quantity - 1 } : item
+        );
+    
+        setCartItems(newItems);
+        if (quantity > 1) {
+            setQuantity(quantity - 1);
+        } else {
+            setQuantity(0); 
+        }
+    };
 
   if (!product) {
     return (
@@ -92,7 +125,7 @@ export default function ProductPage() {
                     size="lg"
                     className="w-full text-white bg-black"
                     variant="outline"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); setQuantity(1);}}>
+                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); handleAddToCart();}}>
                     <ShoppingBag className="h-4 w-4 mr-2" />
                     Add to Cart 
                   </Button>
@@ -105,7 +138,7 @@ export default function ProductPage() {
                       variant="outline"
                       size="lg"
                       className="rounded-r-none w-1/3 "
-                      onClick={() => setQuantity(quantity - 1)}
+                      onClick={() => handleRemoveFromCart()}
                       disabled={quantity <= 0}
                     >
                       <Minus className="h-3 w-3" />
@@ -121,7 +154,7 @@ export default function ProductPage() {
                         if (quantity >= 10) {
                           toast.error("Max 10 elements per customer");
                         } else {
-                          setQuantity(quantity + 1);
+                          handleAddToCart();
                         }
                       }}
                       disabled={quantity >= 10}
