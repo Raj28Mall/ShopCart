@@ -15,7 +15,6 @@ interface ProductCardProps {
     name: string;
     image: string;
     price: number;
-    quantity: number;
 }
 
 interface CartItem {   
@@ -23,10 +22,10 @@ interface CartItem {
     quantity: number;
 }
 
-export const ProductCard = ({ id,  name, image, price, quantity }: ProductCardProps) => {
+export const ProductCard = ({ id,  name, image, price }: ProductCardProps) => {
     const setCartItems = useCartStore((state) => state.setCartItems);
     const cartItems = useCartStore((state) => state.cartItems);
-    const [qty, setQty] = useState<number>(quantity);
+    const [qty, setQty] = useState<number>((cartItems.find((item) => item.id === id)?.quantity || 0));
     const router=useRouter();
 
     const handleCardClick = () => {
