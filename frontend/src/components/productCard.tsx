@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingBag, Plus, Minus } from "lucide-react";
 import { toast } from 'react-hot-toast';
 import { useRouter } from "next/navigation"
+import { useCartStore } from "@/store/cartStore";
 
 interface ProductCardProps {
     id: number;
@@ -17,13 +18,53 @@ interface ProductCardProps {
     quantity: number;
 }
 
+interface CartItem {   
+    id: number;
+    quantity: number;
+}
+
 export const ProductCard = ({ id,  name, image, price, quantity }: ProductCardProps) => {
-    const [qty, setQty]= useState<number>(quantity);
+    const setCartItems = useCartStore((state) => state.setCartItems);
+    const cartItems = useCartStore((state) => state.cartItems);
+    const [qty, setQty] = useState<number>(quantity);
     const router=useRouter();
 
     const handleCardClick = () => {
         router.push(`/products/${id}`);
     };
+
+    const handleAddToCart = () => {
+        setQty(qty + 1);
+        const existingItem = cartItems.find((item) => item.id === id);
+        let newItems;
+        if (existingItem) {
+            newItems = cartItems.map(item =>
+                item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+            );
+        } else {
+            newItems = [...cartItems, { id, quantity: 1 }];
+        }
+        setCartItems(newItems);
+    };
+
+    const handleRemoveFromCart = () => {
+        const existingItem = cartItems.find((item) => item.id === id);
+        if (!existingItem) return;
+    
+        const newItems = existingItem.quantity === 1
+            ? cartItems.filter(item => item.id !== id)
+            : cartItems.map(item =>
+                item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+            );
+    
+        setCartItems(newItems);
+        if (qty > 1) {
+            setQty(qty - 1);
+        } else {
+            setQty(0); 
+        }
+    };
+    
 
     return (
         <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 cursor-pointer bg-white" onClick={handleCardClick}>
@@ -35,7 +76,7 @@ export const ProductCard = ({ id,  name, image, price, quantity }: ProductCardPr
                 <div className="flex flex-col 2xl:flex-row items-center justify-between mt-2 xl:mt-0">
                     <span className="font-bold cursor-text py-2" onClick={(e)=> e.stopPropagation()}>₹{price.toFixed(2)}</span>
                     {qty <= 0 ? (
-                        <Button size="sm" variant="outline" onClick={(e : React.MouseEvent<HTMLButtonElement>) => {e.stopPropagation(); setQty(1);}}>
+                        <Button size="sm" variant="outline" onClick={(e : React.MouseEvent<HTMLButtonElement>) => {e.stopPropagation(); handleAddToCart();}}>
                             <ShoppingBag className="h-4 w-4 mr-2" />
                             Add to Cart
                         </Button>
@@ -45,7 +86,7 @@ export const ProductCard = ({ id,  name, image, price, quantity }: ProductCardPr
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 rounded-r-none"
-                            onClick={() => setQty(qty - 1)}
+                            onClick={() => handleRemoveFromCart()}
                             disabled={qty <= 0}>
                             <Minus className="h-3 w-3" />
                         </Button>
@@ -56,7 +97,7 @@ export const ProductCard = ({ id,  name, image, price, quantity }: ProductCardPr
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 rounded-l-none"
-                            onClick={() => {if(qty>=10){toast.error("Max 10 elements per customer")}else{setQty(qty + 1);}}}
+                            onClick={() => {if(qty>=10){toast.error("Max 10 elements per customer")}else{handleAddToCart()}}}
                             disabled={qty >= 10}>
                             <Plus className="h-3 w-3" />
                         </Button>

@@ -9,12 +9,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2, Loader2, Check, Download, Home, Package, } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useCartStore } from "@/store/cartStore";
-import { Separator } from "@/components/ui/separator";
 import toast from "react-hot-toast";
+import { useCartStore } from "@/store/cartStore";
+import { useProductStore } from "@/store/productStore";
+import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 
-interface CartItem{
+interface Product {
   id: number
   name: string
   price: number
@@ -24,52 +25,20 @@ interface CartItem{
   longDescription: string
   rating: number
   quantity: number
-  // reviews: number
   details: string[]
 }
 
 export default function Cart(){
-    // const cartItems= useCartStore((state)=>state.cartItems); //for when implementing global zustand state
-    // const setCartItems= useCartStore((state)=>state.setCartItems);
+    const rawCartItems= useCartStore((state)=>state.cartItems); 
+    const setCartItems= useCartStore((state)=>state.setCartItems);
+    const cartItems= rawCartItems.filter((item => item.quantity > 0));
+    const cartProducts = cartItems
+    .map((item) => {
+      const product = useProductStore.getState().products.find((p) => p.id === item.id);
+      return product ? { product, quantity: item.quantity } : null;
+    })
+    .filter((entry): entry is { product: Product; quantity: number } => entry !== null);  
 
-    const [cartItems, setCartItems] = useState<CartItem[]>([
-      {
-        id: 1,
-        name: "Smart LED Light Strips",
-        price: 34.99,
-        image: "/products/electronics/led_strips.jpg",
-        category: "Electronics",
-        rating: 4.3,
-        quantity: 3,
-        shortDescription: "Customizable LED strips with app control and voice command support.",
-        longDescription: "Transform any space with our Smart LED Light Strips that combine sophisticated illumination technology with intuitive controls. Each strip contains individually addressable RGB LEDs capable of displaying 16 million distinct colors, allowing you to precisely match existing décor or create dramatic contrasts. The advanced controller interprets audio input through frequency analysis algorithms, synchronizing light patterns with your music. The modular design allows you to connect multiple strips seamlessly while maintaining perfect color uniformity. The smartphone app provides unprecedented control from simple color selection to complex dynamic scenes simulating natural phenomena like ocean waves or sunrise progressions.",
-        details: ["Compatible with Alexa/Google", "16M colors", "Music sync", "App-controlled"]
-      },
-      {
-        id: 2,
-        name: "Ergonomic Office Chair",
-        price: 249.99,
-        image: "/products/kitchen/office_chair.jpg",
-        category: "Electronics",
-        rating: 4.7,
-        quantity: 2,
-        shortDescription: "Adjustable office chair designed for comfort during long work hours.",
-        longDescription: "Transform your work experience with our Ergonomic Office Chair, developed with orthopedic specialists. The dynamically adaptive lumbar support automatically adjusts to your movements, providing continuous support for proper spinal alignment. The breathable mesh back features varying tension zones mapped to different areas of your back. The waterfall-edge seat cushion utilizes high-resilience foam with temperature-responsive properties, distributing weight evenly to eliminate pressure points. The precision-engineered synchronous tilt mechanism maintains ideal angles between torso and legs throughout different recline positions, allowing posture changes throughout the day to reduce muscle fatigue.",
-        details: ["Adjustable height", "Headrest", "And armrests", "Promotes good posture for long work sessions"]
-      },
-      {
-        id: 3,
-        name: "Wireless Mechanical Keyboard",
-        price: 109.99,
-        image: "/products/electronics/wireless_keyboard.jpg",
-        category: "Electronics",
-        rating: 4.8,
-        quantity: 5,
-        shortDescription: "Premium wireless keyboard with tactile mechanical switches.",
-        longDescription: "Experience typing perfection with our Wireless Mechanical Keyboard. Each key houses an individual German-manufactured switch with gold-plated contact points providing consistent actuation force and satisfying tactile feedback. The keycaps are crafted from double-shot PBT plastic that will never fade even after years of use, with a subtly textured surface for excellent finger positioning. The aircraft-grade aluminum top plate provides exceptional rigidity that eliminates flex and creaking. Advanced Bluetooth implementation features adaptive frequency hopping to avoid interference, while 1000Hz polling rate delivers wired-like responsiveness for demanding gamers.",
-        details: ["Customizable keys", "Bluetooth and USB-C connectivity", "Perfect for productivity and gaming"]
-      },
-  ]);
     const [couponCode, setCouponCode]=useState<string>("");
     const [loading, setLoading]=useState<boolean>(false);
     const [isOpen, setIsOpen]=useState<boolean>(false);
@@ -81,7 +50,10 @@ export default function Cart(){
       month: "long",
       day: "numeric",
     });  
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = cartProducts.reduce((sum, item) => {
+      if (!item) return sum;
+      return sum + (item.product).price * item.quantity;
+    }, 0);  
     const shipping = subtotal>0 ? 20.00 : 0;
     const tax = subtotal * 0.07;
     const total = subtotal + shipping + tax;
@@ -143,21 +115,21 @@ export default function Cart(){
                           <div className="col-span-2 text-right pr-12">Subtotal</div>
                         </div>
 
-                        {cartItems.map((item) => (
-                          <div key={item.id} className="border p-4">
+                        {cartProducts.map((item) => (
+                          <div key={(item.product).id} className="border p-4">
                             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                               <div className="col-span-1 md:col-span-6">
                                 <div className="flex items-center gap-4">
                                   <div className="relative h-20 w-20 rounded-md overflow-hidden border">
                                     <Image
-                                      src={item.image || "/placeholder.svg"}
-                                      alt={item.name}
+                                      src={(item.product).image || "/placeholder.svg"}
+                                      alt={(item.product).name}
                                       fill
                                       className="object-cover"
                                     />
                                   </div>
                                   <div>
-                                    <h3 className="font-medium">{item.name}</h3>
+                                    <h3 className="font-medium">{(item.product).name}</h3>
                                   </div>
                                 </div>
                               </div>
@@ -165,7 +137,7 @@ export default function Cart(){
                               <div className="col-span-1 md:col-span-2 md:text-center">
                                 <div className="flex items-center justify-between md:justify-center">
                                   <span className="text-sm font-medium md:hidden">Price:</span>
-                                  <span>₹{item.price.toFixed(2)}</span>
+                                  <span>₹{(item.product).price.toFixed(2)}</span>
                                 </div>
                               </div>
 
@@ -177,7 +149,7 @@ export default function Cart(){
                                         variant="outline"
                                         size="icon"
                                         className="h-8 w-8 rounded-r-none"
-                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                        onClick={() => updateQuantity((item.product).id, item.quantity - 1)}
                                         disabled={item.quantity <= 1}>
                                           <Minus className="h-3 w-3" />
                                       </Button>
@@ -186,7 +158,7 @@ export default function Cart(){
                                           variant="outline"
                                           size="icon"
                                           className="h-8 w-8 rounded-l-none"
-                                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                          onClick={() => updateQuantity((item.product).id, item.quantity + 1)}
                                           disabled={item.quantity >= 10}>
                                             <Plus className="h-3 w-3" />
                                         </Button>
@@ -198,8 +170,8 @@ export default function Cart(){
                                 <div className="flex items-center justify-between md:justify-end">
                                   <span className="text-sm font-medium md:hidden">Subtotal:</span>
                                   <div className="flex flex-row items-center gap-2 ">
-                                    <span className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</span>
-                                    <Button variant={'ghost'} onClick={() => removeItem(item.id)} className="text-sm text-red-500 hidden md:flex md:items-center md:justify-end">
+                                    <span className="font-medium">₹{((item.product).price * item.quantity).toFixed(2)}</span>
+                                    <Button variant={'ghost'} onClick={() => removeItem((item.product).id)} className="text-sm text-red-500 hidden md:flex md:items-center md:justify-end">
                                       <Trash2 className="h-3 w-3" />
                                     </Button>
                                   </div>
@@ -207,7 +179,7 @@ export default function Cart(){
                               </div>
                             </div>
 
-                            {cartItems.indexOf(item) < cartItems.length - 1 && <Separator />}
+                            {cartProducts.indexOf(item) < cartItems.length - 1 && <Separator />}
                           </div>
                         ))}
                       </div>
@@ -309,18 +281,18 @@ export default function Cart(){
               <div className="space-y-2">
                 <h4 className="font-medium">Order Summary</h4>
                 <div className="max-h-[200px] overflow-auto space-y-3 pr-2">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3">
+                  {cartProducts.map((item) => (
+                    <div key={(item.product).id} className="flex items-center gap-3">
                       <div className="relative h-14 w-14 rounded-md overflow-hidden border flex-shrink-0">
-                        <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+                        <Image src={(item.product).image || "/placeholder.svg"} alt={(item.product).name} fill className="object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{item.name}</p>
+                        <p className="font-medium text-sm truncate">{(item.product).name}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-sm font-medium">₹{((item.product).price * item.quantity).toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {item.quantity} × ₹{item.price.toFixed(2)}
+                          {item.quantity} × ₹{(item.product).price.toFixed(2)}
                         </p>
                       </div>
                     </div>
