@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import * as React from 'react';
 import Link from "next/link";
@@ -73,7 +74,7 @@ export default function AccountClientPage() {
                   <User className="h-4 w-4" />
                   Account Overview
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/account/orders')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
                   <Package className="h-4 w-4" />
                   Orders
                 </Button>
@@ -101,7 +102,7 @@ export default function AccountClientPage() {
         <div className="flex-1">
           <Card>
             <CardHeader>
-              <CardTitle className='text-lg font-semibold'>Account Overview</CardTitle>
+              <CardTitle className='text-xl font-semibold'>Account Overview</CardTitle>
               <CardDescription className='text-gray-400'>View your account information and recent activity</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

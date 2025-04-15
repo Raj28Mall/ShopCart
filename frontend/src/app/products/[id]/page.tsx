@@ -113,7 +113,7 @@ export default function ProductPage() {
                 (10 reviews)
               </span>
             </div>
-            <p className="text-2xl font-bold mt-4 mb-8"> ${product.price.toFixed(2)} </p>
+            <p className="text-2xl font-bold mt-4 mb-8"> ${Number(product.price).toFixed(2)} </p>
             <p className="text-muted-foreground my-4">{product.shortDescription}</p>
 
             <Separator />
