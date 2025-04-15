@@ -59,7 +59,7 @@ export default function AccountClientPage() {
   return (
     <>
     <Navbar/>
-    <div className="container px-4 py-8 md:px-8 md:py-12">
+    <div className="container px-4 py-8 md:px-20 md:py-12">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/4">
           <Card className="pb-3">
@@ -73,7 +73,7 @@ export default function AccountClientPage() {
                   <User className="h-4 w-4" />
                   Account Overview
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/orders')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
                   <Package className="h-4 w-4" />
                   Orders
                 </Button>

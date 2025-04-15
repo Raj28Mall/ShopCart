@@ -1,5 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Link from "next/link";
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginSchema } from "../../../../../schemas/loginSchema";
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
@@ -7,29 +12,22 @@ import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {  
-    const [loading, setLoading]=useState<boolean>(false);
-    const [email, setEmail]=useState<string>("");
-    const [password, setPassword]=useState<string>("");
+
+    const { reset, register, handleSubmit, formState: { errors, isSubmitting }} = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
     const router=useRouter();
 
-    const handleLogin=async()=>{
-        if(!email || !password ){
-            toast.error("Please fill all the fields");
-            return;
+    const onSubmit = async (data: LoginSchema) => {
+        try{
+            await new Promise((resolve)=> setTimeout(resolve, 2000)); //simulating API authentication process
+            toast.success("Login successful");
+            router.push('/');
+            reset();
+        } catch(err){
+            toast.error("Login failed. Please try again later.");
         }
-        const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
-        if(!emailRegex.test(email)){
-            toast.error("Invalid email");
-            return;
-        }
-        setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        router.push('/');
-        toast.success("Login successful");
     }
 
   return (
@@ -40,20 +38,22 @@ export default function LoginPage() {
               <CardDescription>Sign in to your account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 ">
-            <form className="space-y-4 pb-2">
+            <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4 pb-2">
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="email">Email</Label>
-                    <Input value={email} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setEmail(e.target.value)}} className="py-3" id="email" type="email" placeholder="Enter your email" required />
+                    <Input className="py-3" id="email" type="email" placeholder="Enter your email" {...register("email")} />
+                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
                 </div>
                 <div>
                     <Label className="font-semibold pb-2 pl-1" htmlFor="password">Password</Label>
-                    <Input value={password} onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setPassword(e.target.value)}} className="py-3" id="password" type="password" placeholder="Enter your password" required />
+                    <Input className="py-3" id="password" type="password" placeholder="Enter your password" {...register("password")} />
+                    {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
                 </div>
-            </form>
-
-              <Button className="w-full bg-slate-500 text-white" onClick={handleLogin} disabled={loading}>  
-                {loading?  <Loader2 className="animate-spin w-5 h-5" /> : "Log In"}
+              <Button className="w-full bg-slate-500 text-white" type={"submit"} disabled={isSubmitting}>  
+                {isSubmitting?  <Loader2 className="animate-spin w-5 h-5" /> : "Log In"}
               </Button>
+
+            </form>
 
             </CardContent>
             <CardFooter className="flex flex-col justify-center items-center pb-2">

@@ -52,7 +52,7 @@ export default function Cart(){
     });  
     const subtotal = cartProducts.reduce((sum, item) => {
       if (!item) return sum;
-      return sum + (item.product).price * item.quantity;
+      return sum + Number((item.product).price) * item.quantity;
     }, 0);  
     const shipping = subtotal>0 ? 20.00 : 0;
     const tax = subtotal * 0.07;
@@ -137,7 +137,7 @@ export default function Cart(){
                               <div className="col-span-1 md:col-span-2 md:text-center">
                                 <div className="flex items-center justify-between md:justify-center">
                                   <span className="text-sm font-medium md:hidden">Price:</span>
-                                  <span>₹{(item.product).price.toFixed(2)}</span>
+                                  <span>₹{Number((item.product).price).toFixed(2)}</span>
                                 </div>
                               </div>
 
@@ -170,7 +170,7 @@ export default function Cart(){
                                 <div className="flex items-center justify-between md:justify-end">
                                   <span className="text-sm font-medium md:hidden">Subtotal:</span>
                                   <div className="flex flex-row items-center gap-2 ">
-                                    <span className="font-medium">₹{((item.product).price * item.quantity).toFixed(2)}</span>
+                                    <span className="font-medium">₹{(Number((item.product).price) * item.quantity).toFixed(2)}</span>
                                     <Button variant={'ghost'} onClick={() => removeItem((item.product).id)} className="text-sm text-red-500 hidden md:flex md:items-center md:justify-end">
                                       <Trash2 className="h-3 w-3" />
                                     </Button>
@@ -292,7 +292,7 @@ export default function Cart(){
                       <div className="text-right">
                         <p className="text-sm font-medium">₹{((item.product).price * item.quantity).toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {item.quantity} × ₹{(item.product).price.toFixed(2)}
+                          {item.quantity} × ₹{Number((item.product).price).toFixed(2)}
                         </p>
                       </div>
                     </div>
