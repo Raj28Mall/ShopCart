@@ -14,6 +14,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useProductStore } from "@/store/productStore";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
+import { addToOrderHistory } from "@/lib/api";
 
 interface Product {
   id: number
@@ -78,6 +79,7 @@ export default function Cart(){
         return;
       }
       setLoading(true);
+      // const response = await addToOrderHistory(1, 1, orderNumber, 1); // replace with actual userId and productId
       await new Promise((resolve) => setTimeout(resolve, 2000)); //simulate payment processing
       setPaymentDone(true);
       setLoading(false);
@@ -325,8 +327,7 @@ export default function Cart(){
                 </Link>
               </Button>
               <Button variant="outline" className="sm:flex-1" onClick={() => handleOpenChange(false)} asChild>
-                {/* Add actual route to accounts/orders */}
-                <Link href="/comingSoon">      
+                <Link href="/account">      
                   <Download  className="h-4 w-4 mr-2" />
                   View Order Details
                 </Link>
