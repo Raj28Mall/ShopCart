@@ -94,21 +94,19 @@ export default function OrdersPage() {
               </div>
 
               {/* Orders List */}
-              <div className="border rounded-md divide-y">
+              <div className="border rounded-md divide-y overflow-y-scroll">
                 {orders.map((order) => (
                   <div key={order.id} className="p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium">Order #{order.id}</p>
+                          <p className="font-medium">Order {order.id}</p>
                           <span
                             className={`px-2 py-1 text-xs rounded-full ${
                               order.status === "Delivered"
                                 ? "bg-green-100 text-green-800"
                                 : order.status === "Processing"
                                   ? "bg-blue-100 text-blue-800"
-                                  : order.status === "Shipped"
-                                    ? "bg-yellow-100 text-yellow-800"
                                     : "bg-red-100 text-red-800"
                             }`}
                           >
@@ -119,7 +117,7 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="font-medium">${order.total.toFixed(2)}</p>
+                          <p className="font-medium">₹{order.total.toFixed(2)}</p>
                           <p className="text-sm text-muted-foreground">{order.items} items</p>
                         </div>
                         <Link href={`/account/orders/${order.id}`}>
@@ -131,26 +129,6 @@ export default function OrdersPage() {
                     </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <Button variant="outline" size="sm" disabled>
-                  Previous
-                </Button>
-                <div className="flex items-center gap-1">
-                  <Button variant="outline" size="sm" className="w-8 h-8 p-0 bg-primary text-primary-foreground">
-                    1
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-8 h-8 p-0">
-                    2
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-8 h-8 p-0">
-                    3
-                  </Button>
-                </div>
-                <Button variant="outline" size="sm">
-                  Next
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -179,7 +157,7 @@ const orders = [
   {
     id: "ORD-345678",
     date: "August 10, 2023",
-    status: "Shipped",
+    status: "Processing",
     total: 249.5,
     items: 2,
   },

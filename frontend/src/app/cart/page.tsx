@@ -29,6 +29,9 @@ interface Product {
   details: string[]
 }
 
+const USERID="raj123";
+
+
 export default function Cart(){
     const rawCartItems= useCartStore((state)=>state.cartItems); 
     const setCartItems= useCartStore((state)=>state.setCartItems);
