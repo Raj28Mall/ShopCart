@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import Link from "next/link"
 import { User, Package, Settings, Heart, CreditCard, LogOut, Search } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -8,9 +10,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Navbar } from "@/components/navbar";
+import { getOrderHistory } from "@/lib/api";
 
 export default function OrdersPage() {
     const router= useRouter();
+    interface Order {
+      orderId: string;
+      orderDate: string;
+      orderStatus: string;
+      totalPrice: number;
+      totalQuantity: number;
+    }
+    
+    const [orders, setOrders] = useState<Order[]>([]);
+
+    useEffect(() => {
+      const fetchOrders = async () => {
+        try {
+          const response = await getOrderHistory("raj123");
+          setOrders(response);
+          console.log("Fetched orders:", response);
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+        }
+      };
+  
+      fetchOrders();
+    }, []);
 
   return (
     <>
@@ -96,31 +122,31 @@ export default function OrdersPage() {
               {/* Orders List */}
               <div className="border rounded-md divide-y overflow-y-scroll">
                 {orders.map((order) => (
-                  <div key={order.id} className="p-4">
+                  <div key={order.orderId} className="p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium">Order {order.id}</p>
+                          <p className="font-medium">Order {order.orderId}.</p>
                           <span
                             className={`px-2 py-1 text-xs rounded-full ${
-                              order.status === "Delivered"
+                              order.orderStatus === "Delivered"
                                 ? "bg-green-100 text-green-800"
-                                : order.status === "Processing"
+                                : order.orderStatus === "Processing"
                                   ? "bg-blue-100 text-blue-800"
                                     : "bg-red-100 text-red-800"
                             }`}
                           >
-                            {order.status}
+                            {order.orderStatus}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground">{order.date}</p>
+                        <p className="text-sm text-muted-foreground">{order.orderDate}</p> {/* ADD DATE PROCESSING */}
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="font-medium">₹{order.total.toFixed(2)}</p>
-                          <p className="text-sm text-muted-foreground">{order.items} items</p>
+                          <p className="font-medium">₹{Number(order.totalPrice).toFixed(2)}</p>
+                          <p className="text-sm text-muted-foreground">{order.totalQuantity} items</p>
                         </div>
-                        <Link href={`/account/orders/${order.id}`}>
+                        <Link href={`/account/orders/${order.orderId}`}>
                           <Button variant="outline" size="sm">
                             View Details
                           </Button>
@@ -138,41 +164,3 @@ export default function OrdersPage() {
     </>
   )
 }
-
-const orders = [
-  {
-    id: "ORD-123456",
-    date: "June 15, 2023",
-    status: "Delivered",
-    total: 159.97,
-    items: 3,
-  },
-  {
-    id: "ORD-789012",
-    date: "July 23, 2023",
-    status: "Processing",
-    total: 89.99,
-    items: 1,
-  },
-  {
-    id: "ORD-345678",
-    date: "August 10, 2023",
-    status: "Processing",
-    total: 249.5,
-    items: 2,
-  },
-  {
-    id: "ORD-901234",
-    date: "September 5, 2023",
-    status: "Delivered",
-    total: 124.95,
-    items: 4,
-  },
-  {
-    id: "ORD-567890",
-    date: "October 12, 2023",
-    status: "Cancelled",
-    total: 79.99,
-    items: 1,
-  },
-]

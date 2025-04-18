@@ -17,10 +17,10 @@ export const getProducts = async()=>{
     }
 };
 
-export const getOrderHistory= async()=>{
+export const getOrderHistory= async(userId: string)=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
-        const response = await axios.get(URL);
+        const response = await axios.get(URL, { params: { userId } });
         return response.data;
     } catch(err){
         console.error("Error while fetching order history: ", err);
@@ -28,10 +28,10 @@ export const getOrderHistory= async()=>{
     }
 };
 
-export const addToOrderHistory= async(userId: number, productId: number, orderNo: string, quantity: number)=>{
+export const addToOrderHistory= async(userId: number, totalPrice: number, totalQuantity: number, orderStatus: string, )=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
-        const response = await axios.post(URL, {userId, productId, orderNo, quantity});
+        const response = await axios.post(URL, {userId, totalPrice, totalQuantity, orderStatus});
         return response.data;
     } catch(err){
         console.error("Error while processing order: ", err);
