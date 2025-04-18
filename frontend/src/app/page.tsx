@@ -55,7 +55,6 @@ export default function Home() {
       try {
         const response = await getProducts();
         setProducts(response);
-        console.log(response);
       } catch (error) {
         console.error("Error fetching products:", error);
       }

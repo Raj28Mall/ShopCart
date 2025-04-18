@@ -14,7 +14,8 @@ import { useCartStore } from "@/store/cartStore";
 import { useProductStore } from "@/store/productStore";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import { addToOrderHistory } from "@/lib/api";
+import { addOrderProduct, addToOrderHistory } from "@/lib/api";
+import { useOrderStore } from "@/store/orderStore";
 
 interface Product {
   id: number
@@ -47,8 +48,8 @@ export default function Cart(){
     const [loading, setLoading]=useState<boolean>(false);
     const [isOpen, setIsOpen]=useState<boolean>(false);
     const [paymentDone, setPaymentDone]= useState<boolean>(false);
+    const [orderNumber, setOrderNumber]= useState<number>(0);
     const router=useRouter();
-    const orderNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const orderDate = new Date().toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
@@ -85,8 +86,19 @@ export default function Cart(){
       const totalPrice=total;
       const totalQuantity= cartItems.reduce((sum, item) => sum + item.quantity, 0);
       const orderStatus="Processing";
+      await new Promise((resolve) => setTimeout(resolve, 1000));   
       try{
-        const response = await addToOrderHistory(userId, totalPrice, totalQuantity, orderStatus);
+        const response1= await addToOrderHistory(userId, totalPrice, totalQuantity, orderStatus);
+        const orderId= (response1.orderId);
+        setOrderNumber(Number(orderId));
+        const products= useProductStore.getState().products.filter((product) => cartItems.some((item) => item.id === product.id));
+        const response2= await addOrderProduct(orderId, products.map((product) => ({
+          productId: product.id,
+          productName: product.name,
+          productImage: product.image,
+          productPrice: product.price,
+          productQuantity: cartItems.find((item) => item.id === product.id)?.quantity || 1,
+        })));
       } catch(err){
         console.error("Error while processing order: ", err);
         toast.error("Error while processing order");
@@ -96,8 +108,6 @@ export default function Cart(){
       setPaymentDone(true);
       setLoading(false);
       handleOpenChange(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));    //add this to clear cart once payment is done
-      // setCartItems([]); 
     };
 
     const handleOpenChange = (open: boolean) => {
@@ -106,6 +116,11 @@ export default function Cart(){
         setCartItems([]);
       }
     };
+
+    useEffect(() => {
+      console.log(orderNumber)
+    }
+    , [orderNumber]);
 
     return(
         <div className="overflow-x-hidden min-h-screen">
@@ -284,8 +299,7 @@ export default function Cart(){
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Order Number</p>
-                  <p className="font-medium">{orderNumber}</p>
+                  <p className="text-muted-foreground">Order No: {orderNumber}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-muted-foreground">Date</p>
@@ -342,9 +356,9 @@ export default function Cart(){
                 </Link>
               </Button>
               <Button variant="outline" className="sm:flex-1" onClick={() => handleOpenChange(false)} asChild>
-                <Link href="/account">      
+                <Link href={`/account/orders`}>      
                   <Download  className="h-4 w-4 mr-2" />
-                  View Order Details
+                  View Order History
                 </Link>
               </Button>
             </DialogFooter>

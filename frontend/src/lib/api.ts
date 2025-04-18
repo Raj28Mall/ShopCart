@@ -38,3 +38,25 @@ export const addToOrderHistory= async(userId: string, totalPrice: number, totalQ
         return;
     }
 }
+
+export const addOrderProduct = async( orderId: string, products: Array<{ productId: number; productName: string; productImage: string; productPrice: number; productQuantity: number; }> ) => {
+    const URL = `${API_URL}/order_api/order_products`;
+    try {
+        const response = await axios.post(URL, { orderId, products });
+        return response.data;
+    } catch (err) {
+        console.error("Error while adding order products: ", err);
+        return;
+    }
+}
+
+export const getOrderProducts= async(orderId: string)=>{
+    const URL=`${API_URL}/order_api/order_products`;
+    try{
+        const response = await axios.get(URL, { params: { orderId } });
+        return response.data;
+    } catch(err){
+        console.error("Error while fetching order products: ", err);
+        return;
+    }
+}

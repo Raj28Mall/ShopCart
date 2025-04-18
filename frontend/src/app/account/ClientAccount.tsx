@@ -137,7 +137,7 @@ export default function AccountClientPage() {
                 <h2 className="text-lg font-semibold">Default Address</h2>
 
                 <div className="bg-white border p-4 rounded-md">
-                  <p className="font-medium">Raj Mall</p>
+                  <p className="font-semibold">Home</p>
                   <p className="text-sm text-muted-foreground">Rambaug, Nahar, Powai</p>
                   <p className="text-sm text-muted-foreground">A-101</p>
                   <p className="text-sm text-muted-foreground">Mumbai - 400076</p>
@@ -157,23 +157,3 @@ export default function AccountClientPage() {
   )
 }
 
-const recentOrders = [
-  {
-    id: "ORD-123456",
-    date: "June 15, 2023",
-    status: "Delivered",
-    total: 159.97,
-  },
-  {
-    id: "ORD-789012",
-    date: "July 23, 2023",
-    status: "Processing",
-    total: 89.99,
-  },
-  {
-    id: "ORD-345678",
-    date: "August 10, 2023",
-    status: "Shipped",
-    total: 249.5,
-  },
-]

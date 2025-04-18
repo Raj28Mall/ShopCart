@@ -8,21 +8,15 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Navbar } from "@/components/navbar";
 import { getOrderHistory } from "@/lib/api";
+import { useOrderStore } from '@/store/orderStore';
 
 export default function OrdersPage() {
     const router= useRouter();
-    interface Order {
-      orderId: string;
-      orderDate: string;
-      orderStatus: string;
-      totalPrice: number;
-      totalQuantity: number;
-    }
-    
-    const [orders, setOrders] = useState<Order[]>([]);
+  
+    const orders= useOrderStore((state)=>state.orders);
+    const setOrders= useOrderStore((state)=>state.setOrders);
 
     useEffect(() => {
       const fetchOrders = async () => {
