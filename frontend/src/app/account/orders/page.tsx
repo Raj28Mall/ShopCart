@@ -139,7 +139,7 @@ export default function OrdersPage() {
                             {order.orderStatus}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground">{order.orderDate}</p> {/* ADD DATE PROCESSING */}
+                        <p className='text-sm'>{new Date(order.orderDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p> {/* ADD DATE PROCESSING */}
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
