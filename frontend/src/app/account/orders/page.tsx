@@ -29,7 +29,6 @@ export default function OrdersPage() {
         try {
           const response = await getOrderHistory("raj123");
           setOrders(response);
-          console.log("Fetched orders:", response);
         } catch (error) {
           console.error("Error fetching orders:", error);
         }
@@ -63,15 +62,15 @@ export default function OrdersPage() {
                 <Settings className="h-4 w-4" />
                 Settings
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/wishlist')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
                 <Heart className="h-4 w-4" />
                 Wishlist
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/payment')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
                 <CreditCard className="h-4 w-4" />
                 Payment Methods
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/payment')} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
                 <LogOut className="h-4 w-4" />
                 Sign Out
                 </Button>
@@ -92,7 +91,7 @@ export default function OrdersPage() {
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input placeholder="Search orders..." className="pl-8" />
                 </div>
-                <div className="flex gap-2">
+                {/* <div className="flex gap-2">
                   <Select defaultValue="all">
                     <SelectTrigger className="w-[160px]">
                       <SelectValue placeholder="Filter by status" />
@@ -116,7 +115,7 @@ export default function OrdersPage() {
                       <SelectItem value="price-low">Price: Low to High</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
               </div>
 
               {/* Orders List */}
@@ -126,7 +125,7 @@ export default function OrdersPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium">Order {order.orderId}.</p>
+                          <p className="font-medium">Order: {order.orderId}</p>
                           <span
                             className={`px-2 py-1 text-xs rounded-full ${
                               order.orderStatus === "Delivered"

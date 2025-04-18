@@ -28,7 +28,7 @@ export const getOrderHistory= async(userId: string)=>{
     }
 };
 
-export const addToOrderHistory= async(userId: number, totalPrice: number, totalQuantity: number, orderStatus: string, )=>{
+export const addToOrderHistory= async(userId: string, totalPrice: number, totalQuantity: number, orderStatus: string, )=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
         const response = await axios.post(URL, {userId, totalPrice, totalQuantity, orderStatus});

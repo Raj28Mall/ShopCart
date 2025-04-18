@@ -29,7 +29,7 @@ interface Product {
   details: string[]
 }
 
-const USERID="raj123";
+const userId="raj123";
 
 
 export default function Cart(){
@@ -82,17 +82,29 @@ export default function Cart(){
         return;
       }
       setLoading(true);
-      // const response = await addToOrderHistory(1, 1, orderNumber, 1); // replace with actual userId and productId
-      await new Promise((resolve) => setTimeout(resolve, 2000)); //simulate payment processing
+      const totalPrice=total;
+      const totalQuantity= cartItems.reduce((sum, item) => sum + item.quantity, 0);
+      const orderStatus="Processing";
+      try{
+        const response = await addToOrderHistory(userId, totalPrice, totalQuantity, orderStatus);
+      } catch(err){
+        console.error("Error while processing order: ", err);
+        toast.error("Error while processing order");
+        setLoading(false);
+        return;
+      }
       setPaymentDone(true);
       setLoading(false);
       handleOpenChange(true);
-      // await new Promise((resolve) => setTimeout(resolve, 1000));    //add this to clear cart once payment is done
+      await new Promise((resolve) => setTimeout(resolve, 1000));    //add this to clear cart once payment is done
       // setCartItems([]); 
     };
 
     const handleOpenChange = (open: boolean) => {
       setIsOpen(open);
+      if (!open) {
+        setCartItems([]);
+      }
     };
 
     return(
