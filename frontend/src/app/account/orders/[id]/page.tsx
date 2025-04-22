@@ -15,6 +15,7 @@ import { use } from "react";
 import { useOrderStore } from "@/store/orderStore";
 import { getOrderProducts } from '@/lib/api';
 
+const SHIPPING_COST="20.00";
 interface orderProduct{
     orderId: number
     productId: number;
@@ -33,6 +34,11 @@ export default function OrderDetailsPage() {
     const [orderProducts, setOrderProducts]=useState<orderProduct[]>([]);
     useEffect(() => {
         const fetchOrderProducts = async () => {
+          console.log("Order ID: "+id);
+          console.log("Orders: ");
+          console.log(orders);
+          console.log("Order: ");
+          console.log(order);
             try {
               if(!order){
                 throw new Error("Order not found");
@@ -164,8 +170,13 @@ export default function OrderDetailsPage() {
                   <div className="border rounded-md p-4">
                     <div className="space-y-1">
                       <div className="flex justify-between pb-2 border-b">
+                        <span className="text-gray-400">Subtotal</span>
+                        <span className="">₹{Number(order?.totalPrice)-Number(SHIPPING_COST)}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between pb-2 border-b">
                         <span className="text-gray-400">Shipping</span>
-                        <span className="">₹20.00</span>
+                        <span className="">₹{SHIPPING_COST}</span>
                       </div>
                       <Separator />
                       <div className="flex justify-between font-medium">

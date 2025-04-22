@@ -82,15 +82,15 @@ export default function AccountClientPage() {
                   <Settings className="h-4 w-4" />
                   Settings
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/wishlist')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
                   <Heart className="h-4 w-4" />
                   Wishlist
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/payment')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
                   <CreditCard className="h-4 w-4" />
                   Payment Methods
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/payment')} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
+                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
                   <LogOut className="h-4 w-4" />
                   Sign Out
                 </Button>
