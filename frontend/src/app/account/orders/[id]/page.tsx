@@ -33,27 +33,21 @@ export default function OrderDetailsPage() {
     const order= orders.find((order) => Number(order.orderId) == Number(id));
     const [orderProducts, setOrderProducts]=useState<orderProduct[]>([]);
     useEffect(() => {
-        const fetchOrderProducts = async () => {
-          console.log("Order ID: "+id);
-          console.log("Orders: ");
-          console.log(orders);
-          console.log("Order: ");
-          console.log(order);
-            try {
-              if(!order){
-                throw new Error("Order not found");
-              }
-                const response = await getOrderProducts(order.orderId.toString() || "");
-                console.log(response);
-                setOrderProducts(response);
-                console.log(orderProducts);
-            } catch (error) {
-                console.error("Error fetching order products:", error);
-            }
-        };
-        fetchOrderProducts();
-    }
-    , []);
+      if (!order) {
+        console.log("Order not ready yet");
+        return;
+      }
+      const fetchOrderProducts = async () => {
+        try {
+          const response = await getOrderProducts(order.orderId.toString());
+          setOrderProducts(response);
+        } catch (error) {
+          console.error("Error fetching order products:", error);
+        }
+      };
+    
+      fetchOrderProducts();
+    }, [order]); 
 
   return (
     <>
@@ -100,6 +94,7 @@ export default function OrderDetailsPage() {
           </div>
 
           <div className="flex-1">
+            {order?
             <Card>
               <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -203,7 +198,66 @@ export default function OrderDetailsPage() {
                   <Button variant="outline">Need Help?</Button>
                 </div>
               </CardContent>
-            </Card>
+            </Card>:
+            <Card>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-pulse">
+              <div className="space-y-2">
+                <div className="h-4 w-32 bg-gray-200 rounded" />
+                <div className="h-6 w-48 bg-gray-300 rounded" />
+                <div className="h-4 w-36 bg-gray-200 rounded" />
+              </div>
+              <div className="h-6 w-24 bg-gray-200 rounded-full" />
+            </CardHeader>
+          
+            <CardContent className="space-y-8 animate-pulse">
+          
+              {/* Order Items */}
+              <div className="space-y-4">
+                <div className="h-5 w-32 bg-gray-300 rounded" />
+                <div className="border rounded-md divide-y">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="p-4 flex items-start gap-4">
+                      <div className="relative h-20 w-20 bg-gray-200 rounded-md flex-shrink-0 overflow-hidden">
+                        <Image
+                          src="/placeholder.svg"
+                          alt="placeholder"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-2/5 bg-gray-300 rounded" />
+                        <div className="h-4 w-1/6 bg-gray-200 rounded" />
+                      </div>
+                      <div className="space-y-2 text-right">
+                        <div className="h-4 w-16 bg-gray-300 rounded ml-auto" />
+                        <div className="h-4 w-20 bg-gray-200 rounded ml-auto" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+          
+              {/* Order Summary */}
+              <div className="space-y-4">
+                <div className="h-5 w-32 bg-gray-300 rounded" />
+                <div className="border rounded-md p-4 space-y-4">
+                  <div className="flex justify-between">
+                    <div className="h-4 w-24 bg-gray-200 rounded" />
+                    <div className="h-4 w-12 bg-gray-200 rounded" />
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="h-4 w-24 bg-gray-200 rounded" />
+                    <div className="h-4 w-12 bg-gray-200 rounded" />
+                  </div>
+                  <div className="flex justify-between font-medium">
+                    <div className="h-4 w-16 bg-gray-300 rounded" />
+                    <div className="h-4 w-20 bg-gray-300 rounded" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>}
           </div>
         </div>
       </div>
