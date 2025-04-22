@@ -1,33 +1,26 @@
-# **ShopCart**   
+# 🛒 ShopCart
 
-### **Homepage**  
-- A user-friendly landing page displaying featured products and categories. 
-    - Responsiveness pending
-    - Search functionality left -> can use Fuse for a fuzzy search
+**ShopCart** is a modern and responsive eCommerce web application built with the goal of replicating the functionality and user experience of top-tier online shopping platforms. From dynamic product listings to a seamless shopping cart experience, ShopCart covers it all.
 
-### **Product Listing Page**  
-- A page to showcase available products with sorting and filtering options. 
-    - Sorting and filtering implemented
-    - Responsiveness pending
-    - Categories handling
+---
 
-### **Product Details Page**  
-- A page that displays detailed information about individual products.
-    - Responsiveness pending
+## 🚀 Features
 
-### **Shopping Cart**  
-- A cart system that allows users to add, update, and remove items.  
-    - Cart UI done
+- 📱 Responsive design for mobile and desktop
+- 🔍 Product search and filtering
+- ⭐ Product ratings and descriptions
+- 🛍️ Add to cart and remove functionality
+- 🔄 Persistent cart using local storage
+- 🧾 View past orders and ordered items (Order History)
+- 📦 Product details modal/page
+- 💳 Checkout flow (dummy or integrated)
 
-### **Checkout Flow**  
-- A simple checkout process with a payment gateway.  
-    - Payment successful Modal shows up
+---
 
-### **User Authentication**  
-- Option for users to create accounts, log in, and manage their profiles.  
-    - Profile Managemenet left
-    - Settings left
-    - Previous Orders left
+## 🛠️ Tech Stack
 
-### **Responsive Design**  
-- Ensure the project is mobile-friendly and looks great across different devices.  
+- **Frontend:** NextJS, shadCN
+- **State Management:** Zustand
+- **Backend:** NodeJS
+- **Database:** MySQL
+
