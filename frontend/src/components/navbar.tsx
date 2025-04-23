@@ -2,27 +2,36 @@
 import * as React from 'react';
 import { useState } from 'react';
 import Link from "next/link";
-import { Search, ShoppingCart, User } from "lucide-react";
+import { Search, ShoppingCart,  } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useRouter } from 'next/navigation';
 import { useSearchStore } from '@/store/searchStore';
 import { useAuthStore } from '@/store/authStore';
+import { useUserStore } from '@/store/userStore';
 
 export const Navbar=()=>{
     const isLogged= useAuthStore((state)=>state.isAuthenticated);
+    const user= useUserStore((state)=>state.user);
     const searchQuery= useSearchStore((state)=>state.searchQuery);
     const setSearchQuery= useSearchStore((state)=>state.setSearchQuery);
     const router=useRouter();
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
+            if(searchQuery.trim() === "") {
+                return;
+            }
             router.push("/products");
         }
     };
     const handleClick=()=>{
-
+        if(searchQuery.trim() === "") {
+            return;
+        }
         router.push("/products");
     }
     return(
@@ -37,10 +46,17 @@ export const Navbar=()=>{
                     <h1 className="text-xl font-semibold">ShopCart</h1>
                 </Link>
 
-                <div className="flex flex-row justify-center items-center space-x-4">
-                    <Input value={searchQuery} onKeyDown={handleKeyDown} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>setSearchQuery(e.target.value)} id='search' className="max-w-md hidden md:block md:w-96 " placeholder="Search for products" />
-                    <Label htmlFor='search' className='cursor-pointer transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5' onClick={handleClick}><Search /></Label>
-                </div>
+                <Input value={searchQuery} onKeyDown={handleKeyDown} onChange={(e: React.ChangeEvent<HTMLInputElement>)=>setSearchQuery(e.target.value)} id='search' className="max-w-md hidden md:block md:w-96 " placeholder="Search for products" />
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <div className="flex flex-row justify-center items-center space-x-4">
+                            <Label htmlFor='search' className='cursor-pointer transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5' onClick={handleClick}><Search /></Label>
+                        </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p className='text-white'>Search</p>
+                    </TooltipContent>
+                </Tooltip>
             </div>
 
             <div className='flex flex-row justify-center items-center px-10'>
@@ -52,14 +68,30 @@ export const Navbar=()=>{
                     </Link>
                 ) : (
                     <div className='flex flex-row justify-between items-center space-x-5 '>
-                        <Button onClick={()=>{router.push('/cart')}} variant={'ghost'} className='flex flex-row h-full'>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                            <Button onClick={()=>{router.push('/cart')}} variant={'ghost'} className='flex flex-row h-full'>
                             <ShoppingCart className="h-6 w-6" />
                             <h3 className='text-sm'>Cart</h3>
                         </Button>
-                        <Button onClick={()=>{router.push('/account')}} variant={'ghost'} className='flex flex-row h-full'>
-                            <User className="h-6 w-6" />
-                            <h3 className='text-sm'>Profile</h3>
-                        </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className='text-white'>Cart</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button onClick={() => router.push("/account")} variant="ghost" className="p-0 h-9 w-9 rounded-full">
+                                <Avatar className="h-9 w-9">
+                                    <AvatarImage src={user.picture} alt="Profile" />
+                                    <AvatarFallback>JD</AvatarFallback>
+                                </Avatar>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className='text-white'>{user.name}</p>
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
                 )}
             </div>
