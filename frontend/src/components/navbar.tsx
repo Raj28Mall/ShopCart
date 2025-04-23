@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { useSearchStore } from '@/store/searchStore';
+import { useAuthStore } from '@/store/authStore';
 
 export const Navbar=()=>{
-    const [isLogged, setIsLogged] = useState<boolean>(true);
+    const isLogged= useAuthStore((state)=>state.isAuthenticated);
     const searchQuery= useSearchStore((state)=>state.searchQuery);
     const setSearchQuery= useSearchStore((state)=>state.setSearchQuery);
     const router=useRouter();
@@ -21,6 +22,7 @@ export const Navbar=()=>{
         }
     };
     const handleClick=()=>{
+
         router.push("/products");
     }
     return(

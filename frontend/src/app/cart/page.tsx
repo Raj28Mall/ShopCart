@@ -15,8 +15,8 @@ import { useProductStore } from "@/store/productStore";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { addOrderProduct, addToOrderHistory } from "@/lib/api";
-import { useOrderStore } from "@/store/orderStore";
-
+import { RequireAuth } from "@/components/requireAuth";
+import { useAuthStore } from "@/store/authStore";
 interface Product {
   id: number
   name: string
@@ -88,11 +88,11 @@ export default function Cart(){
       const orderStatus="Processing";
       await new Promise((resolve) => setTimeout(resolve, 1000));   
       try{
-        const response1= await addToOrderHistory(userId, totalPrice, totalQuantity, orderStatus);
+        const response1= await addToOrderHistory(totalPrice, totalQuantity, orderStatus);
         const orderId= (response1.orderId);
         setOrderNumber(Number(orderId));
         const products= useProductStore.getState().products.filter((product) => cartItems.some((item) => item.id === product.id));
-        const response2= await addOrderProduct(orderId, products.map((product) => ({
+        await addOrderProduct(orderId, products.map((product) => ({
           productId: product.id,
           productName: product.name,
           productImage: product.image,
@@ -117,12 +117,8 @@ export default function Cart(){
       }
     };
 
-    useEffect(() => {
-      console.log(orderNumber)
-    }
-    , [orderNumber]);
-
     return(
+        <RequireAuth>
         <div className="overflow-x-hidden min-h-screen">
             <Navbar/>
             <h1 className='text-3xl font-bold pt-3 my-8 mx-12'>Shopping Cart</h1>
@@ -366,7 +362,6 @@ export default function Cart(){
         </Dialog>
 
         </div>
-
-        
+      </RequireAuth>
     );
 }

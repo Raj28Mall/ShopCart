@@ -15,7 +15,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'react-hot-toast';
 import { useCartStore } from "@/store/cartStore";
-import { resolve } from "path";
+import { RequireAuth } from "@/components/requireAuth";
+import { useAuthStore } from "@/store/authStore";
 
 export default function ProductPage() {
     const params= useParams();
@@ -71,7 +72,7 @@ export default function ProductPage() {
 
   if (!product && productNotFound) {
     return (
-      <>
+      <RequireAuth>
       <Navbar/>
       <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
         <h1 className="text-2xl font-bold">Product not found</h1>
@@ -82,11 +83,12 @@ export default function ProductPage() {
           <Button variant={"outline"}>Back to Products</Button>
         </Link>
       </div>
-      </>
+      </RequireAuth>
     );
 };
 
   return(
+    <RequireAuth>
     <div className="overflow-x-hidden min-h-screen">
       <Navbar />
       <Link href="/products" className="flex items-center text-sm mb-8 hover:underline m-6">
@@ -274,5 +276,6 @@ export default function ProductPage() {
     }
       </div>
     </div>
+  </RequireAuth>
   );
 }

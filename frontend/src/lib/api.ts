@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance with interceptors
 
@@ -19,10 +18,10 @@ export const getProducts = async()=>{
     }
 };
 
-export const getOrderHistory= async(userId: string)=>{
+export const getOrderHistory= async()=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
-        const response = await axiosInstance.get(URL, { params: { userId } });
+        const response = await axiosInstance.get(URL);
         return response.data;
     } catch(err){
         console.error("Error while fetching order history: ", err);
@@ -30,10 +29,10 @@ export const getOrderHistory= async(userId: string)=>{
     }
 };
 
-export const addToOrderHistory= async(userId: string, totalPrice: number, totalQuantity: number, orderStatus: string, )=>{
+export const addToOrderHistory= async(totalPrice: number, totalQuantity: number, orderStatus: string, )=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
-        const response = await axiosInstance.post(URL, {userId, totalPrice, totalQuantity, orderStatus});
+        const response = await axiosInstance.post(URL, {totalPrice, totalQuantity, orderStatus});
         return response.data;
     } catch(err){
         console.error("Error while processing order: ", err);
@@ -63,14 +62,13 @@ export const getOrderProducts= async(orderId: string)=>{
     }
 }
 
-// Function to login and get the token
 export const loginUser = async (email: string, password: string) => {
     const URL=`${API_URL}/api/auth/login`;
     try {
       const response = await axios.post(URL, { email, password });
-      return response.data; // Return response containing the token
+      return response.data; 
     } catch (error) {
-        console.log("Error during login: ", error);
-        throw error; // Rethrow the error to be handled by the calling function
+        console.error("Error during login: ", error);
+        throw error;
     }
   };

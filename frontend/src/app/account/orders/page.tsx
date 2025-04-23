@@ -21,7 +21,7 @@ export default function OrdersPage() {
     useEffect(() => {
       const fetchOrders = async () => {
         try {
-          const response = await getOrderHistory("raj123");
+          const response = await getOrderHistory();
           setOrders(response);
         } catch (error) {
           console.error("Error fetching orders:", error);

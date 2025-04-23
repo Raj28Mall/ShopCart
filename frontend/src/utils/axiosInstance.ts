@@ -1,12 +1,13 @@
 "use client";
 import axios from 'axios';
-import { useAuthStore } from "../store/authStore"; // Path to your auth store
+import { useAuthStore } from "../store/authStore"; 
+import { toast } from "react-hot-toast";
 
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,  // Replace with your backend API URL
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
 });
 
-// Add Authorization header on every request
+// Adding Authorization header for protected API requersts
 instance.interceptors.request.use(
   (config) => {
     const { accessToken } = useAuthStore.getState(); 
@@ -23,7 +24,7 @@ instance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
-      window.location.href = '/login'; 
+      toast.error("This is in axios instance. Error 401: Unauthorized. Logging out.");
     }
     return Promise.reject(error);
   }

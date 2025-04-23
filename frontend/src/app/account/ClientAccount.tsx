@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useRouter } from "next/navigation";
 import { toast } from 'react-hot-toast';
 import { Navbar } from '@/components/navbar';
+import { useAuthStore } from '@/store/authStore';
 
 interface User{
     id: number
@@ -44,6 +45,10 @@ export default function AccountClientPage() {
   };
 
   const router= useRouter();
+  const handleLogOut=()=>{
+    useAuthStore.getState().logout();
+    router.push('/');
+  }
   const user: User={
     "id": 1,
     "name": "Raj Mall",
@@ -57,6 +62,7 @@ export default function AccountClientPage() {
   const [phone, setPhone]=useState<number>(user.phone);
   const [profileChange, setProfileChange]= useState<boolean>(false);
   const [profileUpdating, setProfileUpdating] = useState<boolean>(false);
+  
   return (
     <>
     <Navbar/>
@@ -90,7 +96,7 @@ export default function AccountClientPage() {
                   <CreditCard className="h-4 w-4" />
                   Payment Methods
                 </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
+                <Button variant={'ghost'} onClick={() => handleLogOut()} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
                   <LogOut className="h-4 w-4" />
                   Sign Out
                 </Button>
