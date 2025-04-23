@@ -13,21 +13,29 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { loginUser } from "@/lib/api"; 
 
 export default function LoginPage() {  
-
+    const { setToken } = useAuthStore(); // Zustand store for token
     const { reset, register, handleSubmit, formState: { errors, isSubmitting }} = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
     const router=useRouter();
 
-    const onSubmit = async (data: LoginSchema) => {
+    const onSubmit = async (loginData: LoginSchema) => {
         try{
-            console.log(data);
-            await new Promise((resolve)=> setTimeout(resolve, 2000)); //simulating API authentication process
+            const data= await loginUser(loginData.email, loginData.password);
+            if(!data){
+                toast.error("Invalid credentials");
+                return;
+            }
+            const token=data.acccessToken;
+            setToken(token);
+            await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
             toast.success("Login successful");
             router.push('/');
             reset();
         } catch(err){
-            toast.error("Login failed. Please try again later.");
+            toast.error("Invalid credentials");
         }
     }
 

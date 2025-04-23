@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance with interceptors
 
 const API_URL= process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -20,7 +22,7 @@ export const getProducts = async()=>{
 export const getOrderHistory= async(userId: string)=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
-        const response = await axios.get(URL, { params: { userId } });
+        const response = await axiosInstance.get(URL, { params: { userId } });
         return response.data;
     } catch(err){
         console.error("Error while fetching order history: ", err);
@@ -31,7 +33,7 @@ export const getOrderHistory= async(userId: string)=>{
 export const addToOrderHistory= async(userId: string, totalPrice: number, totalQuantity: number, orderStatus: string, )=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
-        const response = await axios.post(URL, {userId, totalPrice, totalQuantity, orderStatus});
+        const response = await axiosInstance.post(URL, {userId, totalPrice, totalQuantity, orderStatus});
         return response.data;
     } catch(err){
         console.error("Error while processing order: ", err);
@@ -42,7 +44,7 @@ export const addToOrderHistory= async(userId: string, totalPrice: number, totalQ
 export const addOrderProduct = async( orderId: string, products: Array<{ productId: number; productName: string; productImage: string; productPrice: number; productQuantity: number; }> ) => {
     const URL = `${API_URL}/order_api/order_products`;
     try {
-        const response = await axios.post(URL, { orderId, products });
+        const response = await axiosInstance.post(URL, { orderId, products });
         return response.data;
     } catch (err) {
         console.error("Error while adding order products: ", err);
@@ -53,10 +55,22 @@ export const addOrderProduct = async( orderId: string, products: Array<{ product
 export const getOrderProducts= async(orderId: string)=>{
     const URL=`${API_URL}/order_api/order_products`;
     try{
-        const response = await axios.get(URL, { params: { orderId } });
+        const response = await axiosInstance.get(URL, { params: { orderId } });
         return response.data;
     } catch(err){
         console.error("Error while fetching order products: ", err);
         return;
     }
 }
+
+// Function to login and get the token
+export const loginUser = async (email: string, password: string) => {
+    const URL=`${API_URL}/api/auth/login`;
+    try {
+      const response = await axios.post(URL, { email, password });
+      return response.data; // Return response containing the token
+    } catch (error) {
+        console.log("Error during login: ", error);
+        throw error; // Rethrow the error to be handled by the calling function
+    }
+  };
