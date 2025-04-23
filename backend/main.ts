@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import productRoutes from './routes/productRoutes'; 
 import orderRoutes from './routes/orderRoutes';
+import auth from './routes/auth';
 import cors from 'cors'; 
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors({origin: 'http://localhost:3000'}, ));
 // Using productRoutes for any routes under "/api"
 app.use('/product_api', productRoutes);
 app.use("/order_api", orderRoutes);
+app.use('/api/auth', auth);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

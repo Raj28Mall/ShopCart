@@ -21,6 +21,7 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginSchema) => {
         try{
+            console.log(data);
             await new Promise((resolve)=> setTimeout(resolve, 2000)); //simulating API authentication process
             toast.success("Login successful");
             router.push('/');
