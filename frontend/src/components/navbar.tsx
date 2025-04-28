@@ -2,23 +2,28 @@
 import * as React from 'react';
 import { useState } from 'react';
 import Link from "next/link";
-import { Search, ShoppingCart,  } from "lucide-react";
+import { Search, ShoppingCart, } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 import { useRouter } from 'next/navigation';
 import { useSearchStore } from '@/store/searchStore';
 import { useAuthStore } from '@/store/authStore';
 import { useUserStore } from '@/store/userStore';
+import { useCartStore } from '@/store/cartStore';
 
 export const Navbar=()=>{
     const isLogged= useAuthStore((state)=>state.isAuthenticated);
     const user= useUserStore((state)=>state.user);
     const searchQuery= useSearchStore((state)=>state.searchQuery);
     const setSearchQuery= useSearchStore((state)=>state.setSearchQuery);
+    const cartItemCount= useCartStore((state)=>state.cartItems.length);
     const router=useRouter();
+
+    console.log(cartItemCount);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -71,9 +76,16 @@ export const Navbar=()=>{
                         <Tooltip>
                             <TooltipTrigger asChild>
                             <Button onClick={()=>{router.push('/cart')}} variant={'ghost'} className='flex flex-row h-full'>
-                            <ShoppingCart className="h-6 w-6" />
-                            <h3 className='text-sm'>Cart</h3>
-                        </Button>
+                                <ShoppingCart className="h-6 w-6" />
+                                <span className="hidden sm:inline-block">Cart</span>
+                                {cartItemCount > 0 && (
+                                    <Badge
+                                    variant="default"
+                                    className=" text-white bg-red-400 absolute top-1 -right-[1px] h-3 w-3 flex items-center justify-center p-0 text-xs rounded-full"
+                                    >
+                                    </Badge>
+                                )}
+                            </Button>
                             </TooltipTrigger>
                             <TooltipContent>
                                 <p className='text-white'>Cart</p>
@@ -84,7 +96,7 @@ export const Navbar=()=>{
                                 <Button onClick={() => router.push("/account")} variant="ghost" className="p-0 h-9 w-9 rounded-full">
                                 <Avatar className="h-9 w-9">
                                     <AvatarImage src={user.picture} alt="Profile" />
-                                    <AvatarFallback>JD</AvatarFallback>
+                                    <AvatarFallback>{user.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
                                 </Avatar>
                                 </Button>
                             </TooltipTrigger>
