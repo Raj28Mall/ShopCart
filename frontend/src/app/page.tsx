@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/productCard";
 import { useProductStore } from "@/store/productStore";
 import { getProducts } from '@/lib/api';
+import Footer from '@/components/footer';
 
 const CATEGORY_COUNT=6;
 const PRODUCT_COUNT=10;
@@ -117,6 +118,7 @@ export default function Home() {
               </Button>
             </Link>
           </div>
+          <Footer/>
     </div>
   );
 }

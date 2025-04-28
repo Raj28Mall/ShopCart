@@ -21,6 +21,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
+import Footer from '@/components/footer';
 
 interface Product {
   id: number
@@ -249,6 +250,7 @@ export default function Products(){
             </Button>
           </div>
         </div>
+        <Footer />
       </div>
     );
 }

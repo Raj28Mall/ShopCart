@@ -13,6 +13,8 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "react-hot-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Navbar } from "@/components/navbar"
+import AccountSidebar from "@/components/accountSidebar"
+import Footer from "@/components/footer"
 
 export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false)
@@ -31,40 +33,7 @@ export default function SettingsPage() {
     <div className="container px-4 py-8 md:px-20 md:py-12">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/4">
-        <Card className="pb-3">
-            <CardHeader>
-              <CardTitle className='text-xl'>Account</CardTitle>
-              <CardDescription className="text-gray-400">Manage your account settings and preferences</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <nav className="flex flex-col">
-                <Button variant={'ghost'} onClick={() => router.push('/account')} className="justify-start flex gap-2 mx-2 text-sm bg-muted font-medium">
-                  <User className="h-4 w-4" />
-                  Account Overview
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/orders')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <Package className="h-4 w-4" />
-                  Orders
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/settings')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <Heart className="h-4 w-4" />
-                  Wishlist
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <CreditCard className="h-4 w-4" />
-                  Payment Methods
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
-                </Button>
-              </nav>
-            </CardContent>
-          </Card>
+          <AccountSidebar />
         </div>
 
         <div className="flex-1">
@@ -217,6 +186,7 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+      <Footer />
     </>
   )
 }

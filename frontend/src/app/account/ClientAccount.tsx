@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { Settings, Package, LogOut, User, CreditCard, Heart, Phone, Router, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import AccountSidebar from '@/components/accountSidebar';
 import { useRouter } from "next/navigation";
 import { toast } from 'react-hot-toast';
 import { Navbar } from '@/components/navbar';
@@ -46,6 +46,7 @@ export default function AccountClientPage() {
 
   const router= useRouter();
   const handleLogOut=()=>{
+    console.log("CLICKED ON LOGOUT");
     useAuthStore.getState().logout();
     router.push('/');
   }
@@ -69,40 +70,7 @@ export default function AccountClientPage() {
     <div className="container px-4 py-8 md:px-20 md:py-12">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/4">
-          <Card className="pb-3">
-            <CardHeader>
-              <CardTitle className='text-xl'>Account</CardTitle>
-              <CardDescription className="text-gray-400">Manage your account settings and preferences</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <nav className="flex flex-col">
-                <Button variant={'ghost'} onClick={() => router.push('/account')} className="justify-start flex gap-2 mx-2 text-sm bg-muted font-medium">
-                  <User className="h-4 w-4" />
-                  Account Overview
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/orders')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <Package className="h-4 w-4" />
-                  Orders
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/account/settings')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <Settings className="h-4 w-4" />
-                  Settings
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <Heart className="h-4 w-4" />
-                  Wishlist
-                </Button>
-                <Button variant={'ghost'} onClick={() => router.push('/comingSoon')} className="flex justify-start gap-2 mx-2 text-sm hover:bg-muted/50 transition-colors">
-                  <CreditCard className="h-4 w-4" />
-                  Payment Methods
-                </Button>
-                <Button variant={'ghost'} onClick={() => handleLogOut()} className="flex justify-start gap-2 mx-2 text-red-500 hover:text-red-600 transition-colors">
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
-                </Button>
-              </nav>
-            </CardContent>
-          </Card>
+          <AccountSidebar />
         </div>
 
         <div className="flex-1">

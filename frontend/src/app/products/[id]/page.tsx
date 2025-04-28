@@ -16,7 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from 'react-hot-toast';
 import { useCartStore } from "@/store/cartStore";
 import { RequireAuth } from "@/components/requireAuth";
-import { useAuthStore } from "@/store/authStore";
+import Footer from "@/components/footer";
 
 export default function ProductPage() {
     const params= useParams();
@@ -90,7 +90,7 @@ export default function ProductPage() {
   return(
     <RequireAuth>
     <div className="overflow-x-hidden min-h-screen">
-      <Navbar />
+      <Navbar/>
       <Link href="/products" className="flex items-center text-sm mb-8 hover:underline m-6">
           <ChevronLeft className="h-4 w-4 mr-1" />
           Back to Products
@@ -275,6 +275,7 @@ export default function ProductPage() {
           </div>
     }
       </div>
+      <Footer/>
     </div>
   </RequireAuth>
   );

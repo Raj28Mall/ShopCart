@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import ClientAccount from "./ClientAccount"
+import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "Account | Shopcart",
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 }
 
 export default function AccountPage() {
-  return <ClientAccount />
+  return(
+    <>
+      <ClientAccount />
+      <Footer />
+    </>
+  );
 }
