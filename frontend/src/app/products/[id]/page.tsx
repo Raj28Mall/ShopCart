@@ -193,12 +193,12 @@ export default function ProductPage() {
               <TabsList className="grid grid-cols-2 w-full bg-gray-200 rounded-full">
                 <TabsTrigger
                   value="description"
-                  className="text-sm font-medium rounded-full transition-all  data-[state=active]:bg-white   data-[state=active]:text-black  data-[state=active]:shadow-none">
+                  className="text-sm font-medium rounded-full transition-all  data-[state=active]:bg-white data-[state=active]:text-black  data-[state=active]:shadow-none">
                   Description
                 </TabsTrigger>
                 <TabsTrigger
                   value="details"
-                  className="text-sm font-medium rounded-full transition-all  data-[state=active]:bg-white   data-[state=active]:text-black data-[state=active]:shadow-none">
+                  className="text-sm font-medium rounded-full transition-all  data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:shadow-none">
                   Details
                 </TabsTrigger>
               </TabsList>

@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import db from "../db";
 import { validate } from "./../middleware/validate";
-import { loginSchema, LoginSchema } from "../../schemas/loginSchema";
 const router = express.Router();
 
 // POST /api/login
@@ -17,7 +16,6 @@ router.post("/login", validate(LoginSchema), async (req: Request, res: Response)
     if (!user) {
       return res.status(401).json({ message: "Invalid username" });
     }
-    
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
