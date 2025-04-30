@@ -3,6 +3,7 @@ import express, {Request, Response} from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import db from "../db";
+import { LoginSchema } from "../../schemas/loginSchema";
 import { validate } from "./../middleware/validate";
 const router = express.Router();
 

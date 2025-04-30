@@ -43,7 +43,7 @@ export default function SignupPage() {
             </Link>
             <p>Sign up</p>
               </CardTitle>
-              <CardDescription className="text-center text-slate-600">Sign up to create your account</CardDescription>
+              <CardDescription className="text-center text-slate-500">Sign up to create your account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 ">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pb-2" noValidate>

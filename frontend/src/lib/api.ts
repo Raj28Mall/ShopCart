@@ -71,4 +71,39 @@ export const loginUser = async (email: string, password: string) => {
         console.error("Error during login: ", error);
         throw error;
     }
-  };
+};
+
+export const registerUser = async (name: string, email: string, password: string) => {
+    const URL=`${API_URL}/api/auth/register`;
+    try {
+        const response = await axios.post(URL, { name, email, password });
+        return response.data; 
+    } catch (error) {
+        console.error("Error during registration: ", error);
+        throw error;
+    }
+}
+
+export const addProduct = async (product: { name: string; category: string; price: string; image: File| string; rating?: string; stock: string; shortDescription: string; longDescription: string; status: string;
+}) => {
+    const URL = `${API_URL}/product_api/products`;
+    const productToSend = { ...product, rating: product.rating ?? "0.0", }; //default values
+    try {
+        const response = await axios.post(URL, productToSend);
+        return response.data; 
+    } catch (error) {
+        console.error("Error while adding product: ", error);
+        throw error;
+    }
+}
+
+export const deleteProduct = async (productId: string) => {
+    const URL = `${API_URL}/product_api/products/${productId}`;
+    try {
+        const response = await axios.delete(URL);
+        return response.data; 
+    } catch (error) {
+        console.error("Error while deleting product: ", error);
+        throw error;
+    }
+}

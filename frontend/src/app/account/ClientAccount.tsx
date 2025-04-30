@@ -43,13 +43,7 @@ export default function AccountClientPage() {
     setProfileChange(false);
     toast.success("Profile updated successfully");
   };
-
-  const router= useRouter();
-  const handleLogOut=()=>{
-    console.log("CLICKED ON LOGOUT");
-    useAuthStore.getState().logout();
-    router.push('/');
-  }
+  
   const user: User={
     "id": 1,
     "name": "Raj Mall",

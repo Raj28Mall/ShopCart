@@ -23,8 +23,6 @@ export const Navbar=()=>{
     const cartItemCount= useCartStore((state)=>state.cartItems.length);
     const router=useRouter();
 
-    console.log(cartItemCount);
-
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             if(searchQuery.trim() === "") {

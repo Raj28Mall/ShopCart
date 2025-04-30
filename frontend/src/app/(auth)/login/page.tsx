@@ -56,7 +56,7 @@ export default function LoginPage() {
             </Link>
             <p>Sign In</p>
               </CardTitle>
-              <CardDescription className="text-center text-slate-600">Sign in to your account</CardDescription>
+              <CardDescription className="text-center text-slate-500">Sign in to your account</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 ">
             <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4 pb-2">

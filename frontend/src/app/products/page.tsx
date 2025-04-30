@@ -46,12 +46,9 @@ export default function Products(){
     const [displayCount, setDisplayCount]=useState<number>(15);
     const [displayProducts, setDisplayProducts]= useState<Product[]>([]);
     const [loading, setLoading]= useState<boolean>(true);
-    const [imagesLoaded, setImagesLoaded]= useState<number>(0);
     const initializedRef = useRef(false);
     const products= useProductStore((state) => state.products);
-    const setProducts= useProductStore((state) => state.setProducts);
     const searchQuery= useSearchStore((state) => state.searchQuery);
-    const totalImages=displayProducts.length;
     const router = useRouter();
     useEffect(() => {
       const load = async ()=>{

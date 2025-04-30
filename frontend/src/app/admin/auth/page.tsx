@@ -4,8 +4,8 @@ import Link from "next/link";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, LoginSchema } from "../../../../../../schemas/loginSchema";
-import { signupSchema, SignupSchema } from "../../../../../../schemas/signupSchema";
+import { loginSchema, LoginSchema } from "../../../../../schemas/loginSchema";
+import { signupSchema, SignupSchema } from "../../../../../schemas/signupSchema";
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button"
@@ -78,7 +78,7 @@ export default function LoginPage() {
             </Link>
             <p>Admin Portal</p>
               </CardTitle>
-              <CardDescription className="text-center text-slate-600">Login to your admin account or request access</CardDescription>
+              <CardDescription className="text-center text-slate-500">Login to your admin account or request access</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 ">
             <Tabs defaultValue="login" className="w-full">

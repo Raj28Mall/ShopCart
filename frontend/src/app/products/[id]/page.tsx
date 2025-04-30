@@ -17,6 +17,7 @@ import { toast } from 'react-hot-toast';
 import { useCartStore } from "@/store/cartStore";
 import { RequireAuth } from "@/components/requireAuth";
 import Footer from "@/components/footer";
+import { ProductCard } from "@/components/productCard";
 
 export default function ProductPage() {
     const params= useParams();
@@ -128,7 +129,7 @@ export default function ProductPage() {
               (10 reviews)
             </span>
           </div>
-          <p className="text-2xl font-bold mt-4 mb-8"> ${Number(product.price).toFixed(2)} </p>
+          <p className="text-2xl font-bold mt-4 mb-8">₹ {Number(product.price).toFixed(2)} </p>
           <p className="text-muted-foreground my-4">{product.shortDescription}</p>
 
           <Separator />
@@ -203,7 +204,7 @@ export default function ProductPage() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="description" className="mt-4 text-sm text-muted-foreground">
+              <TabsContent value="description" className="mt-4 text-sm">
                 <p className="p-1">{product.longDescription}</p>
               </TabsContent>
 
@@ -274,6 +275,15 @@ export default function ProductPage() {
             </div>
           </div>
     }
+
+    <div className="mt-16">
+        <h2 className="text-2xl font-bold mb-6 px-6">You might also like</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10">
+          {products.slice(0,8).map((product) => (
+            <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={Number(product.price)} />
+          ))}
+        </div>
+      </div>
       </div>
       <Footer/>
     </div>

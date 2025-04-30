@@ -112,6 +112,11 @@
   --sidebar-ring: oklch(0.556 0 0);
 } */
 
+/* Direct style for muted-foreground text since the Tailwind class isn't working */
+.text-muted-foreground {
+  color: #71717a !important; /* Adding an important rule to ensure it overrides other styles */
+}
+
 @layer base {
   * {
     @apply border-gray-200 outline-blue-500/50;

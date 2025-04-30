@@ -3,6 +3,11 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+    const inputProps = { ...props };
+    if (type === "file") {
+      delete inputProps.value;
+    }
+
   return (
     <input
       type={type}

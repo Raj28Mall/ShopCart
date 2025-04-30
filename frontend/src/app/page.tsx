@@ -11,6 +11,7 @@ import { ProductCard } from "@/components/productCard";
 import { useProductStore } from "@/store/productStore";
 import { getProducts } from '@/lib/api';
 import Footer from '@/components/footer';
+import { categories } from '@/app/constants';
 
 const CATEGORY_COUNT=6;
 const PRODUCT_COUNT=10;
@@ -18,44 +19,12 @@ const PRODUCT_COUNT=10;
 export default function Home() {
   const products = useProductStore((state) => state.products);    
   const setProducts = useProductStore((state) => state.setProducts);
-  const categories = [
-    {
-      id: 1,
-      name: "Clothing",
-      slug: "clothing",
-      image: "/products/clothes/clothing.jpg",
-    },
-    {
-      id: 2,
-      name: "Electronics",
-      slug: "electronics",
-      image: "/products/electronics/electronics.jpg",
-    },
-    {
-      id: 3,
-      name: "Home & Kitchen",
-      slug: "home-kitchen",
-      image: "/products/kitchen/kitchen.avif",
-    },
-    {
-      id: 4,
-      name: "Sports",
-      slug: "sports",
-      image: "/products/sports/sports.avif",
-    },
-    {
-      id: 5,
-      name: "Beauty",
-      slug: "beauty",
-      image: "/products/beauty/beauty.jpeg",
-    },
-  ];
   
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await getProducts();
-        setProducts(response);
+        setProducts(response);    {/* Filtering out the active products is left. preferably in db because SQL query is efficient */}
       } catch (error) {
         console.error("Error fetching products:", error);
       }
