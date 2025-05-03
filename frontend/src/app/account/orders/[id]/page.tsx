@@ -118,7 +118,7 @@ export default function OrderDetailsPage() {
                           <p className="font-medium">
                             ₹{(Number(item.productPrice) * Number(item.productQuantity)).toFixed(2)}
                           </p>
-                          <Button variant="link" className="h-auto p-0 text-sm mt-5">
+                          <Button variant="link" onClick={()=>router.push(`/products/${item.productId}`)} className="h-auto p-0 text-sm mt-5">
                             Buy Again
                           </Button>
                         </div>
@@ -178,7 +178,6 @@ export default function OrderDetailsPage() {
           
             <CardContent className="space-y-8 animate-pulse">
           
-              {/* Order Items */}
               <div className="space-y-4">
                 <div className="h-5 w-32 bg-gray-300 rounded" />
                 <div className="border rounded-md divide-y">
@@ -204,8 +203,7 @@ export default function OrderDetailsPage() {
                   ))}
                 </div>
               </div>
-          
-              {/* Order Summary */}
+        
               <div className="space-y-4">
                 <div className="h-5 w-32 bg-gray-300 rounded" />
                 <div className="border rounded-md p-4 space-y-4">

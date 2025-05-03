@@ -1,17 +1,17 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-interface Product {
-  id: number
-  name: string
-  price: number
-  image: string
-  category: string
-  shortDescription: string
-  longDescription: string
-  rating: number
-  quantity: number
-  details: string[]
+export interface Product { 
+  id: string;
+  name: string;
+  category: string;
+  price: string; 
+  image: string;
+  rating?: string; 
+  stock: number; 
+  shortDescription: string;
+  longDescription: string;
+  status: string; 
 }
 
 interface ProductStore {

@@ -7,6 +7,17 @@ if (!API_URL) {
   throw new Error('Backend URL not found');
 }
 
+export const getProduct= async(productId: string)=>{
+    const URL=`${API_URL}/product_api/products/${productId}`;
+    try{
+        const response = await axios.get(URL);
+        return response.data;
+    } catch(err){
+        console.error("Error while fetching product in backend: ", err);
+        return;
+    }
+}
+
 export const getProducts = async()=>{
     const URL=`${API_URL}/product_api/products`;
     try{
@@ -84,15 +95,62 @@ export const registerUser = async (name: string, email: string, password: string
     }
 }
 
-export const addProduct = async (product: { name: string; category: string; price: string; image: File| string; rating?: string; stock: string; shortDescription: string; longDescription: string; status: string;
-}) => {
-    const URL = `${API_URL}/product_api/products`;
-    const productToSend = { ...product, rating: product.rating ?? "0.0", }; //default values
+
+export const addProduct = async (product: { name: string; category: string; price: string; image: File | string;  rating?: string; stock: string; shortDescription: string; longDescription: string; status: string;}) => {
+    const URL = `${API_URL}/product_api/products`; 
+    const formData = new FormData();
+    formData.append('name', product.name);
+    formData.append('category', product.category);
+    formData.append('price', product.price);
+    formData.append('stock', product.stock);
+    formData.append('shortDescription', product.shortDescription);
+    formData.append('longDescription', product.longDescription);
+    formData.append('status', product.status);
+    formData.append('rating', product.rating ?? "0.0");
+    if (product.image instanceof File) {
+        formData.append('image', product.image, product.image.name); 
+    } else if (typeof product.image === 'string') {
+        console.warn("addProduct called with an image string. The backend expects a File upload in the 'image' field for this endpoint.");
+    }
+
     try {
-        const response = await axios.post(URL, productToSend);
+        const response = await axios.post(URL, formData, {});
         return response.data; 
     } catch (error) {
-        console.error("Error while adding product: ", error);
+        if (axios.isAxiosError(error)) {
+            console.error("Error adding product:", error.response?.status, error.response?.data || error.message);
+        } else {
+            console.error("Error while adding product: ", error);
+        }
+        throw error; 
+    }
+}
+
+export const editProduct = async (productId: string, product: { name: string; category: string; price: string; image: File | string; rating?: string; stock: string; shortDescription: string; longDescription: string; status: string;}) => {
+    const URL = `${API_URL}/product_api/products/${productId}`;
+    const formData = new FormData();
+    formData.append('name', product.name);
+    formData.append('category', product.category);
+    formData.append('price', product.price);
+    formData.append('stock', product.stock);
+    formData.append('shortDescription', product.shortDescription);
+    formData.append('longDescription', product.longDescription);
+    formData.append('status', product.status);
+    formData.append('rating', product.rating ?? "0.0");
+    if (product.image instanceof File) {
+        formData.append('image', product.image, product.image.name);
+    } else if (typeof product.image === 'string') {
+        console.warn("editProduct called with an image string. The backend expects a File upload in the 'image' field for this endpoint.");
+    }
+    try {
+        const response = await axios.put(URL, formData, {});
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error("Error editing product:", error.response?.status, error.response?.data || error.message);
+        } else {
+            console.error("Error while editing product: ", error);
+        }
         throw error;
     }
 }

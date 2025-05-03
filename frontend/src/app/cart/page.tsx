@@ -20,14 +20,13 @@ import { useAuthStore } from "@/store/authStore";
 interface Product {
   id: number
   name: string
-  price: number
-  image: string
+  price: string
+  image: File | string
   category: string
   shortDescription: string
   longDescription: string
-  rating: number
+  rating: string
   quantity: number
-  details: string[]
 }
 
 const userId="raj123";
@@ -91,14 +90,14 @@ export default function Cart(){
         const response1= await addToOrderHistory(totalPrice, totalQuantity, orderStatus);
         const orderId= (response1.orderId);
         setOrderNumber(Number(orderId));
-        const products= useProductStore.getState().products.filter((product) => cartItems.some((item) => item.id === product.id));
+        const products= useProductStore.getState().products.filter((product) => cartItems.some((item) => item.id.toString() === product.id.toString()));
         await addOrderProduct(orderId, products.map((product) => ({
-          productId: product.id,
-          productName: product.name,
-          productImage: product.image,
-          productPrice: product.price,
-          productQuantity: cartItems.find((item) => item.id === product.id)?.quantity || 1,
-        })));
+                  productId: Number(product.id),
+                  productName: product.name,
+                  productImage: product.image,
+                  productPrice: Number(product.price),
+                  productQuantity: cartItems.find((item) => Number(item.id) === Number(product.id))?.quantity || 1,
+                })));
       } catch(err){
         console.error("Error while processing order: ", err);
         toast.error("Error while processing order");

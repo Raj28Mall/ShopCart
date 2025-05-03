@@ -23,7 +23,7 @@ export default function ProductPage() {
     const params= useParams();
     const id= params.id;
     const products = useProductStore((state)=>state.products);
-    const product=products.find((product) => product.id === Number(id));
+    const product=products.find((product) => product.id.toString() === (id)?.toString());
     const cartItems = useCartStore((state) => state.cartItems);
     const setCartItems = useCartStore((state) => state.setCartItems);
     const [quantity, setQuantity] = useState<number>(cartItems.find((item)=>item.id===Number(id))?.quantity || 0);
@@ -118,7 +118,7 @@ export default function ProductPage() {
                 <Star
                   key={i}
                   className={`h-5 w-5 ${
-                    i < product.rating
+                    i < Number(product.rating)
                       ? "text-yellow-400 fill-yellow-400"
                       : "text-gray-300"
                   }`}
@@ -126,7 +126,7 @@ export default function ProductPage() {
               ))}
             </div>
             <span className="text-sm text-muted-foreground">
-              (10 reviews)
+              {Number(product.rating)<=0 ? "(No reviews yet)" : "(10 reviews)"}
             </span>
           </div>
           <p className="text-2xl font-bold mt-4 mb-8">₹ {Number(product.price).toFixed(2)} </p>
@@ -280,7 +280,7 @@ export default function ProductPage() {
         <h2 className="text-2xl font-bold mb-6 px-6">You might also like</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10">
           {products.slice(0,8).map((product) => (
-            <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={Number(product.price)} />
+            <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)} />
           ))}
         </div>
       </div>

@@ -17,7 +17,7 @@ interface ProductCardProps {
     price: number;
 }
 
-export const ProductCard = ({ id,  name, image, price }: ProductCardProps) => {
+export const ProductCard = React.memo(({ id,  name, image, price }: ProductCardProps) => {
     const setCartItems = useCartStore((state) => state.setCartItems);
     const cartItems = useCartStore((state) => state.cartItems);
     const [qty, setQty] = useState<number>((cartItems.find((item) => item.id === id)?.quantity || 0));
@@ -62,7 +62,14 @@ export const ProductCard = ({ id,  name, image, price }: ProductCardProps) => {
     return (
         <Card className="overflow-hidden transition-all hover:shadow-lg pt-0 cursor-pointer bg-white" onClick={handleCardClick}>
             <div className="relative h-[250px] w-full">
-                <Image src={image || "/placeholder.svg"} alt={name} fill className="object-cover" />
+                <Image 
+                    src={image || "/placeholder.svg"} 
+                    alt={name} 
+                    fill 
+                    className="object-cover"
+                    loading="lazy" 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+                />
             </div>
             <CardContent className="flex flex-col px-4">
                 <h3 className="font-semibold h-12 overflow-hidden text-ellipsis cursor-text" onClick={(e)=>e.stopPropagation()}>{name}</h3>
@@ -100,4 +107,4 @@ export const ProductCard = ({ id,  name, image, price }: ProductCardProps) => {
             </CardContent>
         </Card>
     );
-}
+});

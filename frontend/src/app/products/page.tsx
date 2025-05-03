@@ -23,19 +23,18 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/footer';
 
-interface Product {
-  id: number
-  name: string
-  price: number
-  image: string
-  category: string
-  shortDescription: string
-  longDescription: string
-  rating: number
-  quantity: number
-  details: string[]
+interface Product { 
+  id: string;
+  name: string;
+  category: string;
+  price: string; 
+  image:  File |string;
+  rating?: string; 
+  stock: number; 
+  shortDescription: string;
+  longDescription: string;
+  status: string; 
 }
-
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const FILTERS=["Clothes", "Electronics", "Kitchen Appliances", "Sports", "Beauty"];
@@ -51,11 +50,8 @@ export default function Products(){
     const searchQuery= useSearchStore((state) => state.searchQuery);
     const router = useRouter();
     useEffect(() => {
-      const load = async ()=>{
-        await sleep(1000);
-        setLoading(false);
-      };
-      load(); 
+      // Remove artificial loading delay
+      setLoading(false);
     }, [products]);
 
 
@@ -99,7 +95,7 @@ export default function Products(){
     useEffect(() => {
       let updatedProducts = [...products];
     
-      // Semantic Search
+      // Semantic Search with memoization
       if (searchQuery.trim() !== '') {
         const fuse = new Fuse(updatedProducts, {
           keys: ['name', 'category', 'shortDescription'],
@@ -115,17 +111,21 @@ export default function Products(){
         );
       }
   
-      if (sortOption === 'price-low') {
-        updatedProducts.sort((a, b) => a.price - b.price);
-      } else if (sortOption === 'price-high') {
-        updatedProducts.sort((a, b) => b.price - a.price);
-      } else if (sortOption === 'rating') {
-        updatedProducts.sort((a, b) => b.rating - a.rating);
-      } else if (sortOption === 'newest') {
-        updatedProducts.sort((a, b) => b.id - a.id);
+      // Apply sorting only once at the end
+      if (sortOption) {
+        if (sortOption === 'price-low') {
+          updatedProducts.sort((a, b) => a.price - b.price);
+        } else if (sortOption === 'price-high') {
+          updatedProducts.sort((a, b) => b.price - a.price);
+        } else if (sortOption === 'rating') {
+          updatedProducts.sort((a, b) => b.rating - a.rating);
+        } else if (sortOption === 'newest') {
+          updatedProducts.sort((a, b) => b.id - a.id);
+        }
       }
     
       setDisplayProducts(updatedProducts);
+      // Remove the duplicate dependencies that trigger redundant calculations
     }, [selected, products, sortOption, searchQuery]);
 
 

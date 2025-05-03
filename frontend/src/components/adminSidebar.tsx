@@ -36,10 +36,6 @@ export const AdminSidebar = () => {
             <LayoutDashboard className="h-5 w-5" />
             Dashboard
           </Button>
-          <Button variant="ghost" onClick={() => router.push('/admin/dashboard/products')} className="w-full flex items-center justify-start gap-3 px-3 py-2 text-sm font-medium rounded-md bg-primary/10 text-primary">
-            <ShoppingBag className="h-5 w-5" />
-            Products
-          </Button>
           <Button variant="ghost" onClick={() => router.push('/admin/dashboard/settings')} className="w-full flex items-center justify-start gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted">
             <Settings className="h-5 w-5" />
             Settings

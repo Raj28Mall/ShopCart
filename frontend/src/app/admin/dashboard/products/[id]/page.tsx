@@ -1,54 +1,58 @@
+// src/app/admin/products/new/page.tsx (or your edit page)
 "use client";
 import type React from "react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Upload, X, } from "lucide-react";
+import { ArrowLeft } from "lucide-react"; 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { AdminSidebar } from "@/components/adminSidebar";
-import { categories } from "@/app/constants";
-import { addProduct } from "@/lib/api";
+import { categories } from "@/app/constants"; 
+import { editProduct, getProduct } from "@/lib/api"; 
 import { toast } from "react-hot-toast";
-import Image from "next/image";
-import { ProductForm } from "@/components/productForm";
+import { ProductForm } from "@/components/productForm"; 
 
 interface Product{
-  name: string;
-  category: string;
-  price: string;
-  image: File | string;
-  rating?: string;
-  stock: string;
-  shortDescription: string;
-  longDescription: string;
-  status: string;
-}
+    name: string;
+    category: string;
+    price: string;
+    image: File | string;
+    rating?: string;
+    stock: string;
+    shortDescription: string;
+    longDescription: string;
+    status: string;
+};
 
-export default function NewProductPage() {
+export default function EditProductPage() { 
+  const params= useParams();
+  const productId= (params.id) as string;
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<Product>(
-    {
-      name: "",
-      category: "",
-      price: "",
-      image: "",
-      rating: "0.0",
-      stock: "",
-      shortDescription: "",
-      longDescription: "",
-      status: "active",
-    }
-  );
+  
+  const [formData, setFormData] = useState<Product>({
+    name: "", 
+    category: "",
+    price: "",
+    image: "",
+    rating: "",
+    stock: "",
+    shortDescription: "",
+    longDescription: "",
+    status: "",
+  });
+  useEffect(() => {
+    const fetchProductData = async (productId: string) => {
+      const productData = await getProduct(productId); 
+      setFormData(productData);
+      if (typeof productData.image === 'string') { 
+        setImagePreview(productData.image);
+      }
+    };
+    if (productId) fetchProductData(productId);
+  }, [productId]); 
 
   useEffect(() => {
     setUser({
@@ -87,14 +91,14 @@ export default function NewProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    
     try {
-      await addProduct(formData);
+      await editProduct(productId, formData);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success("Product created successfully");
+      toast.success("Product updated successfully");
     } catch (error) {
-      console.error("Failed to create product:", error);
-      toast.error("Failed to create product");
+      console.error("Failed to update product:", error);
+      toast.error("Failed to update product");
     } finally {
       setIsSubmitting(false);
     }
@@ -112,19 +116,19 @@ export default function NewProductPage() {
         <header className="bg-card bg-white border-b sticky top-0 z-10">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
-              <Link href="/admin/dashboard" className="flex items-center text-sm hover:text-primary">
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Back to Dashboard
-              </Link>
+               <Link href="/admin/dashboard" className="flex items-center text-sm hover:text-primary">
+                 <ArrowLeft className="h-4 w-4 mr-1" />
+                 Back to Dashboard
+               </Link>
             </div>
-            <h1 className="text-xl font-semibold">Add New Product</h1>
+            <h1 className="text-xl font-semibold">Edit Product</h1>
             <div className="w-20"></div>
           </div>
         </header>
 
         <main className="p-4 md:p-6">
           <form onSubmit={handleSubmit}>
-          <ProductForm
+            <ProductForm
               formData={formData}
               imagePreview={imagePreview}
               handleInputChange={handleInputChange}
@@ -132,18 +136,18 @@ export default function NewProductPage() {
               handleImageChange={handleImageChange}
               removeImage={removeImage}
             />
-            
+
             <div className="flex items-center justify-end gap-4">
               <Button type="button" variant="outline" onClick={() => router.push("/admin/dashboard")}>
                 Cancel
               </Button>
               <Button className="bg-green-500 text-white" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Product"}
+                {isSubmitting ? "Saving..." : "Edit Product"}
               </Button>
             </div>
           </form>
         </main>
       </div>
     </div>
-  )
+  );
 }

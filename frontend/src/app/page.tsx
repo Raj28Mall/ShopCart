@@ -16,6 +16,20 @@ import { categories } from '@/app/constants';
 const CATEGORY_COUNT=6;
 const PRODUCT_COUNT=10;
 
+export interface Product { 
+  id: string;
+  name: string;
+  category: string;
+  price: string; 
+  image: File | string;
+  rating?: string; 
+  stock: number; 
+  shortDescription: string;
+  longDescription: string;
+  status: string; 
+}
+
+
 export default function Home() {
   const products = useProductStore((state) => state.products);    
   const setProducts = useProductStore((state) => state.setProducts);
@@ -24,7 +38,7 @@ export default function Home() {
     const fetchProducts = async () => {
       try {
         const response = await getProducts();
-        setProducts(response);    {/* Filtering out the active products is left. preferably in db because SQL query is efficient */}
+        setProducts(response.filter((product: Product)=>product.status==='active'));    {/* Filtering out the active products preferably in db because SQL query is more efficient */}
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -72,10 +86,10 @@ export default function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-5 gap-6 my-8 px-5 md:px-10 xl:px-25 w-[100vw]">
         {products && products.length > 0 && (
           [...products] //to prevent permanent sorting cause spread operator prevents mutation
-            .sort((a, b) => b.rating - a.rating)
+            .sort((a, b) => Number(b.rating) - Number(a.rating))
             .slice(0, PRODUCT_COUNT)
             .map((product) => (
-              <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={Number(product.price)} />
+              <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)} />
             ))
         )}
           </div>

@@ -18,6 +18,7 @@ import { categories } from "@/app/constants";
 import { AdminSidebar } from "@/components/adminSidebar";
 import { useProductStore } from "@/store/productStore";
 import toast from "react-hot-toast";
+import { fileURLToPath } from "url";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function AdminDashboard() {
     };
 
     fetchProducts();
-  }, [products, setProducts]);
+  }, [setProducts]);
 
   const handleLogout = () => {
     localStorage.removeItem("adminUser");
@@ -250,6 +251,7 @@ export default function AdminDashboard() {
                                         alt={product.name}
                                         fill
                                         className="object-cover"
+                                        sizes="40px"
                                       />
                                     </div>
                                     <div>
@@ -294,7 +296,7 @@ export default function AdminDashboard() {
                       </table>
                     </div>
 
-                    {/* It would be good to add pagination here for better UX */}
+                    {/* It would be good to add pagination here for better efficiency */}
                   </div>
                 </div>
               </CardContent>
