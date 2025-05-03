@@ -3,19 +3,11 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Upload, X, } from "lucide-react";
+import { ArrowLeft, } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { AdminSidebar } from "@/components/adminSidebar";
-import { categories } from "@/app/constants";
 import { addProduct } from "@/lib/api";
 import { toast } from "react-hot-toast";
-import Image from "next/image";
 import { ProductForm } from "@/components/productForm";
 
 interface Product{
@@ -35,20 +27,18 @@ export default function NewProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<Product>(
-    {
-      name: "",
-      category: "",
-      price: "",
-      image: "",
-      rating: "0.0",
-      stock: "",
-      shortDescription: "",
-      longDescription: "",
-      status: "active",
-    }
-  );
+  const defaultInfo= {
+    name: "",
+    category: "",
+    price: "",
+    image: "",
+    rating: "0.0",
+    stock: "",
+    shortDescription: "",
+    longDescription: "",
+    status: "active",
+  };
+  const [formData, setFormData] = useState<Product>(defaultInfo);
 
   useEffect(() => {
     setUser({
@@ -92,6 +82,8 @@ export default function NewProductPage() {
       await addProduct(formData);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Product created successfully");
+      setFormData(defaultInfo);
+      setImagePreview(null);
     } catch (error) {
       console.error("Failed to create product:", error);
       toast.error("Failed to create product");
@@ -132,7 +124,7 @@ export default function NewProductPage() {
               handleImageChange={handleImageChange}
               removeImage={removeImage}
             />
-            
+
             <div className="flex items-center justify-end gap-4">
               <Button type="button" variant="outline" onClick={() => router.push("/admin/dashboard")}>
                 Cancel

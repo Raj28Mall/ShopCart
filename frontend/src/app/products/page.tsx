@@ -28,7 +28,7 @@ interface Product {
   name: string;
   category: string;
   price: string; 
-  image:  File |string;
+  image: string;
   rating?: string; 
   stock: number; 
   shortDescription: string;
@@ -75,14 +75,14 @@ export default function Products(){
       }
 
       if (sortMethod === 'price-low') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => a.price - b.price));
+        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(a.price) - Number(b.price)));
       } else if (sortMethod === 'price-high') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => b.price - a.price));
+        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(b.price) - Number(a.price)));
       } else if (sortMethod === 'rating') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => b.rating - a.rating));
+        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(b.rating) - Number(a.rating)));
       }
       else if (sortMethod === 'newest') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => b.id - a.id));
+        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(b.id) - Number(a.id)));
       }
     }
 
@@ -114,13 +114,13 @@ export default function Products(){
       // Apply sorting only once at the end
       if (sortOption) {
         if (sortOption === 'price-low') {
-          updatedProducts.sort((a, b) => a.price - b.price);
+          updatedProducts.sort((a, b) => Number(a.price) - Number(b.price));
         } else if (sortOption === 'price-high') {
-          updatedProducts.sort((a, b) => b.price - a.price);
+          updatedProducts.sort((a, b) => Number(b.price) - Number(a.price));
         } else if (sortOption === 'rating') {
-          updatedProducts.sort((a, b) => b.rating - a.rating);
+          updatedProducts.sort((a, b) => Number(b.rating) - Number(a.rating));
         } else if (sortOption === 'newest') {
-          updatedProducts.sort((a, b) => b.id - a.id);
+          updatedProducts.sort((a, b) => Number(b.id) - Number(a.id));
         }
       }
     
@@ -231,7 +231,7 @@ export default function Products(){
                   ))
                 ) : displayProducts.length > 0 ? (
                   displayProducts.slice(0, displayCount).map((product) => (
-                    <ProductCard key={product.id} id={product.id} name={product.name} image={product.image} price={Number(product.price)}/>
+                    <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)}/>
                   ))
                 ) : (
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">

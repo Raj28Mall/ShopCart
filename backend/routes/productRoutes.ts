@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs'; 
 
 const uploadDir = path.join(__dirname, '../../frontend/public', 'uploads'); 
+router.use('/uploads', express.static(uploadDir));
 
 // Create upload directory if it doesn't exist
 if (!fs.existsSync(uploadDir)) {
@@ -77,65 +78,101 @@ router.put('/products/:id', upload.single('image'), async (req: Request, res: Re
     const { name, category, price, rating, stock, shortDescription, longDescription, status } = req.body;
     const imageFile = req.file;
 
-    if (!imageFile) {
-        res.status(400).send("Image file is required and must be a valid image type.");
-        return;
-    }
-    const imagePath = `/uploads/${imageFile.filename}`; // Example: path to be stored/served
-    if (!name || !category || !shortDescription || !longDescription || price === undefined || rating === undefined || stock === undefined || status === undefined) {
-        fs.unlink(imageFile!.path, (err) => {
-            if (err) console.error("Error deleting uploaded file after validation fail:", err);
-        });
-        res.status(400).send("Incomplete text field data for the product");
-    }
-
-
-    const priceStr = price.toString();
-    if (!pricePattern.test(priceStr)) {
-        fs.unlink(imageFile!.path, (err) =>{}); { /* deleting file */ }
-        res.status(400).send("Price must be a valid decimal with up to two decimal places (e.g., 10.99)");
-    }
-    const numericPrice = Number(priceStr); 
-
-    const stockStr = stock.toString();
-    const numericStock = Number(stockStr); 
-    if (isNaN(numericStock) || numericStock < 0 || !Number.isInteger(numericStock)) {
-         fs.unlink(imageFile!.path, (err) =>{}); { /* deleting file */ }
-        res.status(400).send("Stock must be a non-negative integer");
-    }
-    const integerStock = parseInt(stockStr, 10); 
-
-    const ratingStr = rating.toString();
-    const numericRating = parseFloat(ratingStr); 
-    if (!ratingPattern.test(ratingStr) || isNaN(numericRating) || numericRating < 0 || numericRating > 5) {
-        fs.unlink(imageFile!.path, (err) =>{}); { /* deleting file */ }
-        res.status(400).send("Rating must be a number between 0.0 and 5.0, with up to one decimal place (e.g., 4.5)");
-    }
-
-    const QUERY = `UPDATE products SET name=?, category=?, price=?, image=?, rating=?, stock=?, shortDescription=?, longDescription=?, status=? WHERE id=?`;
-    const values = [
-        name,
-        category,
-        Number(numericPrice.toFixed(2)),
-        imagePath, 
-        Number(numericRating.toFixed(1)),
-        integerStock,
-        shortDescription,
-        longDescription,
-        status,
-        productId
-    ];
+    let imagePathToSave: string | null = null; 
+    let oldImagePathToDelete: string | null = null;
 
     try {
-        const [results]: any = await db.query(QUERY, values);
-        if (results.affectedRows === 0) {
-            res.status(404).send("Product not found");
-            return;
+        const GET_QUERY = "SELECT * FROM products WHERE id=?";
+        const [existingResults]: any = await db.query(GET_QUERY, [productId]);
+
+        if (existingResults.length === 0) {
+            if (imageFile) {
+                fs.unlink(imageFile.path, (err) => {
+                    if (err) console.error("Error deleting uploaded file after product not found:", err);
+                });
+            }
+            res.status(404).send("Product not found.");
+        }
+        const existingProduct = existingResults[0];
+        imagePathToSave = existingProduct.image; 
+
+        if (imageFile) {
+            imagePathToSave = `/uploads/${imageFile.filename}`; 
+            oldImagePathToDelete = existingProduct.image; // Storing old photo for deletion
+            console.log(`New image uploaded: ${imagePathToSave}. Old image was: ${oldImagePathToDelete}`);
+        } else {
+            console.log(`No new image uploaded. Keeping existing image: ${imagePathToSave}`);
+        }
+
+        if (!name || !category || !shortDescription || !longDescription || price === undefined || rating === undefined || stock === undefined || status === undefined) {
+            if (imageFile) {
+                fs.unlink(imageFile.path, (err) => {
+                    if (err) console.error("Error deleting uploaded file after validation fail:", err);
+                });
+            }
+            res.status(400).send("Incomplete text field data for the product");
+        }
+
+        const priceStr = price.toString();
+        if (!pricePattern.test(priceStr)) {
+            if (imageFile) { fs.unlink(imageFile.path, (err) => { if (err) console.error("Error deleting file on price validation fail:", err); }); }
+            res.status(400).send("Price must be a valid decimal with up to two decimal places (e.g., 10.99)");
+        }
+        const numericPrice = Number(priceStr);
+
+        const stockStr = stock.toString();
+        const numericStock = Number(stockStr);
+        if (isNaN(numericStock) || numericStock < 0 || !Number.isInteger(numericStock)) {
+            if (imageFile) { fs.unlink(imageFile.path, (err) => { if (err) console.error("Error deleting file on stock validation fail:", err); }); }
+            res.status(400).send("Stock must be a non-negative integer");
+        }
+        const integerStock = parseInt(stockStr, 10);
+
+        const ratingStr = rating.toString();
+        if (!ratingPattern.test(ratingStr)) { 
+             if (imageFile) { fs.unlink(imageFile.path, (err) => { if (err) console.error("Error deleting file on rating format validation fail:", err); }); }
+             res.status(400).send("Rating must be a number with up to one decimal place (e.g., 4.5)");
+        }
+        const numericRating = parseFloat(ratingStr); // Then parse
+        if (isNaN(numericRating) || numericRating < 0 || numericRating > 5) { // Then check range
+            if (imageFile) { fs.unlink(imageFile.path, (err) => { if (err) console.error("Error deleting file on rating range validation fail:", err); }); }
+            res.status(400).send("Rating must be between 0.0 and 5.0");
+        }
+
+        const values = [
+            name,
+            category,
+            Number(numericPrice.toFixed(2)),
+            imagePathToSave,              
+            Number(numericRating.toFixed(1)),
+            integerStock,
+            shortDescription,
+            longDescription,
+            status,
+            productId
+        ];
+
+        const UPDATE_QUERY = `UPDATE products SET name=?, category=?, price=?, image=?, rating=?, stock=?, shortDescription=?, longDescription=?, status=? WHERE id=?`;
+        await db.query(UPDATE_QUERY, values);
+
+        if (oldImagePathToDelete && oldImagePathToDelete !== imagePathToSave) {
+            const absoluteOldPath = path.join(uploadDir, path.basename(oldImagePathToDelete)); 
+            console.log(`Attempting to delete old image file: ${absoluteOldPath}`);
+            fs.unlink(absoluteOldPath, (err) => {
+                if (err && err.code !== 'ENOENT') { 
+                    console.error(`Error deleting OLD image file ${absoluteOldPath}:`, err);
+                } 
+            });
         }
         res.status(200).send("Product updated successfully");
     } catch (err) {
-        console.error("Error while updating product: ", err);
-        res.status(500).send("Database error while updating product");
+        console.error(`Error while updating product ${productId}: `, err);
+        if (imageFile) {
+            fs.unlink(imageFile.path, (unlinkErr) => {
+                if (unlinkErr) console.error("Error deleting uploaded file during error handling:", unlinkErr);
+            });
+        }
+        res.status(500).send("Database or server error while updating product");
     }
 });
 
@@ -197,7 +234,6 @@ router.post('/products/', upload.single('image'), async (req: Request, res: Resp
 
     try {
         const [results]: any = await db.query(QUERY, values);
-        console.log(results.imagePath);
         res.status(201).send("Product successfully added");
     } catch (err) {
         console.error("Error while adding product to database: ", err);

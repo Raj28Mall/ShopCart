@@ -137,11 +137,11 @@ export const editProduct = async (productId: string, product: { name: string; ca
     formData.append('longDescription', product.longDescription);
     formData.append('status', product.status);
     formData.append('rating', product.rating ?? "0.0");
+
     if (product.image instanceof File) {
-        formData.append('image', product.image, product.image.name);
-    } else if (typeof product.image === 'string') {
-        console.warn("editProduct called with an image string. The backend expects a File upload in the 'image' field for this endpoint.");
+        formData.append('image', product.image);
     }
+
     try {
         const response = await axios.put(URL, formData, {});
         return response.data;

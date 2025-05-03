@@ -7,10 +7,10 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react"; 
 import { Button } from "@/components/ui/button";
 import { AdminSidebar } from "@/components/adminSidebar";
-import { categories } from "@/app/constants"; 
 import { editProduct, getProduct } from "@/lib/api"; 
 import { toast } from "react-hot-toast";
 import { ProductForm } from "@/components/productForm"; 
+import { set } from "zod";
 
 interface Product{
     name: string;
@@ -31,6 +31,7 @@ export default function EditProductPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageUpdate, setImageUpdate] = useState(false);
   
   const [formData, setFormData] = useState<Product>({
     name: "", 
@@ -82,8 +83,9 @@ export default function EditProductPage() {
       reader.readAsDataURL(file)
     }
   }
-
+  
   const removeImage = () => {
+    setImageUpdate(true);
     setFormData({ ...formData, image: "" });
     setImagePreview(null);
   }
@@ -91,11 +93,12 @@ export default function EditProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       await editProduct(productId, formData);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Product updated successfully");
+      router.push("/admin/dashboard");
     } catch (error) {
       console.error("Failed to update product:", error);
       toast.error("Failed to update product");
