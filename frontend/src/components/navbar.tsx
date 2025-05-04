@@ -23,6 +23,17 @@ export const Navbar=()=>{
     const cartItemCount= useCartStore((state)=>state.cartItems.length);
     const router=useRouter();
 
+    const name = user.name;
+    const words = name.split(" ").filter(word => word.length > 0); 
+
+    let initials = '';
+    if (words.length > 0) {
+        initials += words[0][0];
+        if (words.length > 1) {
+            initials += words[words.length - 1][0];
+        }
+    }
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             if(searchQuery.trim() === "") {
@@ -94,7 +105,7 @@ export const Navbar=()=>{
                                 <Button onClick={() => router.push("/account")} variant="ghost" className="p-0 h-9 w-9 rounded-full">
                                 <Avatar className="h-9 w-9">
                                     <AvatarImage src={user.picture} alt="Profile" />
-                                    <AvatarFallback>{user.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
+                                    <AvatarFallback className='bg-gray-300'>{initials}</AvatarFallback>
                                 </Avatar>
                                 </Button>
                             </TooltipTrigger>

@@ -37,7 +37,7 @@ export default function Footer() {
         </div>
 
       </div>
-      <div className="text-center text-xs text-gray-500 py-4 border-t mt-6">
+      <div className="text-center text-xs text-gray-500 py-4 border-t">
         © {new Date().getFullYear()} ShopCart. All rights reserved.
       </div>
     </footer>

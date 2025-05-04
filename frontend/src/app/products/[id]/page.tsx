@@ -6,8 +6,6 @@ import { useProductStore } from "@/store/productStore";
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import Image from "next/image";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Card, CardContent, CardFooter, CardHeader, CardDescription, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Star, Minus, Plus, ShoppingBag, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,9 +27,7 @@ export default function ProductPage() {
     const [quantity, setQuantity] = useState<number>(cartItems.find((item)=>item.id===Number(id))?.quantity || 0);
     const [productNotFound, setProductNotFound] = useState<boolean>(false);
     const [wishList, setWishList] = useState<boolean>(false);
-    const router = useRouter();
-
-
+    
     setTimeout(() => {
       const waitForItem = async ()=>{
         await new Promise((resolve)=> setTimeout(resolve, 1000));
@@ -148,15 +144,13 @@ export default function ProductPage() {
               ) : (
                 <div
                   className="flex w-full items-center"
-                  onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-                >
+                  onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
                   <Button
                     variant="outline"
                     size="lg"
                     className="rounded-r-none w-1/3 "
                     onClick={() => handleRemoveFromCart()}
-                    disabled={quantity <= 0}
-                  >
+                    disabled={quantity <= 0}>
                     <Minus className="h-3 w-3" />
                   </Button>
                   <div className="w-1/3 h-10 flex justify-center items-center border-y text-sm ">
@@ -279,8 +273,8 @@ export default function ProductPage() {
     <div className="mt-16">
         <h2 className="text-2xl font-bold mb-6 px-6">You might also like</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10">
-          {products.slice(0,8).map((product) => (
-            <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)} />
+          {products.filter((productItem)=>(productItem.category===product?.category)).slice(0,8).map((item) => (
+            <ProductCard key={item.id} id={Number(item.id)} name={item.name} image={item.image} price={Number(item.price)} />
           ))}
         </div>
       </div>
