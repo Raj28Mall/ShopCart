@@ -8,33 +8,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, ShoppingBag, ArrowDown, ChevronDown, X } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioItem, DropdownMenuTrigger, DropdownMenuRadioGroup, DropdownMenuLabel } from '@/components/ui/dropdown-menu';
-import { RadioGroupItem } from '@/components/ui/radio-group';
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ChevronDown, X } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, } from '@/components/ui/dropdown-menu';
 import { useProductStore } from '@/store/productStore';
 import { ProductCard } from '@/components/productCard';
 import { useSearchStore } from '@/store/searchStore';
-import { RadioGroup } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/footer';
-
-interface Product { 
-  id: string;
-  name: string;
-  category: string;
-  price: string; 
-  image: string;
-  rating?: string; 
-  stock: number; 
-  shortDescription: string;
-  longDescription: string;
-  status: string; 
-}
+import { Product } from "@/store/productStore"; 
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const FILTERS=["Clothes", "Electronics", "Kitchen Appliances", "Sports", "Beauty"];

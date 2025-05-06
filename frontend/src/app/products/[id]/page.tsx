@@ -17,6 +17,8 @@ import { RequireAuth } from "@/components/requireAuth";
 import Footer from "@/components/footer";
 import { ProductCard } from "@/components/productCard";
 
+const PRODUCT_IMAGES_COUNT=5; //remeber to make this dynamic according to images fetched from backend
+
 export default function ProductPage() {
     const params= useParams();
     const id= params.id;
@@ -27,12 +29,32 @@ export default function ProductPage() {
     const [quantity, setQuantity] = useState<number>(cartItems.find((item)=>item.id===Number(id))?.quantity || 0);
     const [productNotFound, setProductNotFound] = useState<boolean>(false);
     const [wishList, setWishList] = useState<boolean>(false);
+    const [activeImage, setActiveImage] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const productImages= new Array(PRODUCT_IMAGES_COUNT).fill(product?.image); // All images are the main one for now
+    const incrementQuantity = () => setQuantity((prev) => prev + 1);
+    const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+
+    const nextImage = () => {
+      if (isTransitioning) return
+      setIsTransitioning(true)
+      setActiveImage((prev) => (prev === PRODUCT_IMAGES_COUNT - 1 ? 0 : prev + 1))
+      setTimeout(() => setIsTransitioning(false), 300)
+    }
+  
+    const prevImage = () => {
+      if (isTransitioning) return
+      setIsTransitioning(true)
+      setActiveImage((prev) => (prev === 0 ? PRODUCT_IMAGES_COUNT - 1 : prev - 1))
+      setTimeout(() => setIsTransitioning(false), 300)
+    }
     
     setTimeout(() => {
       const waitForItem = async ()=>{
         await new Promise((resolve)=> setTimeout(resolve, 1000));
         setProductNotFound(true);
       }
+      waitForItem();
     }, []);
 
     const handleAddToCart = () => {
@@ -69,7 +91,7 @@ export default function ProductPage() {
 
   if (!product && productNotFound) {
     return (
-      <RequireAuth>
+      <>
       <Navbar/>
       <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
         <h1 className="text-2xl font-bold">Product not found</h1>
@@ -80,7 +102,7 @@ export default function ProductPage() {
           <Button variant={"outline"}>Back to Products</Button>
         </Link>
       </div>
-      </RequireAuth>
+      </>
     );
 };
 
@@ -272,7 +294,7 @@ export default function ProductPage() {
 
     <div className="mt-16">
         <h2 className="text-2xl font-bold mb-6 px-6">You might also like</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 px-10">
           {products.filter((productItem)=>(productItem.category===product?.category)).slice(0,8).map((item) => (
             <ProductCard key={item.id} id={Number(item.id)} name={item.name} image={item.image} price={Number(item.price)} />
           ))}

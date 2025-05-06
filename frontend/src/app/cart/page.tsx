@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Navbar } from "@/components/navbar";
 import * as React from 'react';
@@ -16,21 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { addOrderProduct, addToOrderHistory } from "@/lib/api";
 import { RequireAuth } from "@/components/requireAuth";
-import { useAuthStore } from "@/store/authStore";
-interface Product {
-  id: number
-  name: string
-  price: string
-  image: File | string
-  category: string
-  shortDescription: string
-  longDescription: string
-  rating: string
-  quantity: number
-}
-
-const userId="raj123";
-
+import { Product } from "@/store/productStore"; 
 
 export default function Cart(){
     const rawCartItems= useCartStore((state)=>state.cartItems); 

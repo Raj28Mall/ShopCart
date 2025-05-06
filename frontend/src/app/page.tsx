@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navbar } from "@/components/navbar";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,28 +13,47 @@ import { useProductStore } from "@/store/productStore";
 import { getProducts } from '@/lib/api';
 import Footer from '@/components/footer';
 import { categories } from '@/app/constants';
+import { Product } from '@/app/types';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const CATEGORY_COUNT=6;
 const PRODUCT_COUNT=10;
 
-export interface Product { 
-  id: string;
-  name: string;
-  category: string;
-  price: string; 
-  image: File | string;
-  rating?: string; 
-  stock: number; 
-  shortDescription: string;
-  longDescription: string;
-  status: string; 
-}
-
-
 export default function Home() {
   const products = useProductStore((state) => state.products);    
   const setProducts = useProductStore((state) => state.setProducts);
+  const [banners, setBanners] = useState([
+    "/hero.png",
+    "/hero_2.png",
+    "/hero_3.jpeg",
+  ]);
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0);
+  const [autoplay, setAutoplay] = useState(true);
   
+  const pauseAutoplay = () => {
+    setAutoplay(false);
+    setTimeout(() => setAutoplay(true), 10000);
+  }
+
+  const nextBanner = () => {
+    setActiveBannerIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+  }
+
+  const prevBanner = () => {
+    setActiveBannerIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+  }
+  
+  useEffect(() => {
+    if (!autoplay) return;
+
+    const interval = setInterval(() => {
+      nextBanner();
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [activeBannerIndex, autoplay])
+
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -51,14 +71,50 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen max-w-screen bg-white overflow-x-hidden">
       <Navbar />
-      <AspectRatio ratio={3/1}>
+      
+      <div className="relative w-full overflow-hidden">
+      <div className="w-screen aspect-[3/1] relative">
         <Image
-          src="/hero.png"
-          alt="Hero Image"
+          src={banners[activeBannerIndex] || "/placeholder.svg"}
+          alt="Banner"
           fill
-          className=""
+          priority
+          className={`object-cover transition-opacity duration-300`}
         />
-      </AspectRatio>
+
+        <div className="absolute inset-0 flex items-center justify-between px-4">
+          <button  className="text-white cursor-pointer rounded-full bg-background/80 backdrop-blur-sm transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+            onClick={() => {
+              pauseAutoplay();
+              prevBanner();
+            }}>
+            <ChevronLeft size={38}/>
+          </button>
+
+          <button  className="text-white cursor-pointer rounded-full bg-background/80 backdrop-blur-sm pr-2 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+            onClick={() => {
+              pauseAutoplay();
+              nextBanner();
+            }}>
+            <ChevronRight size={38} />
+          </button>
+        </div>
+        
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              className={`w-2 h-2 rounded-full ${index === activeBannerIndex ? "bg-primary" : "bg-background/80"}`}
+              onClick={() => {
+                pauseAutoplay();
+                setActiveBannerIndex(index);
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+
       <div className="category-shopping w-[100vw] flex flex-col justify-center items-center py-10">
         <div className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl pb-3 ">Shop by Category</div>
           <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed px-4">Check out our most popular items handpicked for you</p>

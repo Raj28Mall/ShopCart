@@ -10,19 +10,7 @@ import { AdminSidebar } from "@/components/adminSidebar";
 import { editProduct, getProduct } from "@/lib/api"; 
 import { toast } from "react-hot-toast";
 import { ProductForm } from "@/components/productForm"; 
-import { set } from "zod";
-
-interface Product{
-    name: string;
-    category: string;
-    price: string;
-    image: File | string;
-    rating?: string;
-    stock: string;
-    shortDescription: string;
-    longDescription: string;
-    status: string;
-};
+import { Product } from "@/store/productStore"; 
 
 export default function EditProductPage() { 
   const params= useParams();

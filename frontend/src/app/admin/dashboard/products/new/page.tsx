@@ -9,18 +9,7 @@ import { AdminSidebar } from "@/components/adminSidebar";
 import { addProduct } from "@/lib/api";
 import { toast } from "react-hot-toast";
 import { ProductForm } from "@/components/productForm";
-
-interface Product{
-  name: string;
-  category: string;
-  price: string;
-  image: File | string;
-  rating?: string;
-  stock: string;
-  shortDescription: string;
-  longDescription: string;
-  status: string;
-}
+import { Product } from "@/store/productStore"; 
 
 export default function NewProductPage() {
   const router = useRouter();

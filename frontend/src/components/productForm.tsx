@@ -12,18 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { categories } from "@/app/constants";
-
-interface Product {
-  name: string;
-  category: string;
-  price: string;
-  image: File|  string; 
-  rating?: string;
-  stock: string;
-  shortDescription: string;
-  longDescription: string;
-  status: string;
-}
+import { Product } from "@/store/productStore";
 
 interface ProductFormProps {
   formData: Product;
