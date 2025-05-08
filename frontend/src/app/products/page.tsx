@@ -215,7 +215,7 @@ export default function Products(){
                   ))
                 ) : displayProducts.length > 0 ? (
                   displayProducts.slice(0, displayCount).map((product) => (
-                    <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)}/>
+                    <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)} stock={product.stock}/>
                   ))
                 ) : (
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">

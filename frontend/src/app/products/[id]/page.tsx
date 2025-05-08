@@ -296,7 +296,7 @@ export default function ProductPage() {
         <h2 className="text-2xl font-bold mb-6 px-6">You might also like</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 px-10">
           {products.filter((productItem)=>(productItem.category===product?.category)).slice(0,8).map((item) => (
-            <ProductCard key={item.id} id={Number(item.id)} name={item.name} image={item.image} price={Number(item.price)} />
+            <ProductCard key={item.id} id={Number(item.id)} name={item.name} image={item.image} price={Number(item.price)} stock={item.stock} />
           ))}
         </div>
       </div>

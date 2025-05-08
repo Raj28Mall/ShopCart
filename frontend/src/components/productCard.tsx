@@ -15,9 +15,10 @@ interface ProductCardProps {
     name: string;
     image: string;
     price: number;
+    stock:number;
 }
 
-export const ProductCard = React.memo(({ id,  name, image, price }: ProductCardProps) => {
+export const ProductCard = ({ id, name, image, price, stock }: ProductCardProps) => {
     const setCartItems = useCartStore((state) => state.setCartItems);
     const cartItems = useCartStore((state) => state.cartItems);
     const [qty, setQty] = useState<number>((cartItems.find((item) => item.id === id)?.quantity || 0));
@@ -97,8 +98,8 @@ export const ProductCard = React.memo(({ id,  name, image, price }: ProductCardP
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 rounded-l-none"
-                            onClick={() => {if(qty>=10){toast.error("Max 10 elements per customer")}else{handleAddToCart()}}}
-                            disabled={qty >= 10}>
+                            onClick={() => {if(qty==stock-1){toast(`Only ${stock} items in stock`);}handleAddToCart()}}
+                            disabled={qty >= stock}>
                             <Plus className="h-3 w-3" />
                         </Button>
                     </div>
@@ -107,4 +108,4 @@ export const ProductCard = React.memo(({ id,  name, image, price }: ProductCardP
             </CardContent>
         </Card>
     );
-});
+};

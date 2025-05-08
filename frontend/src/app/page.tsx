@@ -150,7 +150,7 @@ export default function Home() {
             .sort((a, b) => Number(b.rating) - Number(a.rating))
             .slice(0, PRODUCT_COUNT)
             .map((product) => (
-              <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)} />
+              <ProductCard key={product.id} id={Number(product.id)} name={product.name} image={product.image} price={Number(product.price)} stock={product.stock} />
             ))
         )}
           </div>
