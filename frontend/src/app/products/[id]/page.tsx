@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import * as React from "react";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import { useProductStore } from "@/store/productStore";
 import { Navbar } from "@/components/navbar";
 import Link from "next/link";
@@ -32,23 +32,48 @@ export default function ProductPage() {
     const [productNotFound, setProductNotFound] = useState<boolean>(false);
     const [wishList, setWishList] = useState<boolean>(false);
     const [activeImage, setActiveImage] = useState(0);
-    const [isTransitioning, setIsTransitioning] = useState(false);
     const productImages= new Array(PRODUCT_IMAGES_COUNT).fill(product?.image); // All images are the main one for now
     const incrementQuantity = () => setQuantity((prev) => prev + 1);
     const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
+    const [isZoomed, setIsZoomed] = useState(false)
+    const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
+    const imageContainerRef = useRef<HTMLDivElement>(null)
+    const zoomFactor = 1.5 
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current) return
+
+    const { left, top, width, height } = imageContainerRef.current.getBoundingClientRect()
+    const x = (e.clientX - left) / width
+    const y = (e.clientY - top) / height
+
+    setZoomPosition({ x, y })
+  }
+
+  const handleMouseEnter = () => setIsZoomed(true)
+  const handleMouseLeave = () => setIsZoomed(false)
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current || e.touches.length === 0) return
+
+    const touch = e.touches[0]
+    const { left, top, width, height } = imageContainerRef.current.getBoundingClientRect()
+    const x = (touch.clientX - left) / width
+    const y = (touch.clientY - top) / height
+
+    setZoomPosition({ x, y })
+  }
+
+  const handleTouchStart = () => setIsZoomed(true)
+  const handleTouchEnd = () => setIsZoomed(false)
+
     const nextImage = () => {
-      if (isTransitioning) return
-      setIsTransitioning(true)
       setActiveImage((prev) => (prev === PRODUCT_IMAGES_COUNT - 1 ? 0 : prev + 1))
-      setTimeout(() => setIsTransitioning(false), 300)
     }
   
     const prevImage = () => {
-      if (isTransitioning) return
-      setIsTransitioning(true)
       setActiveImage((prev) => (prev === 0 ? PRODUCT_IMAGES_COUNT - 1 : prev - 1))
-      setTimeout(() => setIsTransitioning(false), 300)
     }
     
     setTimeout(() => {
@@ -119,7 +144,15 @@ export default function ProductPage() {
       <div className="container px-4 py-8 md:px-6 md:py-10">
         {product? 
         <div className="-mt-15 lg:-mt-24 flex flex-col lg:gap-x-16 lg:flex-row flex-wrap gap-y-10 items-start justify-center p-4 sm:p-6 md:p-8 lg:p-10">
-        <div className="w-full lg:basis-[50%] max-w-md lg:max-w-xl">
+        <div ref={imageContainerRef}
+         className="w-full lg:basis-[50%] max-w-md lg:max-w-xl cursor-zoom-in"
+         onMouseMove={handleMouseMove}
+         onMouseEnter={handleMouseEnter}
+         onMouseLeave={handleMouseLeave}
+         onTouchMove={handleTouchMove}
+         onTouchStart={handleTouchStart}
+         onTouchEnd={handleTouchEnd}>
+
           <div className="aspect-[1/1] rounded-lg overflow-hidden border relative max-w-full">
             <Image
               src={product.image || "/placeholder.svg"}
@@ -127,6 +160,18 @@ export default function ProductPage() {
               fill
               className="object-cover"
             />
+
+            {isZoomed && (
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  backgroundImage: `url(${product.image})`,
+                  backgroundPosition: `${zoomPosition.x * 100}% ${zoomPosition.y * 100}%`,
+                  backgroundSize: `${zoomFactor * 100}%`,
+                  backgroundRepeat: "no-repeat",
+                }}
+              />
+            )}
           </div>
         </div>
 
