@@ -7,8 +7,9 @@ import { Navbar } from "@/components/navbar";
 import Link from "next/link";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Star, Minus, Plus, ShoppingBag, Heart } from "lucide-react";
+import { ChevronLeft, Star, Minus, Plus, ShoppingBag, Heart, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { useParams, useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { toast } from 'react-hot-toast';
@@ -16,6 +17,7 @@ import { useCartStore } from "@/store/cartStore";
 import { RequireAuth } from "@/components/requireAuth";
 import Footer from "@/components/footer";
 import { ProductCard } from "@/components/productCard";
+import { Badge } from "@/components/ui/badge";
 
 const PRODUCT_IMAGES_COUNT=5; //remeber to make this dynamic according to images fetched from backend
 
@@ -292,12 +294,75 @@ export default function ProductPage() {
           </div>
     }
 
-    <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-6 px-6">You might also like</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 px-10">
-          {products.filter((productItem)=>(productItem.category===product?.category)).slice(0,8).map((item) => (
-            <ProductCard key={item.id} id={Number(item.id)} name={item.name} image={item.image} price={Number(item.price)} stock={item.stock} />
+      <div className="mt-16">
+        <h2 className="text-2xl font-bold mb-6">You might also like</h2>
+        <div className="relative">
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute left-0 top-1/2 z-10 rounded-full bg-background/80 backdrop-blur-sm shadow-md hidden md:flex"
+            onClick={() => {
+              const container = document.getElementById("related-products-container")
+              if (container) {
+                container.scrollBy({ left: -300, behavior: "smooth" })
+              }
+            }}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          <div
+            id="related-products-container"
+            className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide snap-x snap-mandatory"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {products.filter((item)=>item.category==product?.category).map((product) => (
+              <Link key={product.id} href={`/products/${product.id}`} className="relative flex-none w-[280px] snap-start">
+                <Card className="overflow-hidden transition-all hover:shadow-lg h-full pt-0">
+                  <div className="relative h-[200px] w-full">
+                    <Image src={product.image || "/placeholder.svg"} alt={product.name} fill className="object-cover" loading="lazy" 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                  </div>
+
+
+                  {(Number(product.id)%4===0 || Number(product.id)%3===0)?
+                    <div className="absolute top-2 left-2">
+                      <Badge className="bg-blue-500 hover:bg-blue-600">New</Badge>
+                  </div>
+                  : ""}
+                  
+                  {(Number(product.id)%2===0)?
+                    <div className="absolute top-2 right-2">
+                      <Badge className="text-white bg-red-500 hover:bg-red-600">15% OFF</Badge>
+                  </div>:""}
+                    
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold">{product.name}</h3>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="font-bold">${Number(product.price).toFixed(2)}</span>
+                      <Button size="sm" variant="outline">
+                        <ShoppingBag className="h-4 w-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
           ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute right-0 top-1/2 z-10 rounded-full bg-background/80 backdrop-blur-sm shadow-md hidden md:flex"
+            onClick={() => {
+              const container = document.getElementById("related-products-container")
+              if (container) {
+                container.scrollBy({ left: 300, behavior: "smooth" })
+              }
+            }}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       </div>
       </div>

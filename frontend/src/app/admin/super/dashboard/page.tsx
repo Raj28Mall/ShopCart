@@ -12,8 +12,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { AdminSidebar } from "@/components/adminSidebar"
+import { Label } from "@/components/ui/label";
+import { AdminSidebar } from "@/components/adminSidebar";
+import { useUserStore } from "@/store/userStore";
+import { useAuthStore } from "@/store/authStore";
+import { toast } from "react-hot-toast";
 
 interface Admin {
   id: string
@@ -33,7 +36,9 @@ interface AdminRequest {
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null)
+  const user= useUserStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
   const [admins, setAdmins] = useState<Admin[]>([])
   const [adminRequests, setAdminRequests] = useState<AdminRequest[]>([])
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,15 +51,22 @@ export default function SuperAdminDashboard() {
   const [adminToDelete, setAdminToDelete] = useState<string | null>(null)
 
   useEffect(() => {
-    setUser({
-      name: "Super Admin",
-      email: "superadmin@example.com",
-      role: "superadmin",
-    })
-
     setAdmins(mockAdmins)
     setAdminRequests(mockAdminRequests)
   }, [])
+
+  useEffect(() => {
+    if (!user || !((user.role)==='superadmin')) {
+      if(user.role==="admin"){
+        router.push("/admin/dashboard");
+      }
+      else if(user.role==="user"){
+        router.push("/");
+      }
+      toast.error("You are not authorized to access this page");
+    }
+  }
+  , [router, user, logout]);
 
   const handleBannerImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

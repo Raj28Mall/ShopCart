@@ -32,6 +32,7 @@ export default function LoginPage() {
             }
             const token = data.token;
             setToken(token);
+            console.log(data.user);
             setUser(data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
             toast.success("Login successful");

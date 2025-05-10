@@ -17,26 +17,24 @@ import { getProducts, deleteProduct as deleteProductApi } from "@/lib/api";
 import { categories } from "@/app/constants";
 import { AdminSidebar } from "@/components/adminSidebar";
 import { useProductStore } from "@/store/productStore";
+import { useAuthStore } from "@/store/authStore";
+import { useUserStore } from "@/store/userStore";
 import toast from "react-hot-toast";
-import { fileURLToPath } from "url";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const products = useProductStore((state) => state.products);
   const setProducts = useProductStore((state) => state.setProducts);
+  const logout= useAuthStore((state)=>state.logout);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useUserStore((state) => state.user);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
 
   useEffect(() => {
-    setUser({
-      name: "Test Admin",
-      email: "admin@example.com",
-      role: "admin",
-    })
     const fetchProducts = async () => {
         try {
           const response = await getProducts();
@@ -47,14 +45,21 @@ export default function AdminDashboard() {
           // console.log(products);
         }
     };
-
     fetchProducts();
   }, [setProducts]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminUser");
-    router.push("/admin/auth");
+  useEffect(() => {
+    if (!user || !((user.role)==='admin')) {
+      if(user.role==='superadmin'){
+        router.push("/admin/super/dashboard");
+      }
+      else{
+        toast.error("You are not authorized to access this page");
+        router.push("/");
+      }
+    }
   }
+  , [router, user, logout]);
 
   const confirmDelete = (productId: string) => {
     setProductToDelete(productId);
@@ -132,7 +137,7 @@ export default function AdminDashboard() {
                     <DropdownMenuItem asChild>
                       <Link href="/admin/dashboard/settings">Settings</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="" onClick={handleLogout}>Log out</DropdownMenuItem>
+                    <DropdownMenuItem className="" onClick={logout}>Log out</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -327,3 +332,4 @@ export default function AdminDashboard() {
     </div>
   )
 }
+

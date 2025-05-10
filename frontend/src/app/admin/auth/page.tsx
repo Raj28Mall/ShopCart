@@ -38,7 +38,7 @@ export default function LoginPage() {
             setUser(data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
             toast.success("Login successful");
-            router.push('/');
+            router.push('/admin/dashboard');
             resetLogin();
         } catch(err){
             toast.error("Invalid credentials");
