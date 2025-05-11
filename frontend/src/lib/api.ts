@@ -36,18 +36,18 @@ export const getOrderHistory= async()=>{
         return response.data;
     } catch(err){
         console.error("Error while fetching order history: ", err);
-        return;
+        throw err; 
     }
 };
 
-export const addToOrderHistory= async(totalPrice: number, totalQuantity: number, orderStatus: string, )=>{
+export const addToOrderHistory= async(totalPrice: number, totalQuantity: number, orderStatus: string)=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
         const response = await axiosInstance.post(URL, {totalPrice, totalQuantity, orderStatus});
         return response.data;
     } catch(err){
         console.error("Error while processing order: ", err);
-        return;
+        throw err; 
     }
 }
 
@@ -84,13 +84,13 @@ export const loginUser = async (email: string, password: string) => {
     }
 };
 
-export const registerUser = async (name: string, email: string, password: string) => {
-    const URL=`${API_URL}/api/auth/register`;
+export const signupUser = async (name: string, email: string, password: string, confirmPassword: string) => {
+    const URL=`${API_URL}/api/auth/signup`;
     try {
-        const response = await axios.post(URL, { name, email, password });
+        const response = await axios.post(URL, { name, email, password, confirmPassword });
         return response.data; 
     } catch (error) {
-        console.error("Error during registration: ", error);
+        console.error("Error during signup: ", error);
         throw error;
     }
 }

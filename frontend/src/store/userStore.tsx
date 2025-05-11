@@ -7,6 +7,7 @@ interface User {
   email: string
   picture: string;
   role: string;
+  dateJoined: string; 
 }
 
 interface UserStore {
@@ -17,7 +18,7 @@ interface UserStore {
 export const useUserStore = create<UserStore>()(
   persist(
     (set) => ({
-      user: { id:'',  name: '', email: '', picture: '', role:'user' },
+      user: { id:'',  name: '', email: '', picture: '', role:'', dateJoined: '' },
       setUser: (user: User) => set({ user }),
     }),
     {

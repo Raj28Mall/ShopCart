@@ -13,16 +13,31 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation";
+import { signupUser } from "@/lib/api";
+import { sign } from "crypto";
+import { useAuthStore } from "@/store/authStore";
+import { useUserStore } from "@/store/userStore";
 
 export default function SignupPage() {  
+    const { setToken } = useAuthStore(); 
+    const setUser = useUserStore((state) => state.setUser);
     const { reset, register, handleSubmit, formState: { errors, isSubmitting }} = useForm<SignupSchema>({ resolver: zodResolver(signupSchema) });
     const router=useRouter();
 
-    const onSubmit= async( data: SignupSchema) =>{
+    const onSubmit= async( signupData: SignupSchema) =>{
         try{
-            await new Promise((resolve)=> setTimeout(resolve, 2000)); //simulate API authentication
-            toast.success("Account Created");
-            router.push("/");
+            const data= await signupUser(signupData.name, signupData.email, signupData.password, signupData.confirmPassword);
+            if(!data){
+                toast.error("Invalid credentials");
+                return;
+            }
+            const token = data.token;
+            setToken(token);
+            console.log(data.user);
+            setUser(data.user);
+            await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
+            toast.success("Account created");
+            router.push('/');
             reset();
         } catch(err){
             toast.error("Account creation failed. Please try again later.");

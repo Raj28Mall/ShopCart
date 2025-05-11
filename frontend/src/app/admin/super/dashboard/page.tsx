@@ -17,6 +17,7 @@ import { AdminSidebar } from "@/components/adminSidebar";
 import { useUserStore } from "@/store/userStore";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-hot-toast";
+import Fuse from "fuse.js"
 
 interface Admin {
   id: string
@@ -59,11 +60,12 @@ export default function SuperAdminDashboard() {
     if (!user || !((user.role)==='superadmin')) {
       if(user.role==="admin"){
         router.push("/admin/dashboard");
+        toast.error("You are not authorized to access this page");
       }
       else if(user.role==="user"){
         router.push("/");
+        toast.error("You are not authorized to access this page");
       }
-      toast.error("You are not authorized to access this page");
     }
   }
   , [router, user, logout]);
@@ -135,12 +137,11 @@ export default function SuperAdminDashboard() {
     return answer;
   }
 
-  // IMPLEMENT THE SAME FUZZY SEARCH FUNCTIONALITY
-  const filteredAdmins = admins.filter(
-    (admin) =>
-      admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      admin.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  const fuseOptions = {
+    keys: ['name', 'email', 'shortDescription'],
+    threshold: 0.3,
+  }
+  const filteredAdmins= searchQuery.trim()? new Fuse(admins, fuseOptions).search(searchQuery).map(result => result.item): admins;
 
   if (!user) {
     return null;

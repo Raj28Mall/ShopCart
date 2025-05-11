@@ -41,6 +41,7 @@ export default function Products(){
 
     useEffect(() => {
       setDisplayProducts(products);
+      console.log(products);
     }, [products]);
     
     

@@ -13,28 +13,34 @@ import { useRouter } from "next/navigation";
 import { toast } from 'react-hot-toast';
 import { Navbar } from '@/components/navbar';
 import { useAuthStore } from '@/store/authStore';
+import { useUserStore } from '@/store/userStore';
+import { RequireAuth } from '@/components/requireAuth';
 
-interface User{
-    id: number
-    name: string
-    email: string
-    phone: number
-    joinDate: string
-    address: {
-        street: string;
-        apartment?: string;
-        city: string;
-        state: string;
-        country: string;
+// Helper function to format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  
+  const date = new Date(dateString);
+  
+  // Function to add ordinal suffix (1st, 2nd, 3rd, etc.)
+  const getOrdinalSuffix = (day: number) => {
+    if (day > 3 && day < 21) return 'th';
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
     }
-}
+  };
+  
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  
+  return `${day}${suffix} ${date.toLocaleString('en-US', { month: 'long' })}, ${date.getFullYear()}`;
+};
 
 export default function AccountClientPage() {
-//   const user=useUserStore((state)=>state.user);      // for when user zustand global state is implemented
-//   if(!user){
-//     router.push('/login');
-//     return;
-//   }
+  const user=useUserStore((state)=>state.user);     
   const handleProfileChanges=async()=>{
     // add form validation for name, email, phone
     setProfileUpdating(true);
@@ -44,22 +50,14 @@ export default function AccountClientPage() {
     toast.success("Profile updated successfully");
   };
   
-  const user: User={
-    "id": 1,
-    "name": "Raj Mall",
-    "email": "rajmall.0206@gmail.com",
-    "phone": 9167601208,
-    "joinDate": "11/04/2025",
-    "address":{street:"Rambuag, Nahar, Powai", apartment:"A-101", city:"Mumbai -400076", state:"Maharashtra", country:"India"}
-  }
   const [name, setName]=useState<string>(user.name);
   const [email, setEmail]=useState<string>(user.email);
-  const [phone, setPhone]=useState<number>(user.phone);
+  const [phone, setPhone]=useState<number>(9167601208);
   const [profileChange, setProfileChange]= useState<boolean>(false);
   const [profileUpdating, setProfileUpdating] = useState<boolean>(false);
   
   return (
-    <>
+    <RequireAuth>
     <Navbar/>
     <div className="container px-4 py-8 md:px-20 md:py-12">
       <div className="flex flex-col md:flex-row gap-8">
@@ -91,7 +89,7 @@ export default function AccountClientPage() {
                   </div>
                   <div>
                     <p className=" text-gray-400 text-sm py-2">Member Since</p>
-                    <p className='text-sm'>{user.joinDate}</p> {/* Format date to 11th April, 2025 type shi */}
+                    <p className='text-sm'>{formatDate(user.dateJoined)}</p> {/* Format date to 11th April, 2025 type shi */}
                   </div>
                 </div>
                 <div className="mt-8">
@@ -121,7 +119,7 @@ export default function AccountClientPage() {
         </div>
       </div>
     </div>
-    </>
+    </RequireAuth>
   )
 }
 

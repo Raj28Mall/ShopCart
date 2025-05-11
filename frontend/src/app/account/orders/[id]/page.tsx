@@ -11,7 +11,6 @@ import {Card,CardContent,CardDescription,CardHeader,CardTitle, } from "@/compone
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
-import { use } from "react";
 import { useOrderStore } from "@/store/orderStore";
 import { getOrderProducts } from '@/lib/api';
 import AccountSidebar from '@/components/accountSidebar';
@@ -20,7 +19,7 @@ import Footer from '@/components/footer';
 const SHIPPING_COST="20.00";
 interface orderProduct{
     orderId: number
-    productId: number;
+    productID: number;
     productName: string;
     productPrice: number;
     productQuantity: number;
@@ -96,7 +95,7 @@ export default function OrderDetailsPage() {
                     <h3 className="text-lg font-medium">Order Items</h3>
                     <div className="border rounded-md divide-y">
                       {orderProducts.map((item) => (
-                        <div key={`${id}-${item.productId}`} className="p-4 flex items-start gap-4">
+                        <div key={`${id}-${item.productID}`} className="p-4 flex items-start gap-4">
                           <div className="relative h-20 w-20 rounded-md overflow-hidden border flex-shrink-0">
                             <Image
                               src={item.productImage || "/placeholder.svg"}
@@ -118,7 +117,7 @@ export default function OrderDetailsPage() {
                           <p className="font-medium">
                             ₹{(Number(item.productPrice) * Number(item.productQuantity)).toFixed(2)}
                           </p>
-                          <Button variant="link" onClick={()=>router.push(`/products/${item.productId}`)} className="h-auto p-0 text-sm mt-5">
+                          <Button variant="link" onClick={()=>router.push(`/products/${item.productID}`)} className="h-auto p-0 text-sm mt-5">
                             Buy Again
                           </Button>
                         </div>
