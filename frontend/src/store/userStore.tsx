@@ -1,12 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-interface User {
+export interface User {
   id: string
   name: string
   email: string
   picture: string;
   role: string;
+  status: string;
   dateJoined: string; 
 }
 
@@ -18,7 +19,7 @@ interface UserStore {
 export const useUserStore = create<UserStore>()(
   persist(
     (set) => ({
-      user: { id:'',  name: '', email: '', picture: '', role:'', dateJoined: '' },
+      user: { id:'',  name: '', email: '', picture: '', role:'', status:'', dateJoined: '' },
       setUser: (user: User) => set({ user }),
     }),
     {

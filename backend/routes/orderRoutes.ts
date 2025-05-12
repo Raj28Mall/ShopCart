@@ -99,7 +99,7 @@ router.get('/orders', requireAuth, async(req: Request, res: Response)=>{
 });
 
 //route for adding products of a particular order
-router.post('/order_products', async (req: Request, res: Response) => {
+router.post('/order_products', requireAuth, async (req: Request, res: Response) => {
     const { orderId, products } = req.body;
 
     if (!Array.isArray(products) || products.length === 0) {
@@ -136,7 +136,7 @@ router.post('/order_products', async (req: Request, res: Response) => {
 });
 
 //route for getting products of a particular order
-router.get('/order_products', async(req: Request, res: Response)=>{
+router.get('/order_products', requireAuth, async(req: Request, res: Response)=>{
     const orderId = req.query["orderId"];
     const QUERY=`SELECT * FROM orderProducts WHERE orderId = ${orderId}`;
     try{

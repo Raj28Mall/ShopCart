@@ -30,3 +30,6 @@ export const categories = [
       image: "/products/beauty/beauty.jpeg",
     },
 ];
+
+export const SHIPPING_COST= 20.00;
+export const zoomFactor = 1.5;

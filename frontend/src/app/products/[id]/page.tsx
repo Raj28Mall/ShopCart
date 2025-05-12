@@ -16,7 +16,7 @@ import { toast } from 'react-hot-toast';
 import { useCartStore } from "@/store/cartStore";
 import { RequireAuth } from "@/components/requireAuth";
 import Footer from "@/components/footer";
-import { ProductCard } from "@/components/productCard";
+import { zoomFactor } from "@/app/constants";
 import { Badge } from "@/components/ui/badge";
 
 const PRODUCT_IMAGES_COUNT=5; //remeber to make this dynamic according to images fetched from backend
@@ -39,7 +39,6 @@ export default function ProductPage() {
     const [isZoomed, setIsZoomed] = useState(false)
     const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
     const imageContainerRef = useRef<HTMLDivElement>(null)
-    const zoomFactor = 1.5 
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current) return

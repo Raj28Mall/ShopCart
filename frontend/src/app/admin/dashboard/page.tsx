@@ -20,13 +20,13 @@ import { useProductStore } from "@/store/productStore";
 import { useAuthStore } from "@/store/authStore";
 import { useUserStore } from "@/store/userStore";
 import toast from "react-hot-toast";
+import { RequireAdminAuth } from "@/components/requireAdminAuth";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const products = useProductStore((state) => state.products);
   const setProducts = useProductStore((state) => state.setProducts);
   const logout= useAuthStore((state)=>state.logout);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useUserStore((state) => state.user);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -47,19 +47,6 @@ export default function AdminDashboard() {
     };
     fetchProducts();
   }, [setProducts]);
-
-  useEffect(() => {
-    if (!user || !((user.role)==='admin')) {
-      if(user.role==='superadmin'){
-        router.push("/admin/super/dashboard");
-      }
-      else{
-        toast.error("You are not authorized to access this page");
-        router.push("/");
-      }
-    }
-  }
-  , [router, user, logout]);
 
   const confirmDelete = (productId: string) => {
     setProductToDelete(productId);

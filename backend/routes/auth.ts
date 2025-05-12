@@ -12,10 +12,10 @@ const router = express.Router();
 
 // POST /api/login
 router.post("/login", validate(loginSchema), async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const QUERY = "SELECT * FROM users WHERE email = ?";
+  const { email, password, role } = req.body;
+  const QUERY = "SELECT * FROM users WHERE (email = ? AND role= ?)";
   try {
-    const [results] = await db.execute(QUERY, [email]) as [any[], any];
+    const [results] = await db.execute(QUERY, [email, role]) as [any[], any];
     const user = results[0];
     if (!user) {
       res.status(401).json({ message: "Invalid credentials" });
@@ -49,20 +49,23 @@ router.post("/login", validate(loginSchema), async (req: Request, res: Response)
 });
 
 router.post("/signup", validate(signupSchema), async (req: Request, res: Response) => {
-  const { name, email, password, confirmPassword } = req.body;
+  const { name, email, password, confirmPassword, role } = req.body;
   const id = uuidv4();
-  const picture = null;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const QUERY = "INSERT INTO users (id, name, email, picture, password) VALUES (UUID_TO_BIN(?, 1), ?, ?, ?, ?)";
+  let status;
+  if(role === "admin"){
+    status="pending";
+  } else if(role==="user"){
+    status="active";
+  }
+  const QUERY = "INSERT INTO users (id, name, email, password, role, status) VALUES (UUID_TO_BIN(?, 1), ?, ?, ?, ?, ?)";
   try {
-    await db.execute(QUERY, [id, name, email, picture, hashedPassword]);
-    
+    await db.execute(QUERY, [id, name, email, hashedPassword, role, status]);
     const token = jwt.sign(
       { id, email },
       process.env["JWT_SECRET"] as string,
       { expiresIn: "1h" }
     );
-
     res.status(201).json({
       token,
       user: {
@@ -70,7 +73,7 @@ router.post("/signup", validate(signupSchema), async (req: Request, res: Respons
         name,
         email,
         picture: null,
-        role: "user",
+        role: role,
         dateJoined: new Date(),
       },
     });

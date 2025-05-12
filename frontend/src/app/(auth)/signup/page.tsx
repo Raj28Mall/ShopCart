@@ -24,9 +24,9 @@ export default function SignupPage() {
     const { reset, register, handleSubmit, formState: { errors, isSubmitting }} = useForm<SignupSchema>({ resolver: zodResolver(signupSchema) });
     const router=useRouter();
 
-    const onSubmit= async( signupData: SignupSchema) =>{
+    const onSubmit= async(signupData: SignupSchema) =>{
         try{
-            const data= await signupUser(signupData.name, signupData.email, signupData.password, signupData.confirmPassword);
+            const data= await signupUser(signupData.name, signupData.email, signupData.password, signupData.confirmPassword, "user");
             if(!data){
                 toast.error("Invalid credentials");
                 return;

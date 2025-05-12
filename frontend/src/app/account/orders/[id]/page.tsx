@@ -15,8 +15,8 @@ import { useOrderStore } from "@/store/orderStore";
 import { getOrderProducts } from '@/lib/api';
 import AccountSidebar from '@/components/accountSidebar';
 import Footer from '@/components/footer';
+import { SHIPPING_COST } from '@/app/constants';
 
-const SHIPPING_COST="20.00";
 interface orderProduct{
     orderId: number
     productID: number;

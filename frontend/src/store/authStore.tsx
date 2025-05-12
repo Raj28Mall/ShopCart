@@ -4,7 +4,8 @@ import { persist } from 'zustand/middleware';
 interface AuthStore {
   accessToken: string | null;
   isAuthenticated: boolean;
-  setToken: (token: string) => void;
+  isAdmin: boolean;
+  setToken: (token: string, isAdmin: boolean) => void;
   logout: () => void;
 }
 
@@ -13,8 +14,9 @@ export const useAuthStore = create(
     (set) => ({
       accessToken: null,
       isAuthenticated: false,
-      setToken: (token) => set({ accessToken: token, isAuthenticated: true }),
-      logout: () => set({ accessToken: null, isAuthenticated: false }),
+      isAdmin: false,
+      setToken: (token, admin) => set({ accessToken: token, isAdmin:admin, isAuthenticated: true }),
+      logout: () => set({ accessToken: null, isAuthenticated: false, isAdmin: false }),
     }),
     {
       name: 'auth-storage', // key in localStorage

@@ -22,7 +22,6 @@ export const Navbar=()=>{
     const setSearchQuery= useSearchStore((state)=>state.setSearchQuery);
     const cartItemCount= useCartStore((state)=>state.cartItems.length);
     const router=useRouter();
-
     const name = user.name;
     const words = name.split(" ").filter(word => word.length > 0); 
 

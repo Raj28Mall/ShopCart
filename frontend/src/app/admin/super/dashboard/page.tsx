@@ -17,45 +17,30 @@ import { AdminSidebar } from "@/components/adminSidebar";
 import { useUserStore } from "@/store/userStore";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-hot-toast";
+import { getAdmins } from "@/lib/api"
+import { adminApproval } from "@/lib/api"
 import Fuse from "fuse.js"
+import { User } from "@/store/userStore"
 
-interface Admin {
-  id: string
-  name: string
-  email: string
-  role: "admin" | "superadmin"
-  status: "active" | "pending"
-  productsCount: number
-}
-
-interface AdminRequest {
-  id: string
-  name: string
-  email: string
-  requestDate: string
-}
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
   const user= useUserStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
-  const [admins, setAdmins] = useState<Admin[]>([])
-  const [adminRequests, setAdminRequests] = useState<AdminRequest[]>([])
+  const [admins, setAdmins] = useState<User[]>([])
+  const [adminRequests, setAdminRequests] = useState<User[]>([])
   const [searchQuery, setSearchQuery] = useState("");
 
   const [bannerImage, setBannerImage] = useState<string>("/hero.png");
   const [newBannerImage, setNewBannerImage] = useState<string | null>(null);
   const [isBannerDialogOpen, setIsBannerDialogOpen] = useState(false)
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [adminToDelete, setAdminToDelete] = useState<string | null>(null)
-
-  useEffect(() => {
-    setAdmins(mockAdmins)
-    setAdminRequests(mockAdminRequests)
-  }, [])
-
+  const [isDeleteAdminDialogOpen, setIsDeleteAdminDialogOpen] = useState(false);
+  const [isDeleteRequestDialogOpen, setIsDeleteRequestDialogOpen] = useState(false);
+  const [adminToDelete, setAdminToDelete] = useState<string | null>(null);
+  const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
+  
   useEffect(() => {
     if (!user || !((user.role)==='superadmin')) {
       if(user.role==="admin"){
@@ -66,6 +51,19 @@ export default function SuperAdminDashboard() {
         router.push("/");
         toast.error("You are not authorized to access this page");
       }
+    } else if(user.role==="superadmin"){
+      const fetchAdmins = async () =>{
+        try {
+          const response1 = await getAdmins("active");
+          const response2 = await getAdmins("pending");
+          setAdmins(response1);
+          setAdminRequests(response2);
+        } catch (error) {
+          console.error("Error fetching admins: ", error);
+          toast.error("Failed to fetch admins");
+        }
+      }
+      fetchAdmins();
     }
   }
   , [router, user, logout]);
@@ -91,40 +89,59 @@ export default function SuperAdminDashboard() {
 
   const confirmDeleteAdmin = (adminId: string) => {
     setAdminToDelete(adminId)
-    setIsDeleteDialogOpen(true)
+    setIsDeleteAdminDialogOpen(true)
   }
 
   const deleteAdmin = () => {
     if (adminToDelete) {
       setAdmins(admins.filter((admin) => admin.id !== adminToDelete)) //delete admin API
-      setIsDeleteDialogOpen(false)
+      setIsDeleteAdminDialogOpen(false)
       setAdminToDelete(null)
     }
   }
 
-  const approveAdminRequest = (requestId: string) => {
-    const request = adminRequests.find((req) => req.id === requestId)
-    if (request) {
-      // Add to admins list
-      setAdmins([
-        ...admins,
-        {
-          id: request.id,
-          name: request.name,
-          email: request.email,
-          role: "admin",
-          status: "active",
-          productsCount: 0,
-        },
-      ])
-
-      // Remove from requests
-      setAdminRequests(adminRequests.filter((req) => req.id !== requestId))
+  const approveAdminRequest = async (requestEmail: string) => {
+    try{
+      await adminApproval(requestEmail, "approved");
+      const requestedAdmin = adminRequests.find((req) => req.email === requestEmail);
+      setAdminRequests(adminRequests.filter((req) => req.email !== requestEmail));
+      setAdmins([...admins, requestedAdmin as User]);
+      toast.success("Admin request approved successfully");
+    } catch(err){
+      toast.error("Error approving admin request");
+      console.error("Error approving admin request: ", err);
     }
   }
 
-  const rejectAdminRequest = (requestId: string) => {
-    setAdminRequests(adminRequests.filter((req) => req.id !== requestId))
+  const rejectAdminRequest = async (requestEmail: string) => {
+    try{
+      await adminApproval(requestEmail, "rejected");
+      setAdminRequests(adminRequests.filter((req) => req.email !== requestEmail));
+      toast("Admin request rejected");
+    } catch(err){
+      toast.error("Error rejecting admin request");
+      console.error("Error rejecting admin request: ", err);
+    }
+  }
+  
+  const confirmDeleteRequest = (requestEmail: string) => {
+    setRequestToDelete(requestEmail);
+    setIsDeleteRequestDialogOpen(true);
+  }
+  
+  const deleteRequest = async () => {
+    if (requestToDelete) {
+      try {
+        await adminApproval(requestToDelete, "deleted");
+        setAdminRequests(adminRequests.filter((req) => req.email !== requestToDelete));
+        toast.success("Admin request deleted successfully");
+        setIsDeleteRequestDialogOpen(false);
+        setRequestToDelete(null);
+      } catch(err) {
+        toast.error("Error deleting admin request");
+        console.error("Error deleting admin request: ", err);
+      }
+    }
   }
 
   const initials = (name: string)=>{
@@ -240,7 +257,7 @@ export default function SuperAdminDashboard() {
                                     <td className="pl-16 pr-4 py-3">
                                       <div className="flex items-center gap-3">
                                         <Avatar>
-                                          <AvatarImage src={'/raj.jpeg'} alt="Profile" />
+                                          <AvatarImage src={"https://picsum.photos/200/300"} alt="Profile" />
                                           <AvatarFallback className="bg-gray-300">{initials(admin.name)}</AvatarFallback>
                                         </Avatar>
                                         <div>
@@ -254,7 +271,7 @@ export default function SuperAdminDashboard() {
                                         {admin.role}
                                       </Badge>
                                     </td>
-                                    <td className="px-4 py-3 whitespace-nowrap">{admin.productsCount}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap">10</td>  {/* Replace with actual products count */}
                                     <td className="px-4 py-3 whitespace-nowrap">Today</td>
                                     <td className="px-4 py-3 whitespace-nowrap">
                                       <div className={"flex items-center justify-start gap-2" }>
@@ -299,16 +316,20 @@ export default function SuperAdminDashboard() {
                                   <div className="font-medium">{request.name}</div>
                                   <div className="text-sm text-muted-foreground">{request.email}</div>
                                   <div className="text-xs text-muted-foreground">
-                                    Requested on {new Date(request.requestDate).toLocaleDateString()}
+                                    Requested on {new Date(request.created_at).toLocaleDateString('en-GB', {
+                                      day: 'numeric',
+                                      month: 'numeric', 
+                                      year: 'numeric'
+                                    })}
                                   </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm" className="text-red-500 bg-white" onClick={() => rejectAdminRequest(request.id)}>
+                                <Button variant="outline" size="sm" className="text-red-500 bg-white" onClick={() => rejectAdminRequest(request.email)}>
                                   <X className="h-4 w-4 mr-1" />
                                   Reject
                                 </Button>
-                                <Button variant={"outline"} className="text-green-500 bg-white" size="sm" onClick={() => approveAdminRequest(request.id)}>
+                                <Button variant="outline" className="text-green-500 bg-white" size="sm" onClick={() => approveAdminRequest(request.email)}>
                                   <Check className="h-4 w-4 mr-1" />
                                   Approve
                                 </Button>
@@ -392,7 +413,7 @@ export default function SuperAdminDashboard() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <Dialog open={isDeleteAdminDialogOpen} onOpenChange={setIsDeleteAdminDialogOpen}>
         <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Remove Admin</DialogTitle>
@@ -401,7 +422,7 @@ export default function SuperAdminDashboard() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDeleteAdminDialogOpen(false)}>
               Cancel
             </Button>
             <Button className="bg-red-500 text-white" variant="destructive" onClick={deleteAdmin}>
@@ -410,56 +431,26 @@ export default function SuperAdminDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete {NOT IMPLEMENTED YET}*/}
+      <Dialog open={isDeleteRequestDialogOpen} onOpenChange={setIsDeleteRequestDialogOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Delete Request</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this request? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteRequestDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" className="bg-red-500 text-white" onClick={deleteRequest}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-
-const mockAdmins: Admin[] = [
-  {
-    id: "1",
-    name: "Super Admin",
-    email: "superadmin@example.com",
-    role: "superadmin",
-    status: "active",
-    productsCount: 15,
-  },
-  {
-    id: "2",
-    name: "John Admin",
-    email: "john@example.com",
-    role: "admin",
-    status: "active",
-    productsCount: 8,
-  },
-  {
-    id: "3",
-    name: "Sarah Admin",
-    email: "sarah@example.com",
-    role: "admin",
-    status: "active",
-    productsCount: 12,
-  },
-  {
-    id: "4",
-    name: "New Admin",
-    email: "newadmin@example.com",
-    role: "admin",
-    status: "pending",
-    productsCount: 0,
-  },
-]
-
-const mockAdminRequests: AdminRequest[] = [
-  {
-    id: "5",
-    name: "Michael Johnson",
-    email: "michael@example.com",
-    requestDate: "2023-09-14T10:00:00Z",
-  },
-  {
-    id: "6",
-    name: "Emily Davis",
-    email: "emily@example.com",
-    requestDate: "2023-09-15T10:00:00Z",
-  },
-]

@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
 import { useUserStore } from "@/store/userStore";
-import { loginUser } from "@/lib/api"; 
+import { loginUser, signupUser } from "@/lib/api"; 
 
 export default function LoginPage() {  
     const { setToken } = useAuthStore(); // Zustand store for token
@@ -28,13 +28,13 @@ export default function LoginPage() {
 
     const onSubmitLogin = async (loginData: LoginSchema) => {
         try{
-            const data= await loginUser(loginData.email, loginData.password);
+            const data= await loginUser(loginData.email, loginData.password, "admin");
             if(!data){
                 toast.error("Invalid credentials");
                 return;
             }
             const token = data.token;
-            setToken(token);
+            setToken(token, true);
             setUser(data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
             toast.success("Login successful");
@@ -45,18 +45,19 @@ export default function LoginPage() {
         }
     }
 
-    const onSubmitSignup = async (loginData: LoginSchema) => {
+    const onSubmitSignup = async (signupData: SignupSchema) => {
         try{
-            const data= await loginUser(loginData.email, loginData.password);
+            const data= await signupUser(signupData.name, signupData.email, signupData.password, signupData.confirmPassword, "admin");
             if(!data){
-                toast.error("Invalid credentials");
+                toast.error("Invalid credentials. Please try again later.");
                 return;
             }
             const token = data.token;
             setToken(token);
+            
             setUser(data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
-            toast.success("Login successful");
+            toast.success("Admin account created. Please wait for approval.");
             router.push('/');
             resetSignup();
         } catch(err){
