@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance with interceptors
 
@@ -27,6 +28,24 @@ export const signupUser = async (name: string, email: string, password: string, 
     }
 }
 
+export const authStatus = async () => {
+    const URL=`${API_URL}/api/auth/status`;
+    try {
+        const response = await axiosInstance.get(URL);
+        return response.data; 
+    } catch (error: any) {
+        console.error("API call to /api/auth/status failed: ", error);
+        if (axios.isAxiosError(error) && error.response && error.response.data) {
+            throw {
+                message: error.response.data.message || "Failed to get auth status from server",
+                status: error.response.status,
+                data: error.response.data
+            };
+        }
+        throw new Error(error.message || "An unexpected error occurred while fetching auth status.");
+    }
+}
+
 export const getAdmins = async (status: string) => {
     let URL=`${API_URL}/user_api/admins`;
     if(status){
@@ -43,7 +62,7 @@ export const getAdmins = async (status: string) => {
 export const adminApproval = async (email: string, status: string) => {
     const URL=`${API_URL}/user_api/admins/${email}/${status}`;
     try {
-        const response = await axiosInstance.put(URL);
+        const response = await axiosInstance.get(URL);
         return response.data; 
     } catch (error) {
         console.error("Error during admin approval: ", error);
@@ -93,7 +112,7 @@ export const addProduct = async (product: { name: string; category: string; pric
     }
     
     try {
-        const response = await axios.post(URL, formData, {});
+        const response = await axiosInstance.post(URL, formData, {});
         return response.data; 
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -122,7 +141,7 @@ export const editProduct = async (productId: string, product: { name: string; ca
     }
     
     try {
-        const response = await axios.put(URL, formData, {});
+        const response = await axiosInstance.put(URL, formData, {});
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -137,7 +156,7 @@ export const editProduct = async (productId: string, product: { name: string; ca
 export const deleteProduct = async (productId: string) => {
     const URL = `${API_URL}/product_api/products/${productId}`;
     try {
-        const response = await axios.delete(URL);
+        const response = await axiosInstance.delete(URL);
         return response.data; 
     } catch (error) {
         console.error("Error while deleting product: ", error);

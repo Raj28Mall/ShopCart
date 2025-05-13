@@ -12,24 +12,28 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter } from 'next/navigation';
 import { useSearchStore } from '@/store/searchStore';
 import { useAuthStore } from '@/store/authStore';
-import { useUserStore } from '@/store/userStore';
 import { useCartStore } from '@/store/cartStore';
 
 export const Navbar=()=>{
-    const isLogged= useAuthStore((state)=>state.isAuthenticated);
-    const user= useUserStore((state)=>state.user);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const user = useAuthStore((state) => state.user); 
+    const isLoadingAuth = useAuthStore((state) => state.isLoading);
+
     const searchQuery= useSearchStore((state)=>state.searchQuery);
     const setSearchQuery= useSearchStore((state)=>state.setSearchQuery);
     const cartItemCount= useCartStore((state)=>state.cartItems.length);
     const router=useRouter();
-    const name = user.name;
-    const words = name.split(" ").filter(word => word.length > 0); 
-
     let initials = '';
-    if (words.length > 0) {
-        initials += words[0][0];
-        if (words.length > 1) {
-            initials += words[words.length - 1][0];
+
+    if(!isLoadingAuth && isAuthenticated && user){
+        const name = user.name;
+        const words = name.split(" ").filter(word => word.length > 0); 
+    
+        if (words.length > 0) {
+            initials += words[0][0];
+            if (words.length > 1) {
+                initials += words[words.length - 1][0];
+            }
         }
     }
 
@@ -47,6 +51,8 @@ export const Navbar=()=>{
         }
         router.push("/products");
     }
+
+
     return(
         <div className="sticky z-50 top-0 w-full font-sans border-b bg-white flex flex-row py-2 justify-between">
             <div className='flex flex-row justify-between items-center space-x-4'>
@@ -73,7 +79,9 @@ export const Navbar=()=>{
             </div>
 
             <div className='flex flex-row justify-center items-center px-10'>
-                {!isLogged ? (
+                {isLoadingAuth ? (
+                    <div className="text-sm text-gray-500">Loading...</div>
+                ) : !isAuthenticated || !user ? (
                     <Link href="/login" className=''>
                         <Button variant={'outline'} className='bg-slate-200'>
                             Log In
@@ -103,13 +111,13 @@ export const Navbar=()=>{
                             <TooltipTrigger asChild>
                                 <Button onClick={() => router.push("/account")} variant="ghost" className="p-0 h-9 w-9 rounded-full">
                                 <Avatar className="h-9 w-9">
-                                    <AvatarImage src={user.picture} alt="Profile" />
+                                    <AvatarImage src={user!.picture} alt="Profile" />
                                     <AvatarFallback className='bg-gray-300'>{initials}</AvatarFallback>
                                 </Avatar>
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p className='text-white'>{user.name}</p>
+                                <p className='text-white'>{user!.name}</p>
                             </TooltipContent>
                         </Tooltip>
                     </div>

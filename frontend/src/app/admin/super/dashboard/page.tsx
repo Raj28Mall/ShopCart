@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import Fuse from "fuse.js"
 import { Upload, Check, X, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,18 +15,16 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label";
 import { AdminSidebar } from "@/components/adminSidebar";
-import { useUserStore } from "@/store/userStore";
 import { useAuthStore } from "@/store/authStore";
 import { toast } from "react-hot-toast";
 import { getAdmins } from "@/lib/api"
 import { adminApproval } from "@/lib/api"
-import Fuse from "fuse.js"
-import { User } from "@/store/userStore"
-
+import { User } from "@/store/authStore"
+import { RequireAdminAuth } from "@/components/requireAdminAuth"
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
-  const user= useUserStore((state) => state.user);
+  const user= useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
   const [admins, setAdmins] = useState<User[]>([])
@@ -43,7 +42,10 @@ export default function SuperAdminDashboard() {
   
   useEffect(() => {
     if (!user || !((user.role)==='superadmin')) {
-      if(user.role==="admin"){
+      if(!user){
+        return;
+      }
+      else if(user.role==="admin"){
         router.push("/admin/dashboard");
         toast.error("You are not authorized to access this page");
       }
@@ -165,6 +167,7 @@ export default function SuperAdminDashboard() {
   }
 
   return (
+    <RequireAdminAuth>
     <div className="flex min-h-screen bg-muted/30">
       <AdminSidebar />
       <div className="flex-1">
@@ -452,5 +455,6 @@ export default function SuperAdminDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+    </RequireAdminAuth>
   )
-}
+};

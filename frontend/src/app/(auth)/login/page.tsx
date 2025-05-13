@@ -14,12 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { useUserStore } from "@/store/userStore";
 import { loginUser } from "@/lib/api"; 
 
 export default function LoginPage() {  
-    const { setToken } = useAuthStore(); // Zustand store for token
-    const setUser = useUserStore((state) => state.setUser); 
+    const login= useAuthStore((state)=>state.login);
     const { reset, register, handleSubmit, formState: { errors, isSubmitting }} = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
     const router=useRouter();
 
@@ -27,13 +25,11 @@ export default function LoginPage() {
         try{
             const data= await loginUser(loginData.email, loginData.password, "user");
             if(!data){
+                console.error(data?.error);
                 toast.error("Invalid credentials");
                 return;
             }
-            const token = data.token;
-            setToken(token);
-            console.log(data.user);
-            setUser(data.user);
+            login(data.token, data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
             toast.success("Login successful");
             router.push('/');

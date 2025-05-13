@@ -10,6 +10,7 @@ import { addProduct } from "@/lib/api";
 import { toast } from "react-hot-toast";
 import { ProductForm } from "@/components/productForm";
 import { Product } from "@/store/productStore"; 
+import { RequireAdminAuth } from "@/components/requireAdminAuth";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -86,6 +87,7 @@ export default function NewProductPage() {
   }
 
   return (
+    <RequireAdminAuth>
     <div className="flex min-h-screen bg-muted/30">
       <AdminSidebar />
 
@@ -126,5 +128,6 @@ export default function NewProductPage() {
         </main>
       </div>
     </div>
+    </RequireAdminAuth>
   )
 }
