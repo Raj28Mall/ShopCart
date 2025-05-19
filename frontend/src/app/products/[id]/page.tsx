@@ -32,7 +32,10 @@ export default function ProductPage() {
     const [productNotFound, setProductNotFound] = useState<boolean>(false);
     const [wishList, setWishList] = useState<boolean>(false);
     const [activeImage, setActiveImage] = useState(0);
-    const productImages= new Array(PRODUCT_IMAGES_COUNT).fill(product?.image); // All images are the main one for now
+    const productImages=[product?.image];
+    for(let i=1;i<PRODUCT_IMAGES_COUNT;i++){
+      productImages[i]=`https://picsum.photos/id/${i}/200`;
+    }
     const incrementQuantity = () => setQuantity((prev) => prev + 1);
     const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
@@ -143,34 +146,68 @@ export default function ProductPage() {
       <div className="container px-4 py-8 md:px-6 md:py-10">
         {product? 
         <div className="-mt-15 lg:-mt-24 flex flex-col lg:gap-x-16 lg:flex-row flex-wrap gap-y-10 items-start justify-center p-4 sm:p-6 md:p-8 lg:p-10">
-        <div ref={imageContainerRef}
-         className="w-full lg:basis-[50%] max-w-md lg:max-w-xl cursor-zoom-in"
-         onMouseMove={handleMouseMove}
-         onMouseEnter={handleMouseEnter}
-         onMouseLeave={handleMouseLeave}
-         onTouchMove={handleTouchMove}
-         onTouchStart={handleTouchStart}
-         onTouchEnd={handleTouchEnd}>
+        <div className="w-full lg:basis-[50%] max-w-md lg:max-w-xl"> {/* New wrapper for image and thumbnails */}
+          <div ref={imageContainerRef}
+          className="w-full cursor-zoom-in" // Removed max-w-md lg:max-w-xl from here
+          onMouseMove={handleMouseMove}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onTouchMove={handleTouchMove}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}>
 
-          <div className="aspect-[1/1] rounded-lg overflow-hidden border relative max-w-full">
-            <Image
-              src={product.image || "/placeholder.svg"}
-              alt={product.name}
-              fill
-              className="object-cover"
-            />
-
-            {isZoomed && (
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  backgroundImage: `url(${product.image})`,
-                  backgroundPosition: `${zoomPosition.x * 100}% ${zoomPosition.y * 100}%`,
-                  backgroundSize: `${zoomFactor * 100}%`,
-                  backgroundRepeat: "no-repeat",
-                }}
+            <div className="aspect-[1/1] rounded-lg overflow-hidden border relative max-w-full">
+              <Image
+                src={productImages[activeImage] || "/placeholder.svg"}
+                alt={product.name}
+                fill
+                className="object-cover"
               />
-            )}
+
+              {isZoomed && (
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    backgroundImage: `url(${productImages[activeImage]})`,
+                    backgroundPosition: `${zoomPosition.x * 100}% ${zoomPosition.y * 100}%`,
+                    backgroundSize: `${zoomFactor * 100}%`,
+                    backgroundRepeat: "no-repeat",
+                  }}
+                />
+              )}
+
+              <div className="absolute inset-0 flex items-center justify-between p-4">
+                  <button
+                    className="text-white cursor-pointer rounded-full transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5 z-10"
+                    onClick={prevImage}>
+                    <ChevronLeft size={32} />
+                  </button>
+                  <button
+                    className="text-white cursor-pointer rounded-full transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5 z-10"
+                    onClick={nextImage}>
+                    <ChevronRight size={32} />
+                  </button>
+                </div>
+              </div>
+          </div> 
+
+          <div className="flex space-x-2 overflow-auto pl-1 py-3">
+          {productImages.map((image, index) => (
+            <button
+              key={index}
+              className={`relative h-20 w-20 cursor-pointer rounded-md border overflow-hidden ${
+                activeImage === index ? "ring-2 ring-primary" : ""
+              }`}
+              onClick={() => setActiveImage(index)}
+            >
+              <Image
+                src={image || "/placeholder.svg"}
+                alt={`${product.name} - Image ${index + 1}`}
+                fill
+                className="object-cover"
+              />
+            </button>
+          ))}
           </div>
         </div>
 
@@ -194,7 +231,7 @@ export default function ProductPage() {
             </span>
           </div>
           <p className="text-2xl font-bold mt-4 mb-8">₹ {Number(product.price).toFixed(2)} </p>
-          <p className="text-muted-foreground my-4">{product.shortDescription}</p>
+          <p className="text-muted-foreground my-8">{product.shortDescription}</p>
 
           <Separator />
 
@@ -252,7 +289,7 @@ export default function ProductPage() {
           </div>
           
           <div className="w-full">
-            <Tabs defaultValue="description" className="mt-8 w-full">
+            <Tabs defaultValue="description" className="mt-12 w-full">
               <TabsList className="grid grid-cols-2 w-full bg-gray-200 rounded-full">
                 <TabsTrigger
                   value="description"
@@ -266,7 +303,7 @@ export default function ProductPage() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="description" className="mt-4 text-sm">
+              <TabsContent value="description" className="mt-6 text-sm">
                 <p className="p-1">{product.longDescription}</p>
               </TabsContent>
 
@@ -359,7 +396,7 @@ export default function ProductPage() {
             className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide snap-x snap-mandatory"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {products.filter((item)=>item.category==product?.category).map((product) => (
+            {products.filter((item)=>(item.category==product?.category) && (item.name!=product.name)).map((product) => (
               <Link key={product.id} href={`/products/${product.id}`} className="relative flex-none w-[280px] snap-start">
                 <Card className="overflow-hidden transition-all hover:shadow-lg h-full pt-0">
                   <div className="relative h-[200px] w-full">
