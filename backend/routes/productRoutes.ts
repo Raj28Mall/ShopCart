@@ -29,15 +29,22 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
     if (file.mimetype.startsWith('image/')) {
         cb(null, true); 
     } else {
+        // Pass an error to cb if the file is not an image
         cb(new Error('Only image files are allowed!'));  
     }
 };
 
+// Updated multer instance to handle 'mainImage' and 'additionalImages'
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
-    limits: { fileSize: 1024 * 1024 * 10 } // 10MB file size limit
+    limits: { fileSize: 1024 * 1024 * 10 } // 10 MB limit per file
 });
+
+const productUploads = upload.fields([
+    { name: 'mainImage', maxCount: 1 },
+    { name: 'additionalImages', maxCount: 5 } // Allow up to 10 additional images
+]);
 
 //route for getting a single product by id
 router.get('/products/:id', async(req: Request, res: Response)=>{
@@ -53,6 +60,19 @@ router.get('/products/:id', async(req: Request, res: Response)=>{
     } catch(err){
         console.error("Error while fetching product by ID: ", err);
         res.status(500).send("Database error while fetching product by ID");
+    }
+});
+
+//route for getting all additional images of a product by id
+router.get('/products/images/:id', async(req: Request, res: Response)=>{
+    const productId = req.params["id"];
+    const QUERY="SELECT * FROM product_images WHERE product_id=?";
+    try{
+        const [results]: any = await db.query(QUERY, [productId]);
+        res.status(200).send(results);
+    } catch(err){
+        console.error("Error while fetching product images by ID: ", err);
+        res.status(500).send("Database error while fetching product images by ID");
     }
 });
 
@@ -172,55 +192,73 @@ router.put('/products/:id', upload.single('image'), async (req: Request, res: Re
     }
 });
 
-router.post('/products/', upload.single('image'), async (req: Request, res: Response) => {
+router.post('/products/', productUploads, async (req: Request, res: Response) => {
     const pricePattern = /^\d+(\.\d{1,2})?$/;
     const ratingPattern = /^\d(\.\d{1})?$/; 
     
     const { name, category, price, rating, stock, shortDescription, longDescription, status } = req.body;
-    const imageFile = req.file;
     
+    // Access files from req.files (because of upload.fields)
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const mainImageFile = files?.['mainImage']?.[0];
+    const additionalImageFiles = files?.['additionalImages'] || [];
+
+    const uploadedFilePaths: string[] = [];
+    if (mainImageFile) uploadedFilePaths.push(mainImageFile.path);
+    additionalImageFiles.forEach(file => uploadedFilePaths.push(file.path));
+
+    const cleanupFiles = () => {
+        uploadedFilePaths.forEach(filePath => {
+            fs.unlink(filePath, (err) => {
+                if (err) console.error(`Error deleting uploaded file ${filePath} after error:`, err);
+            });
+        });
+    };
     
-    if (!imageFile) {
-        res.status(400).send("Image file is required and must be a valid image type.");
+    if (!mainImageFile) {
+        additionalImageFiles.forEach(file => fs.unlink(file.path, err => {if (err) console.error(`Cleanup error for ${file.path}`, err)}));
+        res.status(400).send("Main image file is required and must be a valid image type.");
         return;
     }
-    const imagePath = `/uploads/${imageFile.filename}`; //path to be stored/served
+    const mainImagePath = `/uploads/${mainImageFile.filename}`;
+
     if (!name || !category || !shortDescription || !longDescription || price === undefined || rating === undefined || stock === undefined || status === undefined) {
-        fs.unlink(imageFile!.path, (err) => {
-            if (err) console.error("Error deleting uploaded file after validation fail:", err);
-        });
+        cleanupFiles();
         res.status(400).send("Incomplete text field data for the product");
+        return;
     }
 
     const priceStr = price.toString();
     if (!pricePattern.test(priceStr)) {
-        fs.unlink(imageFile!.path, (err) =>{}); { /* deleting file */ }
+        cleanupFiles();
         res.status(400).send("Price must be a valid decimal with up to two decimal places (e.g., 10.99)");
+        return;
     }
     const numericPrice = Number(priceStr); 
 
     const stockStr = stock.toString();
     const numericStock = Number(stockStr); 
     if (isNaN(numericStock) || numericStock < 0 || !Number.isInteger(numericStock)) {
-         fs.unlink(imageFile!.path, (err) =>{}); { /* deleting file */ }
+        cleanupFiles();
         res.status(400).send("Stock must be a non-negative integer");
+        return;
     }
     const integerStock = parseInt(stockStr, 10); 
 
     const ratingStr = rating.toString();
     const numericRating = parseFloat(ratingStr); 
     if (!ratingPattern.test(ratingStr) || isNaN(numericRating) || numericRating < 0 || numericRating > 5) {
-        fs.unlink(imageFile!.path, (err) =>{}); { /* deleting file */ }
+        cleanupFiles();
         res.status(400).send("Rating must be a number between 0.0 and 5.0, with up to one decimal place (e.g., 4.5)");
+        return;
     }
 
-
-    const QUERY = `INSERT INTO products (name, category, price, image, rating, stock, shortDescription, longDescription, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [
+    const productQuery = `INSERT INTO products (name, category, price, image, rating, stock, shortDescription, longDescription, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const productValues = [
         name,
         category,
         Number(numericPrice.toFixed(2)),
-        imagePath, 
+        mainImagePath, 
         Number(numericRating.toFixed(1)),
         integerStock,
         shortDescription,
@@ -228,20 +266,39 @@ router.post('/products/', upload.single('image'), async (req: Request, res: Resp
         status,
     ];
 
+    let connection;
     try {
-        const [results]: any = await db.query(QUERY, values);
-        res.status(201).send("Product successfully added");
+        connection = await db.getConnection(); // Get a connection for transaction
+        await connection.beginTransaction();
+
+        const [productResults]: any = await db.query(productQuery, productValues);
+        const productId = productResults.insertId;
+
+        if (!productId) {
+            await connection.rollback();
+            cleanupFiles();
+            res.status(500).send("Failed to create product, no product ID obtained.");
+            return;
+        }
+
+        if (additionalImageFiles.length > 0) {
+            const productImagesQuery = `INSERT INTO product_images (product_id, image_url) VALUES ?`;
+            const additionalImageValues = additionalImageFiles.map(file => [productId, `/uploads/${file.filename}`]);
+            await connection.query(productImagesQuery, [additionalImageValues]);
+        }
+
+        await connection.commit();
+        res.status(201).send({ message: "Product successfully added", productId: productId });
+
     } catch (err) {
+        if (connection) await connection.rollback();
+        cleanupFiles();
         console.error("Error while adding product to database: ", err);
-        fs.unlink(imageFile.path, (unlinkErr) => {
-            if (unlinkErr) console.error("Error deleting uploaded file after DB error:", unlinkErr);
-        });
         res.status(500).send("Error saving product data to the database");
+    } finally {
+        if (connection) connection.release();
     }
 });
-
-
-
 
 //route for deleting a single product by id
 router.delete('/products/:id', async (req: Request, res: Response) => {

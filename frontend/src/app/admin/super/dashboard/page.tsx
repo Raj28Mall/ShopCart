@@ -18,18 +18,9 @@ import { AdminSidebar } from "@/components/adminSidebar"
 import { useUserStore } from "@/store/userStore"
 import { useAuthStore } from "@/store/authStore"
 import { toast } from "react-hot-toast"
-import { getAdmins } from "@/lib/api"
-import { adminApproval } from "@/lib/api"
+import { getAdmins, adminApproval, getBanners, addBanner, Banner as BannerType } from "@/lib/api" // Updated imports
 import Fuse from "fuse.js"
 import type { User } from "@/store/userStore"
-
-// Types for banner management
-interface BannerImage {
-  id: string
-  url: string
-  title: string
-  active: boolean
-}
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
@@ -40,15 +31,11 @@ export default function SuperAdminDashboard() {
   const [adminRequests, setAdminRequests] = useState<User[]>([])
   const [searchQuery, setSearchQuery] = useState("")
 
-  const [bannerImages, setBannerImages] = useState<BannerImage[]>([
-    {
-      id: "hero-banner-initial",
-      url: "/hero.png",
-      title: "Default Hero Banner",
-      active: true,
-    },
-  ])
-  const [newBannerImages, setNewBannerImages] = useState<Array<{ url: string; title: string }>>([])
+  const [bannerImages, setBannerImages] = useState<BannerType[]>([]) // Use BannerType
+  const [newBannerFiles, setNewBannerFiles] = useState<File[]>([]) // Store File objects
+  const [newBannerTitles, setNewBannerTitles] = useState<string[]>([]) // Store titles for new banners
+  const [isLoadingBanners, setIsLoadingBanners] = useState(true);
+
   const [isBannerDialogOpen, setIsBannerDialogOpen] = useState(false)
   const [activeBannerIndex, setActiveBannerIndex] = useState(0)
 
@@ -67,95 +54,118 @@ export default function SuperAdminDashboard() {
         toast.error("You are not authorized to access this page")
       }
     } else if (user.role === "superadmin") {
-      const fetchAdmins = async () => {
+      const fetchInitialData = async () => {
+        setIsLoadingBanners(true);
         try {
-          const response1 = await getAdmins("active")
-          const response2 = await getAdmins("pending")
-          setAdmins(response1)
-          setAdminRequests(response2)
+          const [adminsRes, pendingAdminsRes, bannersRes] = await Promise.all([
+            getAdmins("active"),
+            getAdmins("pending"),
+            getBanners(),
+          ]);
+          setAdmins(adminsRes);
+          setAdminRequests(pendingAdminsRes);
+          setBannerImages(bannersRes || []); // Ensure bannerImages is an array
+          if (bannersRes && bannersRes.length > 0) {
+            setActiveBannerIndex(0);
+          }
         } catch (error) {
-          console.error("Error fetching admins: ", error)
-          toast.error("Failed to fetch admins")
+          console.error("Error fetching initial data: ", error);
+          toast.error("Failed to fetch initial data");
+          setBannerImages([]); // Set to empty array on error
+        } finally {
+          setIsLoadingBanners(false);
         }
-      }
-      fetchAdmins()
+      };
+      fetchInitialData();
     }
-  }, [router, user, logout])
+  }, [router, user, logout]);
 
   const handleBannerImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
+    const files = e.target.files;
     if (files && files.length > 0) {
-      addNewBannerImages(Array.from(files))
+      const imageFiles = Array.from(files).filter((file) => file.type.startsWith("image/"));
+      setNewBannerFiles((prevFiles) => [...prevFiles, ...imageFiles]);
+      setNewBannerTitles((prevTitles) => [...prevTitles, ...Array(imageFiles.length).fill("")]);
     }
-  }
-
-  const addNewBannerImages = (files: File[]) => {
-    const imageFiles = files.filter((file) => file.type.startsWith("image/"))
-
-    if (imageFiles.length === 0) return
-
-    imageFiles.forEach((file) => {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setNewBannerImages((prev) => [
-          ...prev,
-          { url: reader.result as string, title: "" },
-        ])
-      }
-      reader.readAsDataURL(file)
-    })
-  }
+     // Reset file input to allow selecting the same file again if needed
+    if (e.target) {
+      e.target.value = "";
+    }
+  };
 
   const updateNewBannerTitle = (index: number, title: string) => {
-    setNewBannerImages((prev) => {
-      const updated = [...prev]
-      if (updated[index]) {
-        updated[index] = { ...updated[index], title }
+    setNewBannerTitles((prev) => {
+      const updated = [...prev];
+      if (updated[index] !== undefined) {
+        updated[index] = title;
       }
-      return updated
-    })
-  }
+      return updated;
+    });
+  };
 
-  const removeNewBanner = (index: number) => {
-    setNewBannerImages((prev) => prev.filter((_, i) => i !== index))
-  }
+  const removeNewBannerPreview = (index: number) => {
+    setNewBannerFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setNewBannerTitles((prevTitles) => prevTitles.filter((_, i) => i !== index));
+  };
 
-  const saveBannerImages = () => {
-    if (newBannerImages.length > 0) {
-      const newBanners: BannerImage[] = newBannerImages.map((banner, idx) => ({
-        id: `banner-${Date.now()}-${idx}`, // Generate a simple unique ID
-        url: banner.url,
-        title: banner.title || `Banner ${bannerImages.length + idx + 1}`, // Use provided title or a default
-        active: true,
-      }))
+  const saveBannerImages = async () => {
+    if (newBannerFiles.length > 0) {
+      let successfulUploads = 0;
+      const currentBannerCount = bannerImages.length;
+      try {
+        const uploadPromises = newBannerFiles.map((file, index) => {
+          const title = newBannerTitles[index] || `Banner ${currentBannerCount + index + 1}`;
+          return addBanner({ title, image: file, active: true });
+        });
+        
+        const newBanners = await Promise.all(uploadPromises);
+        
+        setBannerImages((prev) => [...prev, ...newBanners]);
+        successfulUploads = newBanners.length;
 
-      setBannerImages([...bannerImages, ...newBanners])
-      setNewBannerImages([])
-      setIsBannerDialogOpen(false)
-      toast.success(`${newBanners.length} banner${newBanners.length > 1 ? "s" : ""} added successfully`)
+        setNewBannerFiles([]);
+        setNewBannerTitles([]);
+        setIsBannerDialogOpen(false);
+        if (successfulUploads > 0) {
+          toast.success(`${successfulUploads} banner${successfulUploads > 1 ? "s" : ""} added successfully`);
+        }
+      } catch (error) {
+        console.error("Error uploading banners:", error);
+        toast.error("Failed to upload some banners. Please try again.");
+      }
     }
-  }
+  };
 
-  const deleteBanner = (id: string) => {
-    setBannerImages(bannerImages.filter((banner) => banner.id !== id))
-    if (activeBannerIndex >= bannerImages.length - 1) {
-      setActiveBannerIndex(Math.max(0, bannerImages.length - 2))
+  const deleteBanner = async (id: string) => {
+    try {
+      await deleteBanner(id);
+      const updatedBanners = bannerImages.filter((banner) => banner.id !== id);
+      setBannerImages(updatedBanners);
+      if (activeBannerIndex >= updatedBanners.length && updatedBanners.length > 0) {
+        setActiveBannerIndex(updatedBanners.length - 1);
+      } else if (updatedBanners.length === 0) {
+        setActiveBannerIndex(0);
+      }
+      toast.success("Banner deleted successfully");
+    } catch (error) {
+      console.error("Error deleting banner:", error);
+      toast.error("Failed to delete banner");
     }
-    toast.success("Banner deleted successfully")
-  }
-
-  const toggleBannerActive = (id: string) => {
-    setBannerImages(bannerImages.map((banner) => (banner.id === id ? { ...banner, active: !banner.active } : banner)))
-    toast.success("Banner status updated")
-  }
-
-  const nextBanner = () => {
-    setActiveBannerIndex((prev) => (prev === bannerImages.length - 1 ? 0 : prev + 1))
-  }
+  };
 
   const prevBanner = () => {
-    setActiveBannerIndex((prev) => (prev === 0 ? bannerImages.length - 1 : prev - 1))
-  }
+    if (bannerImages.length === 0) return;
+    setActiveBannerIndex((prevIndex) =>
+      prevIndex === 0 ? bannerImages.length - 1 : prevIndex - 1
+    );
+  };
+
+  const nextBanner = () => {
+    if (bannerImages.length === 0) return;
+    setActiveBannerIndex((prevIndex) =>
+      prevIndex === bannerImages.length - 1 ? 0 : prevIndex + 1
+    );
+  };
 
   const confirmDeleteAdmin = (adminId: string) => {
     setAdminToDelete(adminId)
@@ -261,12 +271,16 @@ export default function SuperAdminDashboard() {
                 <CardDescription>Manage the banners displayed on the homepage slider</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {bannerImages.length > 0 ? (
+                {isLoadingBanners ? (
+                  <div className="relative w-full aspect-[3/1] rounded-md overflow-hidden border flex items-center justify-center bg-gray-100">
+                    <p className="text-muted-foreground">Loading banners...</p>
+                  </div>
+                ) : bannerImages.length > 0 ? (
                   <>
                     <div className="relative w-full aspect-[3/1] rounded-md overflow-hidden border">
                       <div className="relative h-full w-full">
                         <Image
-                          src={bannerImages[activeBannerIndex]?.url || "/placeholder.svg"}
+                          src={bannerImages[activeBannerIndex]?.image_url || "/placeholder.svg"} // MODIFIED: Use image_url
                           alt={bannerImages[activeBannerIndex]?.title || "Banner"}
                           fill
                           className="object-cover transition-opacity duration-300"
@@ -304,7 +318,7 @@ export default function SuperAdminDashboard() {
                               <div className="flex items-center gap-3">
                                 <div className="relative h-16 w-24 rounded-md overflow-hidden border">
                                   <Image
-                                    src={banner.url || "/placeholder.svg"}
+                                    src={banner.image_url || "/placeholder.svg"} // MODIFIED: Use image_url
                                     alt={banner.title || `Banner ${index + 1}`}
                                     fill
                                     className="object-cover"
@@ -547,16 +561,22 @@ export default function SuperAdminDashboard() {
         </main>
       </div>
 
-      <Dialog open={isBannerDialogOpen} onOpenChange={setIsBannerDialogOpen}>
+      <Dialog open={isBannerDialogOpen} onOpenChange={(isOpen) => {
+        setIsBannerDialogOpen(isOpen);
+        if (!isOpen) { // Reset previews when dialog is closed
+          setNewBannerFiles([]);
+          setNewBannerTitles([]);
+        }
+      }}>
         <DialogContent className="sm:max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle>{newBannerImages.length>0? `New Banners (${newBannerImages.length})`: "Add New Banners"}</DialogTitle>
-            <DialogDescription className={newBannerImages.length>0? "hidden": ""}>
+            <DialogTitle>{newBannerFiles.length > 0 ? `New Banners (${newBannerFiles.length})` : "Add New Banners"}</DialogTitle>
+            <DialogDescription className={newBannerFiles.length > 0 ? "hidden" : ""}>
               Upload multiple images for the homepage banner slider. Recommended size is 1920x640 pixels.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className={newBannerImages.length>0? "hidden": "border border-dashed rounded-md text-center"}>
+            <div className={newBannerFiles.length > 0 ? "hidden" : "border border-dashed rounded-md text-center"}>
               <Label htmlFor="banner-images-input" className="p-10 cursor-pointer w-full h-full flex flex-col items-center justify-center">
                 <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground mb-2">Click to browse and upload images</p>
@@ -572,59 +592,67 @@ export default function SuperAdminDashboard() {
               />
             </div>
 
-            {/* Preview of new banners */}
-            {newBannerImages.length > 0 && (
+            {/* Preview of new banners */} 
+            {newBannerFiles.length > 0 && (
               <div className="space-y-4">
                 <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                  {newBannerImages.map((banner, index) => (
-                    <div key={index} className="border rounded-md p-3">
-                      <div className="flex flex-col gap-3">
-                        <div className="relative aspect-[3/1] w-full rounded-md overflow-hidden">
-                          <Image
-                            src={banner.url || "/placeholder.svg"}
-                            alt={banner.title || `Banner preview ${index + 1}`}
-                            fill
-                            className="object-cover"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 right-2 h-6 w-6"
-                            onClick={() => removeNewBanner(index)}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor={`banner-title-${index}`} className="text-xs">
-                            Banner Title
-                          </Label>
-                          <Input
-                            id={`banner-title-${index}`}
-                            value={banner.title}
-                            onChange={(e) => updateNewBannerTitle(index, e.target.value)}
-                            placeholder="Enter a title for this banner"
-                            className="h-8 text-sm"
-                          />
+                  {newBannerFiles.map((file, index) => {
+                    const previewUrl = URL.createObjectURL(file);
+                    return (
+                      <div key={index} className="border rounded-md p-3">
+                        <div className="flex flex-col gap-3">
+                          <div className="relative aspect-[3/1] w-full rounded-md overflow-hidden">
+                            <Image
+                              src={previewUrl} // Use createObjectURL for preview
+                              alt={newBannerTitles[index] || `Banner preview ${index + 1}`}
+                              fill
+                              className="object-cover"
+                              onLoad={() => URL.revokeObjectURL(previewUrl)} // Clean up object URL after load
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-2 right-2 h-6 w-6"
+                              onClick={() => removeNewBannerPreview(index)} // Updated function name
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor={`banner-title-${index}`} className="text-xs">
+                              Banner Title
+                            </Label>
+                            <Input
+                              id={`banner-title-${index}`}
+                              value={newBannerTitles[index]}
+                              onChange={(e) => updateNewBannerTitle(index, e.target.value)}
+                              placeholder="Enter a title for this banner"
+                              className="h-8 text-sm"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBannerDialogOpen(false)}>
+            <Button variant="outline" onClick={() => {
+              setIsBannerDialogOpen(false);
+              setNewBannerFiles([]); // Clear previews on cancel
+              setNewBannerTitles([]);
+            }}>
               Cancel
             </Button>
             <Button
               className="bg-green-500 text-white"
               onClick={saveBannerImages}
-              disabled={newBannerImages.length === 0}
+              disabled={newBannerFiles.length === 0}
             >
-              Add {newBannerImages.length} {newBannerImages.length === 1 ? "Banner" : "Banners"}
+              Add {newBannerFiles.length} {newBannerFiles.length === 1 ? "Banner" : "Banners"}
             </Button>
           </DialogFooter>
         </DialogContent>

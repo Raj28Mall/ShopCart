@@ -20,6 +20,7 @@ export default function EditProductPage() {
   const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageUpdate, setImageUpdate] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   
   const [formData, setFormData] = useState<Product>({
     name: "", 
@@ -121,7 +122,7 @@ export default function EditProductPage() {
           <form onSubmit={handleSubmit}>
             <ProductForm
               formData={formData}
-              imagePreview={imagePreview}
+              imagePreviews={imagePreviews}
               handleInputChange={handleInputChange}
               handleSelectChange={handleSelectChange}
               handleImageChange={handleImageChange}

@@ -28,7 +28,7 @@ export default function LoginPage() {
 
     const onSubmitLogin = async (loginData: LoginSchema) => {
         try{
-            const data= await loginUser(loginData.email, loginData.password, "admin");
+            const data= await loginUser(loginData.email, loginData.password, "superadmin");
             if(!data){
                 toast.error("Invalid credentials");
                 return;
