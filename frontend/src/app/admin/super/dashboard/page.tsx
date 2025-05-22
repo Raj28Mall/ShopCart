@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { Upload, Check, X, Search } from "lucide-react"
+import { Upload, Check, X, Search, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,79 +13,148 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label";
-import { AdminSidebar } from "@/components/adminSidebar";
-import { useUserStore } from "@/store/userStore";
-import { useAuthStore } from "@/store/authStore";
-import { toast } from "react-hot-toast";
+import { Label } from "@/components/ui/label"
+import { AdminSidebar } from "@/components/adminSidebar"
+import { useUserStore } from "@/store/userStore"
+import { useAuthStore } from "@/store/authStore"
+import { toast } from "react-hot-toast"
 import { getAdmins } from "@/lib/api"
 import { adminApproval } from "@/lib/api"
 import Fuse from "fuse.js"
-import { User } from "@/store/userStore"
+import type { User } from "@/store/userStore"
 
+// Types for banner management
+interface BannerImage {
+  id: string
+  url: string
+  title: string
+  active: boolean
+}
 
 export default function SuperAdminDashboard() {
   const router = useRouter()
-  const user= useUserStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const user = useUserStore((state) => state.user)
+  const logout = useAuthStore((state) => state.logout)
 
   const [admins, setAdmins] = useState<User[]>([])
   const [adminRequests, setAdminRequests] = useState<User[]>([])
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const [bannerImage, setBannerImage] = useState<string>("/hero.png");
-  const [newBannerImage, setNewBannerImage] = useState<string | null>(null);
+  const [bannerImages, setBannerImages] = useState<BannerImage[]>([
+    {
+      id: "hero-banner-initial",
+      url: "/hero.png",
+      title: "Default Hero Banner",
+      active: true,
+    },
+  ])
+  const [newBannerImages, setNewBannerImages] = useState<Array<{ url: string; title: string }>>([])
   const [isBannerDialogOpen, setIsBannerDialogOpen] = useState(false)
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0)
 
-  const [isDeleteAdminDialogOpen, setIsDeleteAdminDialogOpen] = useState(false);
-  const [isDeleteRequestDialogOpen, setIsDeleteRequestDialogOpen] = useState(false);
-  const [adminToDelete, setAdminToDelete] = useState<string | null>(null);
-  const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
-  
+  const [isDeleteAdminDialogOpen, setIsDeleteAdminDialogOpen] = useState(false)
+  const [isDeleteRequestDialogOpen, setIsDeleteRequestDialogOpen] = useState(false)
+  const [adminToDelete, setAdminToDelete] = useState<string | null>(null)
+  const [requestToDelete, setRequestToDelete] = useState<string | null>(null)
+
   useEffect(() => {
-    if (!user || !((user.role)==='superadmin')) {
-      if(user.role==="admin"){
-        router.push("/admin/dashboard");
-        toast.error("You are not authorized to access this page");
+    if (!user || !(user.role === "superadmin")) {
+      if (user.role === "admin") {
+        router.push("/admin/dashboard")
+        toast.error("You are not authorized to access this page")
+      } else if (user.role === "user") {
+        router.push("/")
+        toast.error("You are not authorized to access this page")
       }
-      else if(user.role==="user"){
-        router.push("/");
-        toast.error("You are not authorized to access this page");
-      }
-    } else if(user.role==="superadmin"){
-      const fetchAdmins = async () =>{
+    } else if (user.role === "superadmin") {
+      const fetchAdmins = async () => {
         try {
-          const response1 = await getAdmins("active");
-          const response2 = await getAdmins("pending");
-          setAdmins(response1);
-          setAdminRequests(response2);
+          const response1 = await getAdmins("active")
+          const response2 = await getAdmins("pending")
+          setAdmins(response1)
+          setAdminRequests(response2)
         } catch (error) {
-          console.error("Error fetching admins: ", error);
-          toast.error("Failed to fetch admins");
+          console.error("Error fetching admins: ", error)
+          toast.error("Failed to fetch admins")
         }
       }
-      fetchAdmins();
+      fetchAdmins()
     }
-  }
-  , [router, user, logout]);
+  }, [router, user, logout])
 
   const handleBannerImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setNewBannerImage(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+    const files = e.target.files
+    if (files && files.length > 0) {
+      addNewBannerImages(Array.from(files))
     }
   }
 
-  const saveBannerImage = () => {
-    if (newBannerImage) {
-      setBannerImage(newBannerImage)  // Save the new image and delete the old one using multer
-      setNewBannerImage(null)
+  const addNewBannerImages = (files: File[]) => {
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"))
+
+    if (imageFiles.length === 0) return
+
+    imageFiles.forEach((file) => {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setNewBannerImages((prev) => [
+          ...prev,
+          { url: reader.result as string, title: "" },
+        ])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const updateNewBannerTitle = (index: number, title: string) => {
+    setNewBannerImages((prev) => {
+      const updated = [...prev]
+      if (updated[index]) {
+        updated[index] = { ...updated[index], title }
+      }
+      return updated
+    })
+  }
+
+  const removeNewBanner = (index: number) => {
+    setNewBannerImages((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const saveBannerImages = () => {
+    if (newBannerImages.length > 0) {
+      const newBanners: BannerImage[] = newBannerImages.map((banner, idx) => ({
+        id: `banner-${Date.now()}-${idx}`, // Generate a simple unique ID
+        url: banner.url,
+        title: banner.title || `Banner ${bannerImages.length + idx + 1}`, // Use provided title or a default
+        active: true,
+      }))
+
+      setBannerImages([...bannerImages, ...newBanners])
+      setNewBannerImages([])
       setIsBannerDialogOpen(false)
+      toast.success(`${newBanners.length} banner${newBanners.length > 1 ? "s" : ""} added successfully`)
     }
+  }
+
+  const deleteBanner = (id: string) => {
+    setBannerImages(bannerImages.filter((banner) => banner.id !== id))
+    if (activeBannerIndex >= bannerImages.length - 1) {
+      setActiveBannerIndex(Math.max(0, bannerImages.length - 2))
+    }
+    toast.success("Banner deleted successfully")
+  }
+
+  const toggleBannerActive = (id: string) => {
+    setBannerImages(bannerImages.map((banner) => (banner.id === id ? { ...banner, active: !banner.active } : banner)))
+    toast.success("Banner status updated")
+  }
+
+  const nextBanner = () => {
+    setActiveBannerIndex((prev) => (prev === bannerImages.length - 1 ? 0 : prev + 1))
+  }
+
+  const prevBanner = () => {
+    setActiveBannerIndex((prev) => (prev === 0 ? bannerImages.length - 1 : prev - 1))
   }
 
   const confirmDeleteAdmin = (adminId: string) => {
@@ -97,71 +167,74 @@ export default function SuperAdminDashboard() {
       setAdmins(admins.filter((admin) => admin.id !== adminToDelete)) //delete admin API
       setIsDeleteAdminDialogOpen(false)
       setAdminToDelete(null)
+      toast.success("Admin removed successfully")
     }
   }
 
   const approveAdminRequest = async (requestEmail: string) => {
-    try{
-      await adminApproval(requestEmail, "approved");
-      const requestedAdmin = adminRequests.find((req) => req.email === requestEmail);
-      setAdminRequests(adminRequests.filter((req) => req.email !== requestEmail));
-      setAdmins([...admins, requestedAdmin as User]);
-      toast.success("Admin request approved successfully");
-    } catch(err){
-      toast.error("Error approving admin request");
-      console.error("Error approving admin request: ", err);
+    try {
+      await adminApproval(requestEmail, "approved")
+      const requestedAdmin = adminRequests.find((req) => req.email === requestEmail)
+      setAdminRequests(adminRequests.filter((req) => req.email !== requestEmail))
+      setAdmins([...admins, requestedAdmin as User])
+      toast.success("Admin request approved successfully")
+    } catch (err) {
+      toast.error("Error approving admin request")
+      console.error("Error approving admin request: ", err)
     }
   }
 
   const rejectAdminRequest = async (requestEmail: string) => {
-    try{
-      await adminApproval(requestEmail, "rejected");
-      setAdminRequests(adminRequests.filter((req) => req.email !== requestEmail));
-      toast("Admin request rejected");
-    } catch(err){
-      toast.error("Error rejecting admin request");
-      console.error("Error rejecting admin request: ", err);
+    try {
+      await adminApproval(requestEmail, "rejected")
+      setAdminRequests(adminRequests.filter((req) => req.email !== requestEmail))
+      toast("Admin request rejected")
+    } catch (err) {
+      toast.error("Error rejecting admin request")
+      console.error("Error rejecting admin request: ", err)
     }
   }
-  
+
   const confirmDeleteRequest = (requestEmail: string) => {
-    setRequestToDelete(requestEmail);
-    setIsDeleteRequestDialogOpen(true);
+    setRequestToDelete(requestEmail)
+    setIsDeleteRequestDialogOpen(true)
   }
-  
+
   const deleteRequest = async () => {
     if (requestToDelete) {
       try {
-        await adminApproval(requestToDelete, "deleted");
-        setAdminRequests(adminRequests.filter((req) => req.email !== requestToDelete));
-        toast.success("Admin request deleted successfully");
-        setIsDeleteRequestDialogOpen(false);
-        setRequestToDelete(null);
-      } catch(err) {
-        toast.error("Error deleting admin request");
-        console.error("Error deleting admin request: ", err);
+        await adminApproval(requestToDelete, "deleted")
+        setAdminRequests(adminRequests.filter((req) => req.email !== requestToDelete))
+        toast.success("Admin request deleted successfully")
+        setIsDeleteRequestDialogOpen(false)
+        setRequestToDelete(null)
+      } catch (err) {
+        toast.error("Error deleting admin request")
+        console.error("Error deleting admin request: ", err)
       }
     }
   }
 
-  const initials = (name: string)=>{
-    let answer="";
-    const nameParts= name.split(" ");
-    answer+=nameParts[0].charAt(0).toUpperCase();
-    if(nameParts.length>1){
-      answer+=nameParts[nameParts.length-1].charAt(0).toUpperCase();
+  const initials = (name: string) => {
+    let answer = ""
+    const nameParts = name.split(" ")
+    answer += nameParts[0].charAt(0).toUpperCase()
+    if (nameParts.length > 1) {
+      answer += nameParts[nameParts.length - 1].charAt(0).toUpperCase()
     }
-    return answer;
+    return answer
   }
 
   const fuseOptions = {
-    keys: ['name', 'email', 'shortDescription'],
+    keys: ["name", "email", "shortDescription"],
     threshold: 0.3,
   }
-  const filteredAdmins= searchQuery.trim()? new Fuse(admins, fuseOptions).search(searchQuery).map(result => result.item): admins;
+  const filteredAdmins = searchQuery.trim()
+    ? new Fuse(admins, fuseOptions).search(searchQuery).map((result) => result.item)
+    : admins
 
   if (!user) {
-    return null;
+    return null
   }
 
   return (
@@ -174,7 +247,7 @@ export default function SuperAdminDashboard() {
             <div className="flex items-center gap-2">
               <Button className="bg-blue-500 text-white" onClick={() => setIsBannerDialogOpen(true)}>
                 <Upload className="h-4 w-4 mr-2" />
-                Update Banner
+                Add Banners
               </Button>
             </div>
           </div>
@@ -184,16 +257,107 @@ export default function SuperAdminDashboard() {
           <div className="grid gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Current Homepage Banner</CardTitle>
-                <CardDescription>The banner currently displayed on the homepage</CardDescription>
+                <CardTitle>Homepage Banners</CardTitle>
+                <CardDescription>Manage the banners displayed on the homepage slider</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="relative w-full aspect-[3/1] rounded-md overflow-hidden border">
-                  <Image src={bannerImage || "/placeholder.svg"} alt="Homepage Banner" fill className="object-cover" />
-                </div>
-                <div className="flex justify-end mt-4">
-                  <Button className="bg-blue-500 text-white" onClick={() => setIsBannerDialogOpen(true)}>Change Banner</Button>
-                </div>
+              <CardContent className="space-y-4">
+                {bannerImages.length > 0 ? (
+                  <>
+                    <div className="relative w-full aspect-[3/1] rounded-md overflow-hidden border">
+                      <div className="relative h-full w-full">
+                        <Image
+                          src={bannerImages[activeBannerIndex]?.url || "/placeholder.svg"}
+                          alt={bannerImages[activeBannerIndex]?.title || "Banner"}
+                          fill
+                          className="object-cover transition-opacity duration-300"
+                        />
+
+                        {bannerImages.length > 1 && (
+                          <div className="absolute inset-0 flex items-center justify-between p-4">
+                            <button
+                              className="text-gray-300 cursor-pointer rounded-full bg-background/80 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+                              onClick={prevBanner}>
+                              <ChevronLeft size={50} />
+                            </button>
+                            <button
+                              className="text-gray-300 cursor-pointer rounded-full bg-background/80 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+                              onClick={nextBanner}>
+                              <ChevronRight size={50} />
+                            </button>
+                          </div>
+                        )}
+
+                        {bannerImages.length > 1 && (
+                          <div className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md text-xs">
+                            {activeBannerIndex + 1} / {bannerImages.length}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {bannerImages.length > 1 && (
+                      <div className="space-y-2">
+                        <h3 className="text-sm font-medium">All Banners</h3>
+                        <div className="border rounded-md divide-y">
+                          {bannerImages.map((banner, index) => (
+                            <div key={banner.id} className="p-3 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="relative h-16 w-24 rounded-md overflow-hidden border">
+                                  <Image
+                                    src={banner.url || "/placeholder.svg"}
+                                    alt={banner.title || `Banner ${index + 1}`}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{banner.title}</p>
+                                  <div className="flex items-center mt-1">
+                                    <Badge
+                                      variant={banner.active ? "default" : "secondary"}
+                                      className={`text-xs ${banner.active ? "bg-green-100 text-green-800" : ""}`}
+                                    >
+                                      {banner.active ? "Active" : "Inactive"}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button variant="outline" size="sm" onClick={() => toggleBannerActive(banner.id)}>
+                                  {banner.active ? "Deactivate" : "Activate"}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-red-500 hover:text-red-700"
+                                  onClick={() => deleteBanner(banner.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex justify-end mt-4">
+                      <Button className="bg-blue-500 text-white" onClick={() => setIsBannerDialogOpen(true)}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add More Banners
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="border border-dashed rounded-md p-8 text-center">
+                    <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-4">No banners added yet</p>
+                    <Button className="bg-blue-500 text-white" onClick={() => setIsBannerDialogOpen(true)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add First Banner
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -205,11 +369,22 @@ export default function SuperAdminDashboard() {
               <CardContent>
                 <Tabs defaultValue="admins" className="w-full">
                   <TabsList className="grid w-full grid-cols-2 mb-4 bg-gray-300">
-                    <TabsTrigger value="admins" className="text-sm font-medium transition-all  data-[state=active]:bg-white data-[state=active]:text-black  data-[state=active]:shadow-none">Admin Users</TabsTrigger>
-                    <TabsTrigger value="requests" className="text-sm font-medium transition-all  data-[state=active]:bg-white data-[state=active]:text-black  data-[state=active]:shadow-none">
+                    <TabsTrigger
+                      value="admins"
+                      className="text-sm font-medium transition-all  data-[state=active]:bg-white data-[state=active]:text-black  data-[state=active]:shadow-none"
+                    >
+                      Admin Users
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="requests"
+                      className="text-sm font-medium transition-all  data-[state=active]:bg-white data-[state=active]:text-black  data-[state=active]:shadow-none"
+                    >
                       Approval Requests
                       {adminRequests.length > 0 && (
-                        <Badge className="text-white p-0 m-0 px-2 justify-center items-center bg-red-500 text-center rounded-full" variant="default" >
+                        <Badge
+                          className="text-white p-0 m-0 px-2 justify-center items-center bg-red-500 text-center rounded-full"
+                          variant="default"
+                        >
                           {adminRequests.length}
                         </Badge>
                       )}
@@ -258,7 +433,9 @@ export default function SuperAdminDashboard() {
                                       <div className="flex items-center gap-3">
                                         <Avatar>
                                           <AvatarImage src={"https://picsum.photos/200/300"} alt="Profile" />
-                                          <AvatarFallback className="bg-gray-300">{initials(admin.name)}</AvatarFallback>
+                                          <AvatarFallback className="bg-gray-300">
+                                            {initials(admin.name)}
+                                          </AvatarFallback>
                                         </Avatar>
                                         <div>
                                           <div className="font-medium">{admin.name}</div>
@@ -267,22 +444,32 @@ export default function SuperAdminDashboard() {
                                       </div>
                                     </td>
                                     <td className="px-4 py-3 whitespace-nowrap">
-                                      <Badge variant={"outline"} className={admin.role === "superadmin" ? "text-blue-500" : "text-green-500"}>
+                                      <Badge
+                                        variant={"outline"}
+                                        className={admin.role === "superadmin" ? "text-blue-500" : "text-green-500"}
+                                      >
                                         {admin.role}
                                       </Badge>
                                     </td>
-                                    <td className="px-4 py-3 whitespace-nowrap">10</td>  {/* Replace with actual products count */}
+                                    <td className="px-4 py-3 whitespace-nowrap">10</td>{" "}
+                                    {/* Replace with actual products count */}
                                     <td className="px-4 py-3 whitespace-nowrap">Today</td>
                                     <td className="px-4 py-3 whitespace-nowrap">
-                                      <div className={"flex items-center justify-start gap-2" }>
+                                      <div className={"flex items-center justify-start gap-2"}>
                                         <Link href={`/admin/superadmin/admins/${admin.id}`}>
                                           <Button variant="ghost" size="sm">
                                             View
                                           </Button>
                                         </Link>
-                                          <Button variant="ghost" size="sm" className="text-red-500" disabled={admin.role==="superadmin"} onClick={() => confirmDeleteAdmin(admin.id)}>
-                                            Remove
-                                          </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="text-red-500"
+                                          disabled={admin.role === "superadmin"}
+                                          onClick={() => confirmDeleteAdmin(admin.id)}
+                                        >
+                                          Remove
+                                        </Button>
                                       </div>
                                     </td>
                                   </tr>
@@ -309,27 +496,38 @@ export default function SuperAdminDashboard() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <Avatar>
-                                  <AvatarImage src={'request.picture'} alt="Profile" />
+                                  <AvatarImage src={"request.picture"} alt="Profile" />
                                   <AvatarFallback>{initials(request.name)}</AvatarFallback>
                                 </Avatar>
                                 <div>
                                   <div className="font-medium">{request.name}</div>
                                   <div className="text-sm text-muted-foreground">{request.email}</div>
                                   <div className="text-xs text-muted-foreground">
-                                    Requested on {new Date(request.created_at).toLocaleDateString('en-GB', {
-                                      day: 'numeric',
-                                      month: 'numeric', 
-                                      year: 'numeric'
+                                    Requested on{" "}
+                                    {new Date(request.created_at).toLocaleDateString("en-GB", {
+                                      day: "numeric",
+                                      month: "numeric",
+                                      year: "numeric",
                                     })}
                                   </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm" className="text-red-500 bg-white" onClick={() => rejectAdminRequest(request.email)}>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-red-500 bg-white"
+                                  onClick={() => rejectAdminRequest(request.email)}
+                                >
                                   <X className="h-4 w-4 mr-1" />
                                   Reject
                                 </Button>
-                                <Button variant="outline" className="text-green-500 bg-white" size="sm" onClick={() => approveAdminRequest(request.email)}>
+                                <Button
+                                  variant="outline"
+                                  className="text-green-500 bg-white"
+                                  size="sm"
+                                  onClick={() => approveAdminRequest(request.email)}
+                                >
                                   <Check className="h-4 w-4 mr-1" />
                                   Approve
                                 </Button>
@@ -352,53 +550,68 @@ export default function SuperAdminDashboard() {
       <Dialog open={isBannerDialogOpen} onOpenChange={setIsBannerDialogOpen}>
         <DialogContent className="sm:max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle>Update Homepage Banner</DialogTitle>
-            <DialogDescription>
-              Upload a new image for the homepage banner. Recommended size is 1920x640 pixels.
+            <DialogTitle>{newBannerImages.length>0? `New Banners (${newBannerImages.length})`: "Add New Banners"}</DialogTitle>
+            <DialogDescription className={newBannerImages.length>0? "hidden": ""}>
+              Upload multiple images for the homepage banner slider. Recommended size is 1920x640 pixels.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            {newBannerImage ? (
-              <div className="relative w-full aspect-[3/1] rounded-md overflow-hidden border">
-                <Image
-                  src={newBannerImage || "/placeholder.svg"}
-                  alt="New Banner Preview"
-                  fill
-                  className="object-cover"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2"
-                  onClick={() => setNewBannerImage(null)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <div className="border border-dashed rounded-md text-center">
-                <div className="space-y-4">
-                    {newBannerImage ? (
-                        <div className="relative w-full max-w-md mx-auto">
-                            <Image
-                                src={"/hero.png"}
-                                alt="Product preview"
-                                fill
-                                priority={true}
-                                className="rounded-md border object-cover h-64 w-full"
-                            />
+            <div className={newBannerImages.length>0? "hidden": "border border-dashed rounded-md text-center"}>
+              <Label htmlFor="banner-images-input" className="p-10 cursor-pointer w-full h-full flex flex-col items-center justify-center">
+                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">Click to browse and upload images</p>
+                <p className="text-xs text-muted-foreground">You can select multiple images</p>
+              </Label>
+              <Input
+                id="banner-images-input"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleBannerImageChange}
+              />
+            </div>
+
+            {/* Preview of new banners */}
+            {newBannerImages.length > 0 && (
+              <div className="space-y-4">
+                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                  {newBannerImages.map((banner, index) => (
+                    <div key={index} className="border rounded-md p-3">
+                      <div className="flex flex-col gap-3">
+                        <div className="relative aspect-[3/1] w-full rounded-md overflow-hidden">
+                          <Image
+                            src={banner.url || "/placeholder.svg"}
+                            alt={banner.title || `Banner preview ${index + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2 h-6 w-6"
+                            onClick={() => removeNewBanner(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
                         </div>
-                    ) : (
-                        <div className="border border-dashed rounded-md text-center">
-                        <Label htmlFor="image" className="p-10 cursor-pointer w-full h-full flex flex-col">
-                            <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                            <p className="text-sm text-muted-foreground mb-2">Drag and drop, or click to browse</p>
-                        </Label>
-                        <Input name="image" id="image" type="file" accept="image/*" className="hidden cursor-pointer" onChange={handleBannerImageChange} />
+                        <div className="space-y-2">
+                          <Label htmlFor={`banner-title-${index}`} className="text-xs">
+                            Banner Title
+                          </Label>
+                          <Input
+                            id={`banner-title-${index}`}
+                            value={banner.title}
+                            onChange={(e) => updateNewBannerTitle(index, e.target.value)}
+                            placeholder="Enter a title for this banner"
+                            className="h-8 text-sm"
+                          />
                         </div>
-                    )}
+                      </div>
                     </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -406,8 +619,12 @@ export default function SuperAdminDashboard() {
             <Button variant="outline" onClick={() => setIsBannerDialogOpen(false)}>
               Cancel
             </Button>
-            <Button className="bg-green-500 text-white" onClick={saveBannerImage} disabled={!newBannerImage}>
-              Save Changes
+            <Button
+              className="bg-green-500 text-white"
+              onClick={saveBannerImages}
+              disabled={newBannerImages.length === 0}
+            >
+              Add {newBannerImages.length} {newBannerImages.length === 1 ? "Banner" : "Banners"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -432,7 +649,7 @@ export default function SuperAdminDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete {NOT IMPLEMENTED YET}*/}
+      {/* Delete Request Dialog */}
       <Dialog open={isDeleteRequestDialogOpen} onOpenChange={setIsDeleteRequestDialogOpen}>
         <DialogContent className="bg-white">
           <DialogHeader>

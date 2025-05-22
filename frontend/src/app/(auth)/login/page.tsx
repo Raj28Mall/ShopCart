@@ -107,10 +107,15 @@ export default function LoginPage() {
                         </svg>
                     </Button>
                 </div>
-
-                <Link href="/signup" className="text-sm pt-2 underline cursor-pointer">
-                    Dont have an account?
-                </Link>
+                
+                <div className="flex flex-row space-x-4">
+                    <Link href="/signup" className="text-sm pt-2 underline cursor-pointer">
+                        Dont have an account?
+                    </Link>
+                    <Link href={"/admin/auth"} className="text-sm pt-2 underline cursor-pointer">
+                        Admin Login
+                    </Link>
+                </div>
             </CardFooter>
         </Card>
     </div>
