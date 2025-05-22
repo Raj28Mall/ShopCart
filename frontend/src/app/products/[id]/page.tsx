@@ -17,13 +17,12 @@ import { useCartStore } from "@/store/cartStore";
 import { RequireAuth } from "@/components/requireAuth";
 import Footer from "@/components/footer";
 import { zoomFactor } from "@/app/constants";
+import { getProductImages } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
-
-const PRODUCT_IMAGES_COUNT=5; //remeber to make this dynamic according to images fetched from backend
 
 export default function ProductPage() {
     const params= useParams();
-    const id= params.id;
+    const id= params.id as string; // Ensure id is treated as string for api calls
     const products = useProductStore((state)=>state.products);
     const product=products.find((product) => product.id.toString() === (id)?.toString());
     const cartItems = useCartStore((state) => state.cartItems);
@@ -31,17 +30,58 @@ export default function ProductPage() {
     const [quantity, setQuantity] = useState<number>(cartItems.find((item)=>item.id===Number(id))?.quantity || 0);
     const [productNotFound, setProductNotFound] = useState<boolean>(false);
     const [wishList, setWishList] = useState<boolean>(false);
+    
+    const [productImages, setProductImages] = useState<string[]>([]); // MODIFIED: Use state for product images
     const [activeImage, setActiveImage] = useState(0);
-    const productImages=[product?.image];
-    for(let i=1;i<PRODUCT_IMAGES_COUNT;i++){
-      productImages[i]=`https://picsum.photos/id/${i}/200`;
-    }
+    // REMOVED: const productImages=[product?.image];
+    
     const incrementQuantity = () => setQuantity((prev) => prev + 1);
     const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
     const [isZoomed, setIsZoomed] = useState(false)
     const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
     const imageContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const fetchAndSetImages = async () => {
+      if (!product || !id) {
+        // If product is not yet loaded or id is not available
+        // Set main image if product is available, otherwise empty
+        setProductImages(product?.image ? [product.image] : []);
+        setActiveImage(0); // Reset active image
+        return;
+      }
+
+      let currentImageUrls: string[] = [];
+      if (product.image) {
+        currentImageUrls.push(product.image);
+      }
+
+      try {
+        // Assuming getProductImages returns an array of objects like { image_url: string }
+        // or an array of strings if the backend sends URLs directly.
+        const additionalImagesResult = await getProductImages(id); 
+        
+        if (additionalImagesResult && additionalImagesResult.length > 0) {
+          additionalImagesResult.forEach(imgObj => {
+            // Adapt this line if the image URL is stored under a different property name
+            const imageUrl = typeof imgObj === 'string' ? imgObj : (imgObj as any).image_url; 
+            if (imageUrl && !currentImageUrls.includes(imageUrl)) {
+              currentImageUrls.push(imageUrl);
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching additional product images:", error);
+        // Retain main image (if any) if fetching additional ones fails
+      }
+      
+      setProductImages(currentImageUrls);
+      setActiveImage(0); // Reset active image index when images are loaded/changed for the product
+    };
+
+    fetchAndSetImages();
+  }, [id, product]); // Depend on id and the product object
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current) return
@@ -71,11 +111,13 @@ export default function ProductPage() {
   const handleTouchEnd = () => setIsZoomed(false)
 
     const nextImage = () => {
-      setActiveImage((prev) => (prev === PRODUCT_IMAGES_COUNT - 1 ? 0 : prev + 1))
+      if (productImages.length === 0) return; // Guard against no images
+      setActiveImage((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
     }
   
     const prevImage = () => {
-      setActiveImage((prev) => (prev === 0 ? PRODUCT_IMAGES_COUNT - 1 : prev - 1))
+      if (productImages.length === 0) return; // Guard against no images
+      setActiveImage((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
     }
     
     setTimeout(() => {

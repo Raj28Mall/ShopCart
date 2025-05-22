@@ -6,14 +6,13 @@ import { Navbar } from "@/components/navbar";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/productCard";
 import { useProductStore } from "@/store/productStore";
-import { getProducts } from '@/lib/api';
+import { getProducts, getBanners as fetchBannersFromAPI } from '@/lib/api'; // MODIFIED: Import getBanners and alias it
 import Footer from '@/components/footer';
 import { categories } from '@/app/constants';
-import { Product } from '@/app/types';
+import { Product, Banner as BannerType } from '@/app/types'; // MODIFIED: Import BannerType
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Percent, ShoppingBag, Star, Tag } from 'lucide-react';
 
@@ -23,17 +22,28 @@ const PRODUCT_COUNT = 10;
 export default function Home() {
   const products = useProductStore((state) => state.products);    
   const setProducts = useProductStore((state) => state.setProducts);
-  const [banners, setBanners] = useState<string[]>([]);
+  const [banners, setBanners] = useState<BannerType[]>([]); // MODIFIED: Use BannerType[] for state
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
     
-  // Set up banner images from picsum
+  // Set up banner images from API
   useEffect(() => {
-    const bannerSeeds = ["banner1", "banner2", "banner3", "banner4", "banner5"];
-    const bannerUrls = bannerSeeds.map(seed => 
-      `https://picsum.photos/seed/${seed}/1920/640`
-    );
-    setBanners(bannerUrls);
+    const loadBanners = async () => {
+      try {
+        const apiBanners = await fetchBannersFromAPI();
+        if (apiBanners && apiBanners.length > 0) {
+          setBanners(apiBanners.filter(banner => banner.active)); // Filter for active banners
+        } else {
+          // Fallback to placeholder if no active banners from API
+          setBanners([{ id: 'placeholder', title: 'Placeholder Banner', image_url: '/placeholder.svg', active: true }]);
+        }
+      } catch (error) {
+        console.error("Error fetching banners:", error);
+        // Fallback to placeholder on error
+        setBanners([{ id: 'placeholder', title: 'Placeholder Banner', image_url: '/placeholder.svg', active: true }]);
+      }
+    };
+    loadBanners();
   }, []);
   
   const pauseAutoplay = () => {
@@ -78,48 +88,54 @@ export default function Home() {
     <div className="flex flex-col min-h-screen max-w-screen bg-white overflow-x-hidden">
       <Navbar />
       
-      <div className="relative w-full overflow-hidden">
-      <div className="w-screen aspect-[3/1] relative">
-        <Image
-          src={banners[activeBannerIndex] || "/placeholder.svg"}
-          alt="Banner"
-          fill
-          priority
-          className={`object-cover transition-opacity duration-300`}
-        />
-
-        <div className="absolute inset-0 flex items-center justify-between px-4">
-          <button  className="text-white cursor-pointer rounded-full bg-background/80 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
-            onClick={() => {
-              pauseAutoplay();
-              prevBanner();
-            }}>
-            <ChevronLeft size={38}/>
-          </button>
-
-          <button  className="text-white cursor-pointer rounded-full bg-background/80 pr-2 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
-            onClick={() => {
-              pauseAutoplay();
-              nextBanner();
-            }}>
-            <ChevronRight size={38} />
-          </button>
-        </div>
-        
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {banners.map((_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full ${index === activeBannerIndex ? "bg-primary" : "bg-background/80"}`}
-              onClick={() => {
-                pauseAutoplay();
-                setActiveBannerIndex(index);
-              }}
+      {banners.length > 0 && ( // MODIFIED: Conditional rendering for when banners are loaded
+        <div className="relative w-full overflow-hidden">
+          <div className="w-screen aspect-[3/1] relative">
+            <Image
+              src={banners[activeBannerIndex]?.image_url || "/placeholder.svg"} // MODIFIED: Use image_url
+              alt={banners[activeBannerIndex]?.title || "Banner"} // MODIFIED: Use title from banner object
+              fill
+              priority
+              className={`object-cover transition-opacity duration-300`}
             />
-          ))}
+
+            {banners.length > 1 && ( // MODIFIED: Show controls only if more than one banner
+              <>
+                <div className="absolute inset-0 flex items-center justify-between px-4">
+                  <button className="text-white cursor-pointer rounded-full bg-background/80 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+                    onClick={() => {
+                      pauseAutoplay();
+                      prevBanner();
+                    }}>
+                    <ChevronLeft size={38}/>
+                  </button>
+
+                  <button className="text-white cursor-pointer rounded-full bg-background/80 pr-2 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+                    onClick={() => {
+                      pauseAutoplay();
+                      nextBanner();
+                    }}>
+                    <ChevronRight size={38} />
+                  </button>
+                </div>
+                
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  {banners.map((banner, index) => ( // MODIFIED: Iterate over banners state
+                    <button
+                      key={banner.id} // MODIFIED: Use banner.id as key
+                      className={`w-2 h-2 rounded-full ${index === activeBannerIndex ? "bg-primary" : "bg-background/80"}`}
+                      onClick={() => {
+                        pauseAutoplay();
+                        setActiveBannerIndex(index);
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+      )}
     
     <section className="w-full py-12 md:py-16 bg-gradient-to-r from-rose-50 to-teal-50">
         <div className="container px-4 md:px-6">

@@ -51,8 +51,19 @@ export const adminApproval = async (email: string, status: string) => {
     }
 }
 
-export const getProduct= async(productId: string)=>{
+export const getProduct = async(productId: string)=>{
     const URL=`${API_URL}/product_api/products/${productId}`;
+    try{
+        const response = await axios.get(URL);
+        return response.data;
+    } catch(err){
+        console.error("Error while fetching product in backend: ", err);
+        return;
+    }
+}
+
+export const getProductImages= async(productId: string)=>{
+    const URL=`${API_URL}/product_api/products/images/${productId}`;
     try{
         const response = await axios.get(URL);
         return response.data;
@@ -73,10 +84,19 @@ export const getProducts = async()=>{
     }
 };
 
-
-
-export const addProduct = async (product: { name: string; category: string; price: string; image: File | string;  rating?: string; stock: string; shortDescription: string; longDescription: string; status: string;}) => {
-    const URL = `${API_URL}/product_api/products`; 
+export const addProduct = async (product: {
+    name: string;
+    category: string;
+    price: string;
+    image: File | string; // This will be the main image File
+    images?: File[];      // Array of additional image Files
+    rating?: string;
+    stock: string;
+    shortDescription: string;
+    longDescription: string;
+    status: string;
+}) => {
+    const URL = `${API_URL}/product_api/products`;
     const formData = new FormData();
     formData.append('name', product.name);
     formData.append('category', product.category);
@@ -86,14 +106,35 @@ export const addProduct = async (product: { name: string; category: string; pric
     formData.append('longDescription', product.longDescription);
     formData.append('status', product.status);
     formData.append('rating', product.rating ?? "0.0");
+
+    // Handle the main image
     if (product.image instanceof File) {
-        formData.append('image', product.image, product.image.name); 
-    } else if (typeof product.image === 'string') {
-        console.warn("addProduct called with an image string. The backend expects a File upload in the 'image' field for this endpoint.");
+        formData.append('mainImage', product.image, product.image.name);
+    } else if (typeof product.image === 'string' && product.image) {
+        // If it's a string, it might be a URL of an existing image (e.g. during edit)
+        // For addProduct, we typically expect a new File.
+        // Depending on backend logic for handling string 'image' for new products,
+        // this might need adjustment or an error if a File is always expected.
+        // For now, assuming 'mainImage' field is for new file uploads.
+        console.warn("addProduct called with a string for mainImage. Ensure backend handles this or send a File.");
     }
-    
+
+    // Handle additional images
+    if (product.images && Array.isArray(product.images)) {
+        product.images.forEach((file) => {
+            if (file instanceof File) {
+                // Ensure not to send the main image again if it's also in the images array
+                if (!(product.image instanceof File && file.name === product.image.name && file.size === product.image.size)) {
+                    formData.append('additionalImages', file, file.name);
+                }
+            }
+        });
+    }
+
     try {
-        const response = await axios.post(URL, formData, {});
+        const response = await axios.post(URL, formData, {
+            // Ensure headers are set for multipart/form-data if not default
+        });
         return response.data; 
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -145,7 +186,6 @@ export const deleteProduct = async (productId: string) => {
     }
 }
 
-
 export const getOrderHistory= async()=>{
     const URL=`${API_URL}/order_api/orders`;
     try{
@@ -189,3 +229,57 @@ export const getOrderProducts= async(orderId: string)=>{
         return;
     }
 }
+
+// Banner API functions
+export interface Banner {
+    id: string; 
+    title: string;
+    image_url: string; 
+    active: boolean;
+    created_at?: string; 
+}
+
+// GET all banners
+export const getBanners = async () => {
+    const URL = `${API_URL}/banner_api`; 
+    try {
+        const response = await axiosInstance.get(URL);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching banners:", error);
+        throw error;
+    }
+};
+
+// POST a new banner
+export const addBanner = async (bannerData: { title: string; image: File; active: boolean }) => {
+    const URL = `${API_URL}/banner_api`;
+    const formData = new FormData();
+    formData.append('title', bannerData.title);
+    formData.append('image', bannerData.image);
+    formData.append('active', String(bannerData.active));
+
+    try {
+        const response = await axiosInstance.post(URL, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error adding banner:", error);
+        throw error;
+    }
+};
+
+export const deleteBanner = async (bannerId: string) => {
+    const URL = `${API_URL}/banner_api/${bannerId}`;
+    try {
+        const response = await axiosInstance.delete(URL);
+        return response.data;
+    } catch (error) {
+        console.error(`Error deleting banner ${bannerId}:`, error);
+        throw error;
+    }
+};
+
