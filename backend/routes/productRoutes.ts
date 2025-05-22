@@ -25,7 +25,6 @@ const storage = multer.diskStorage({
     }
 });
 
-// (Making sure its image file)
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     if (file.mimetype.startsWith('image/')) {
         cb(null, true); 
@@ -98,11 +97,8 @@ router.put('/products/:id', upload.single('image'), async (req: Request, res: Re
 
         if (imageFile) {
             imagePathToSave = `/uploads/${imageFile.filename}`; 
-            oldImagePathToDelete = existingProduct.image; // Storing old photo for deletion
-            console.log(`New image uploaded: ${imagePathToSave}. Old image was: ${oldImagePathToDelete}`);
-        } else {
-            console.log(`No new image uploaded. Keeping existing image: ${imagePathToSave}`);
-        }
+            oldImagePathToDelete = existingProduct.image;
+        } 
 
         if (!name || !category || !shortDescription || !longDescription || price === undefined || rating === undefined || stock === undefined || status === undefined) {
             if (imageFile) {

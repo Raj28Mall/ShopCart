@@ -9,8 +9,8 @@ if (!API_URL) {
 export const loginUser = async (email: string, password: string, role:string) => {
     const URL=`${API_URL}/api/auth/login`;
     try {
-      const response = await axios.post(URL, { email, password, role });
-      return response.data; 
+        const response = await axios.post(URL, { email, password, role });
+        return response.data; 
     } catch (error) {
         throw error;
     }
