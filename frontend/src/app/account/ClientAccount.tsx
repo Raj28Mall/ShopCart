@@ -16,7 +16,6 @@ import { useAuthStore } from '@/store/authStore';
 import { useUserStore } from '@/store/userStore';
 import { RequireAuth } from '@/components/requireAuth';
 
-// Helper function to format date
 const formatDate = (dateString: string) => {
   if (!dateString) return '';
   

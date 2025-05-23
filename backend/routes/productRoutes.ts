@@ -34,7 +34,6 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
     }
 };
 
-// Updated multer instance to handle 'mainImage' and 'additionalImages'
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
@@ -43,7 +42,7 @@ const upload = multer({
 
 const productUploads = upload.fields([
     { name: 'mainImage', maxCount: 1 },
-    { name: 'additionalImages', maxCount: 5 } // Allow up to 10 additional images
+    { name: 'additionalImages', maxCount: 5 } // Allow up to 5 additional images
 ]);
 
 //route for getting a single product by id
@@ -149,8 +148,8 @@ router.put('/products/:id', upload.single('image'), async (req: Request, res: Re
              if (imageFile) { fs.unlink(imageFile.path, (err) => { if (err) console.error("Error deleting file on rating format validation fail:", err); }); }
              res.status(400).send("Rating must be a number with up to one decimal place (e.g., 4.5)");
         }
-        const numericRating = parseFloat(ratingStr); // Then parse
-        if (isNaN(numericRating) || numericRating < 0 || numericRating > 5) { // Then check range
+        const numericRating = parseFloat(ratingStr);
+        if (isNaN(numericRating) || numericRating < 0 || numericRating > 5) { 
             if (imageFile) { fs.unlink(imageFile.path, (err) => { if (err) console.error("Error deleting file on rating range validation fail:", err); }); }
             res.status(400).send("Rating must be between 0.0 and 5.0");
         }

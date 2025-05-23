@@ -18,7 +18,7 @@ import { AdminSidebar } from "@/components/adminSidebar"
 import { useUserStore } from "@/store/userStore"
 import { useAuthStore } from "@/store/authStore"
 import { toast } from "react-hot-toast"
-import { getAdmins, adminApproval, getBanners, addBanner, Banner as BannerType } from "@/lib/api" // Updated imports
+import { getAdmins, adminApproval, getBanners, addBanner, Banner as BannerType, deleteBanner as deleteBannerApi, updateBanner as updateBannerApi } from "@/lib/api" // MODIFIED: Added updateBannerApi and ensured deleteBanner is aliased
 import Fuse from "fuse.js"
 import type { User } from "@/store/userStore"
 
@@ -31,9 +31,9 @@ export default function SuperAdminDashboard() {
   const [adminRequests, setAdminRequests] = useState<User[]>([])
   const [searchQuery, setSearchQuery] = useState("")
 
-  const [bannerImages, setBannerImages] = useState<BannerType[]>([]) // Use BannerType
-  const [newBannerFiles, setNewBannerFiles] = useState<File[]>([]) // Store File objects
-  const [newBannerTitles, setNewBannerTitles] = useState<string[]>([]) // Store titles for new banners
+  const [bannerImages, setBannerImages] = useState<BannerType[]>([]) 
+  const [newBannerFiles, setNewBannerFiles] = useState<File[]>([]) 
+  const [newBannerTitles, setNewBannerTitles] = useState<string[]>([]) 
   const [isLoadingBanners, setIsLoadingBanners] = useState(true);
 
   const [isBannerDialogOpen, setIsBannerDialogOpen] = useState(false)
@@ -138,7 +138,7 @@ export default function SuperAdminDashboard() {
 
   const deleteBanner = async (id: string) => {
     try {
-      await deleteBanner(id);
+      await deleteBannerApi(id); // MODIFIED: Changed to call deleteBannerApi
       const updatedBanners = bannerImages.filter((banner) => banner.id !== id);
       setBannerImages(updatedBanners);
       if (activeBannerIndex >= updatedBanners.length && updatedBanners.length > 0) {
@@ -165,6 +165,22 @@ export default function SuperAdminDashboard() {
     setActiveBannerIndex((prevIndex) =>
       prevIndex === bannerImages.length - 1 ? 0 : prevIndex + 1
     );
+  };
+
+  const toggleBannerActive = async (bannerId: string) => {
+    const banner = bannerImages.find(b => b.id === bannerId);
+    if (!banner) return;
+
+    try {
+      const updatedBanner = await updateBannerApi(bannerId, { active: !banner.active });
+      setBannerImages(prevBanners => 
+        prevBanners.map(b => b.id === bannerId ? { ...b, active: !banner.active } : b)
+      );
+      toast.success(`Banner ${!banner.active ? 'activated' : 'deactivated'} successfully`);
+    } catch (error) {
+      console.error("Error updating banner status:", error);
+      toast.error("Failed to update banner status");
+    }
   };
 
   const confirmDeleteAdmin = (adminId: string) => {
@@ -280,7 +296,7 @@ export default function SuperAdminDashboard() {
                     <div className="relative w-full aspect-[3/1] rounded-md overflow-hidden border">
                       <div className="relative h-full w-full">
                         <Image
-                          src={bannerImages[activeBannerIndex]?.image_url || "/placeholder.svg"} // MODIFIED: Use image_url
+                          src={bannerImages[activeBannerIndex]?.image_url || "/placeholder.svg"} 
                           alt={bannerImages[activeBannerIndex]?.title || "Banner"}
                           fill
                           className="object-cover transition-opacity duration-300"
@@ -318,7 +334,7 @@ export default function SuperAdminDashboard() {
                               <div className="flex items-center gap-3">
                                 <div className="relative h-16 w-24 rounded-md overflow-hidden border">
                                   <Image
-                                    src={banner.image_url || "/placeholder.svg"} // MODIFIED: Use image_url
+                                    src={banner.image_url || "/placeholder.svg"} 
                                     alt={banner.title || `Banner ${index + 1}`}
                                     fill
                                     className="object-cover"
@@ -603,18 +619,18 @@ export default function SuperAdminDashboard() {
                         <div className="flex flex-col gap-3">
                           <div className="relative aspect-[3/1] w-full rounded-md overflow-hidden">
                             <Image
-                              src={previewUrl} // Use createObjectURL for preview
+                              src={previewUrl}
                               alt={newBannerTitles[index] || `Banner preview ${index + 1}`}
                               fill
                               className="object-cover"
-                              onLoad={() => URL.revokeObjectURL(previewUrl)} // Clean up object URL after load
+                              onLoad={() => URL.revokeObjectURL(previewUrl)} 
                             />
                             <Button
                               type="button"
                               variant="destructive"
                               size="icon"
                               className="absolute top-2 right-2 h-6 w-6"
-                              onClick={() => removeNewBannerPreview(index)} // Updated function name
+                              onClick={() => removeNewBannerPreview(index)} 
                             >
                               <X className="h-3 w-3" />
                             </Button>
@@ -642,7 +658,7 @@ export default function SuperAdminDashboard() {
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setIsBannerDialogOpen(false);
-              setNewBannerFiles([]); // Clear previews on cancel
+              setNewBannerFiles([]);
               setNewBannerTitles([]);
             }}>
               Cancel

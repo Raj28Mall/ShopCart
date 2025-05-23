@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/productCard";
 import { useProductStore } from "@/store/productStore";
-import { getProducts, getBanners as fetchBannersFromAPI } from '@/lib/api'; // MODIFIED: Import getBanners and alias it
+import { getProducts, getBanners as fetchBannersFromAPI } from '@/lib/api'; 
 import Footer from '@/components/footer';
 import { categories } from '@/app/constants';
-import { Product, Banner as BannerType } from '@/app/types'; // MODIFIED: Import BannerType
+import { Product, Banner as BannerType } from '@/app/types'; 
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Percent, ShoppingBag, Star, Tag } from 'lucide-react';
 
@@ -22,24 +22,21 @@ const PRODUCT_COUNT = 10;
 export default function Home() {
   const products = useProductStore((state) => state.products);    
   const setProducts = useProductStore((state) => state.setProducts);
-  const [banners, setBanners] = useState<BannerType[]>([]); // MODIFIED: Use BannerType[] for state
+  const [banners, setBanners] = useState<BannerType[]>([]); 
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
     
-  // Set up banner images from API
   useEffect(() => {
     const loadBanners = async () => {
       try {
         const apiBanners = await fetchBannersFromAPI();
         if (apiBanners && apiBanners.length > 0) {
-          setBanners(apiBanners.filter(banner => banner.active)); // Filter for active banners
+          setBanners(apiBanners.filter(banner => banner.active)); 
         } else {
-          // Fallback to placeholder if no active banners from API
           setBanners([{ id: 'placeholder', title: 'Placeholder Banner', image_url: '/placeholder.svg', active: true }]);
         }
       } catch (error) {
         console.error("Error fetching banners:", error);
-        // Fallback to placeholder on error
         setBanners([{ id: 'placeholder', title: 'Placeholder Banner', image_url: '/placeholder.svg', active: true }]);
       }
     };
@@ -74,7 +71,7 @@ export default function Home() {
     const fetchProducts = async () => {
       try {
         const response = await getProducts();
-        setProducts(response.filter((product: Product)=>product.status==='active'));    {/* Filtering out the active products preferably in db because SQL query is more efficient */}
+        setProducts(response.filter((product: Product)=>product.status==='active'));    
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -88,18 +85,18 @@ export default function Home() {
     <div className="flex flex-col min-h-screen max-w-screen bg-white overflow-x-hidden">
       <Navbar />
       
-      {banners.length > 0 && ( // MODIFIED: Conditional rendering for when banners are loaded
+      {banners.length > 0 && ( 
         <div className="relative w-full overflow-hidden">
           <div className="w-screen aspect-[3/1] relative">
             <Image
-              src={banners[activeBannerIndex]?.image_url || "/placeholder.svg"} // MODIFIED: Use image_url
-              alt={banners[activeBannerIndex]?.title || "Banner"} // MODIFIED: Use title from banner object
+              src={banners[activeBannerIndex]?.image_url || "/placeholder.svg"} 
+              alt={banners[activeBannerIndex]?.title || "Banner"} 
               fill
               priority
               className={`object-cover transition-opacity duration-300`}
             />
 
-            {banners.length > 1 && ( // MODIFIED: Show controls only if more than one banner
+            {banners.length > 1 && ( 
               <>
                 <div className="absolute inset-0 flex items-center justify-between px-4">
                   <button className="text-white cursor-pointer rounded-full bg-background/80 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
@@ -120,9 +117,9 @@ export default function Home() {
                 </div>
                 
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {banners.map((banner, index) => ( // MODIFIED: Iterate over banners state
+                  {banners.map((banner, index) => ( 
                     <button
-                      key={banner.id} // MODIFIED: Use banner.id as key
+                      key={banner.id} 
                       className={`w-2 h-2 rounded-full ${index === activeBannerIndex ? "bg-primary" : "bg-background/80"}`}
                       onClick={() => {
                         pauseAutoplay();

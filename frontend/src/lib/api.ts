@@ -230,7 +230,6 @@ export const getOrderProducts= async(orderId: string)=>{
     }
 }
 
-// Banner API functions
 export interface Banner {
     id: string; 
     title: string;
@@ -239,7 +238,6 @@ export interface Banner {
     created_at?: string; 
 }
 
-// GET all banners
 export const getBanners = async () => {
     const URL = `${API_URL}/banner_api`; 
     try {
@@ -251,7 +249,6 @@ export const getBanners = async () => {
     }
 };
 
-// POST a new banner
 export const addBanner = async (bannerData: { title: string; image: File; active: boolean }) => {
     const URL = `${API_URL}/banner_api`;
     const formData = new FormData();
@@ -260,11 +257,7 @@ export const addBanner = async (bannerData: { title: string; image: File; active
     formData.append('active', String(bannerData.active));
 
     try {
-        const response = await axiosInstance.post(URL, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+        const response = await axios.post(URL, formData);
         return response.data;
     } catch (error) {
         console.error("Error adding banner:", error);

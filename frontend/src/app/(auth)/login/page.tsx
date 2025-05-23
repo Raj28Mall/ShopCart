@@ -31,7 +31,7 @@ export default function LoginPage() {
                 return;
             }
             const token = data.token;
-            setToken(token);
+            setToken(token, false);
             console.log(data.user);
             setUser(data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
