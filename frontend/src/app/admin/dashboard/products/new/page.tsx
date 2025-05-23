@@ -52,11 +52,9 @@ export default function NewProductPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && files.length > 0) {
-      // Convert FileList to array and add to existing files
       const newFiles = Array.from(files)
       setImageFiles((prev) => [...prev, ...newFiles])
 
-      // Create previews for new images
       newFiles.forEach((file) => {
         const reader = new FileReader()
         reader.onloadend = () => {
@@ -65,12 +63,10 @@ export default function NewProductPage() {
         reader.readAsDataURL(file)
       })
 
-      // Set the first image as the main image if none exists
       if (!formData.image && newFiles.length > 0) {
         setFormData({ ...formData, image: newFiles[0] })
       }
 
-      // Add all files to the images array in formData
       setFormData((prev) => ({
         ...prev,
         images: [...(prev.images || []), ...newFiles],
@@ -79,20 +75,16 @@ export default function NewProductPage() {
   }
 
   const removeImage = (index: number) => {
-    // Remove from previews
     setImagePreviews((prev) => prev.filter((_, i) => i !== index))
 
-    // Remove from files
     const newFiles = [...imageFiles]
     newFiles.splice(index, 1)
     setImageFiles(newFiles)
 
-    // Update formData
     setFormData((prev) => {
       const newImages = [...(prev.images || [])]
       newImages.splice(index, 1)
 
-      // If we're removing the main image, set the first remaining image as main
       let newMainImage = prev.image
       if (index === 0 && newImages.length > 0) {
         newMainImage = newImages[0]
@@ -122,7 +114,6 @@ export default function NewProductPage() {
     setIsSubmitting(true)
 
     try {
-      // Update the formData to include all images
       const productData = {
         ...formData,
         images: imageFiles,

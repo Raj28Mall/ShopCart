@@ -32,4 +32,4 @@ export const categories = [
 ];
 
 export const SHIPPING_COST= 20.00;
-export const zoomFactor = 1.5;
+export const zoomFactor =2;

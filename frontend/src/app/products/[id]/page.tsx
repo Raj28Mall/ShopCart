@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 
 export default function ProductPage() {
     const params= useParams();
-    const id= params.id as string; // Ensure id is treated as string for api calls
+    const id= params.id as string; 
     const products = useProductStore((state)=>state.products);
     const product=products.find((product) => product.id.toString() === (id)?.toString());
     const cartItems = useCartStore((state) => state.cartItems);
@@ -31,9 +31,8 @@ export default function ProductPage() {
     const [productNotFound, setProductNotFound] = useState<boolean>(false);
     const [wishList, setWishList] = useState<boolean>(false);
     
-    const [productImages, setProductImages] = useState<string[]>([]); // MODIFIED: Use state for product images
+    const [productImages, setProductImages] = useState<string[]>([]); 
     const [activeImage, setActiveImage] = useState(0);
-    // REMOVED: const productImages=[product?.image];
     
     const incrementQuantity = () => setQuantity((prev) => prev + 1);
     const decrementQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
@@ -45,26 +44,22 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchAndSetImages = async () => {
       if (!product || !id) {
-        // If product is not yet loaded or id is not available
-        // Set main image if product is available, otherwise empty
         setProductImages(product?.image ? [product.image] : []);
-        setActiveImage(0); // Reset active image
+        setActiveImage(0); 
         return;
       }
 
-      let currentImageUrls: string[] = [];
+      const currentImageUrls: string[] = [];
       if (product.image) {
         currentImageUrls.push(product.image);
       }
 
       try {
-        // Assuming getProductImages returns an array of objects like { image_url: string }
-        // or an array of strings if the backend sends URLs directly.
         const additionalImagesResult = await getProductImages(id); 
         
         if (additionalImagesResult && additionalImagesResult.length > 0) {
           additionalImagesResult.forEach(imgObj => {
-            // Adapt this line if the image URL is stored under a different property name
+          
             const imageUrl = typeof imgObj === 'string' ? imgObj : (imgObj as any).image_url; 
             if (imageUrl && !currentImageUrls.includes(imageUrl)) {
               currentImageUrls.push(imageUrl);
@@ -73,15 +68,15 @@ export default function ProductPage() {
         }
       } catch (error) {
         console.error("Error fetching additional product images:", error);
-        // Retain main image (if any) if fetching additional ones fails
+      
       }
       
       setProductImages(currentImageUrls);
-      setActiveImage(0); // Reset active image index when images are loaded/changed for the product
+      setActiveImage(0);
     };
 
     fetchAndSetImages();
-  }, [id, product]); // Depend on id and the product object
+  }, [id, product]); 
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current) return
@@ -111,12 +106,12 @@ export default function ProductPage() {
   const handleTouchEnd = () => setIsZoomed(false)
 
     const nextImage = () => {
-      if (productImages.length === 0) return; // Guard against no images
+      if (productImages.length === 0) return; 
       setActiveImage((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
     }
   
     const prevImage = () => {
-      if (productImages.length === 0) return; // Guard against no images
+      if (productImages.length === 0) return; 
       setActiveImage((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
     }
     
@@ -218,7 +213,7 @@ export default function ProductPage() {
                 />
               )}
 
-              <div className="absolute inset-0 flex items-center justify-between p-4">
+              <div className={productImages.length<=1? "hidden": "absolute inset-0 flex items-center justify-between p-4"}>
                   <button
                     className="text-white cursor-pointer rounded-full transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5 z-10"
                     onClick={prevImage}>
@@ -233,7 +228,7 @@ export default function ProductPage() {
               </div>
           </div> 
 
-          <div className="flex space-x-2 overflow-auto pl-1 py-3">
+          <div className={productImages.length<=1?"hidden": "flex space-x-2 overflow-auto pl-1 py-3"}>
           {productImages.map((image, index) => (
             <button
               key={index}
