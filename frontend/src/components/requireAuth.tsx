@@ -9,23 +9,14 @@ interface RequireAuthProps {
 }
 
 export const RequireAuth = ({ children }: RequireAuthProps) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isLoading = useAuthStore((state) => state.isLoading);
+  const { isAuthenticated } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) {
-      return; 
-    }
-
     if (!isAuthenticated) {
       router.push("/login");
     }
-  }, [isLoading, isAuthenticated, router]);
-
-  if(isLoading){
-    return <div className="text-center p-4">Checking your session...</div>;
-  }
+  }, [isAuthenticated, router]);
 
   if (!isAuthenticated) {
     return <div className="text-center p-4">Redirecting to login...</div>;

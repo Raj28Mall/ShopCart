@@ -3,39 +3,21 @@ import { LayoutDashboard, ShoppingBag, Settings, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
+import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { RequireAuth } from "./requireAuth";
 
 export const AdminSidebar = () => {
     const router = useRouter();
-    const logout = useAuthStore((state) => state.logout);
-    const user = useAuthStore((state) => state.user);
-    const isLoadingAuth = useAuthStore((state) => state.isLoading);
+    const { logout } = useAuthStore();
+    const user = useUserStore((state) => state.user);
     
     const handleLogout = () => {
-      logout();
-      router.push('/');
+        logout();
+        router.push('/');
     };
 
-    if (isLoadingAuth) {
-      // Optional: render a minimal loading state for the sidebar area
-      return (
-          <aside className="hidden md:flex w-64 flex-col bg-card border-r p-4">
-              <p>Loading sidebar...</p>
-          </aside>
-      );
-  }
-
-  if (!user) {
-    // If the user is null (e.g., after logout, or if initial load results in no user),
-    // AdminSidebar itself should not attempt to render user-specific details.
-    // RequireAuth will handle the overall page protection and redirection.
-    // Returning null here means this component just won't render anything if no user.
-    return null;
-}
     return(
-      <RequireAuth>
         <aside className="hidden md:flex w-64 flex-col bg-card border-r">
         <div className="p-6">
         <Link href="/" className="flex flex-row justify-center items-center space-x-2 px-10 mr-5 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5">
@@ -76,6 +58,5 @@ export const AdminSidebar = () => {
           </Button>
         </div>
       </aside>
-      </RequireAuth>
     );
 }

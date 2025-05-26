@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { toast } from 'react-hot-toast';
 import { Navbar } from '@/components/navbar';
 import { useAuthStore } from '@/store/authStore';
+import { useUserStore } from '@/store/userStore';
 import { RequireAuth } from '@/components/requireAuth';
 
 // Helper function to format date
@@ -39,7 +40,7 @@ const formatDate = (dateString: string) => {
 };
 
 export default function AccountClientPage() {
-  const user=useAuthStore((state)=>state.user);     
+  const user=useUserStore((state)=>state.user);     
   const handleProfileChanges=async()=>{
     // add form validation for name, email, phone
     setProfileUpdating(true);

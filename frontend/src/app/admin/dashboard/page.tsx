@@ -18,6 +18,7 @@ import { categories } from "@/app/constants";
 import { AdminSidebar } from "@/components/adminSidebar";
 import { useProductStore } from "@/store/productStore";
 import { useAuthStore } from "@/store/authStore";
+import { useUserStore } from "@/store/userStore";
 import toast from "react-hot-toast";
 import { RequireAdminAuth } from "@/components/requireAdminAuth";
 
@@ -26,7 +27,7 @@ export default function AdminDashboard() {
   const products = useProductStore((state) => state.products);
   const setProducts = useProductStore((state) => state.setProducts);
   const logout= useAuthStore((state)=>state.logout);
-  const user = useAuthStore((state) => state.user);
+  const user = useUserStore((state) => state.user);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -83,7 +84,6 @@ export default function AdminDashboard() {
   }
 
   return (
-    <RequireAdminAuth>
     <div className="flex min-h-screen bg-muted/30">
       <AdminSidebar />
 
@@ -317,7 +317,6 @@ export default function AdminDashboard() {
         </DialogContent>
       </Dialog>
     </div>
-    </RequireAdminAuth>
   )
 }
 

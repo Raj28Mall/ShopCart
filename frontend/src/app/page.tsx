@@ -29,9 +29,9 @@ export default function Home() {
     
   // Set up banner images from picsum
   useEffect(() => {
-    const images = [10, 11, 13, 12, 14];
-    const bannerUrls = images.map(image => 
-      `https://picsum.photos/id/${image}/1920/640`
+    const bannerSeeds = ["banner1", "banner2", "banner3", "banner4", "banner5"];
+    const bannerUrls = bannerSeeds.map(seed => 
+      `https://picsum.photos/seed/${seed}/1920/640`
     );
     setBanners(bannerUrls);
   }, []);
@@ -89,7 +89,7 @@ export default function Home() {
         />
 
         <div className="absolute inset-0 flex items-center justify-between px-4">
-          <button  className="text-white cursor-pointer rounded-full bg-background/80 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+          <button  className="text-white cursor-pointer rounded-full bg-background/80 backdrop-blur-sm transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
             onClick={() => {
               pauseAutoplay();
               prevBanner();
@@ -97,7 +97,7 @@ export default function Home() {
             <ChevronLeft size={38}/>
           </button>
 
-          <button  className="text-white cursor-pointer rounded-full bg-background/80 pr-2 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
+          <button  className="text-white cursor-pointer rounded-full bg-background/80 backdrop-blur-sm pr-2 transform transition-transform duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[1.03] hover:-translate-y-0.5"
             onClick={() => {
               pauseAutoplay();
               nextBanner();

@@ -16,10 +16,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { useUserStore } from "@/store/userStore";
 import { loginUser, signupUser } from "@/lib/api"; 
 
 export default function LoginPage() {  
-    const login =useAuthStore((state)=>state.login);
+    const { setToken } = useAuthStore(); // Zustand store for token
+    const setUser = useUserStore((state) => state.setUser); 
     const { reset: resetLogin, register: registerLogin, handleSubmit: handleSubmitLogin, formState: { errors: errorsLogin, isSubmitting: isSubmittingLogin } } = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) });
     const { reset: resetSignup, register: registerSignup, handleSubmit: handleSubmitSignup, formState: { errors: errorsSignup, isSubmitting: isSubmittingSignup } } = useForm<SignupSchema>({ resolver: zodResolver(signupSchema) });
     const router=useRouter();
@@ -28,11 +30,12 @@ export default function LoginPage() {
         try{
             const data= await loginUser(loginData.email, loginData.password, "admin");
             if(!data){
-                console.error(data?.error);
                 toast.error("Invalid credentials");
                 return;
             }
-            login(data.token, data.user);
+            const token = data.token;
+            setToken(token, true);
+            setUser(data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
             toast.success("Login successful");
             router.push('/admin/dashboard');
@@ -46,11 +49,13 @@ export default function LoginPage() {
         try{
             const data= await signupUser(signupData.name, signupData.email, signupData.password, signupData.confirmPassword, "admin");
             if(!data){
-                console.error(data?.error);
                 toast.error("Invalid credentials. Please try again later.");
                 return;
             }
-            login(data.token, data.user);
+            const token = data.token;
+            setToken(token);
+            
+            setUser(data.user);
             await new Promise((resolve)=> setTimeout(resolve, 500)); //simulating API authentication process
             toast.success("Admin account created. Please wait for approval.");
             router.push('/');

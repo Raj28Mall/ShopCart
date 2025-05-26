@@ -9,31 +9,17 @@ interface RequireAuthProps {
 }
 
 export const RequireAdminAuth = ({ children }: RequireAuthProps) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const isAdmin= useAuthStore((state)=>state.isAdmin);
+  const { isAdmin } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) {
-      return; 
+    if(!isAdmin) {
+      router.push("/admin/auth");
     }
+  }, [ router, isAdmin]);
 
-    if (!isAuthenticated || !isAdmin) {
-      router.push("/login");
-    }
-  }, [isLoading, isAuthenticated, isAdmin, router]);
-
-  if(isLoading){
-    return <div className="text-center p-4">Checking your session...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <div className="text-center p-4">Redirecting to login...</div>;
-  }
-
-  if(!isAdmin){
-    return <div className="text-center p-4">Unauthorized...</div>;
+  if(!isAdmin) {
+    return <div className="text-center p-4">You are not authorized. Redirecting to login.</div>;
   }
 
   return <>{children}</>;

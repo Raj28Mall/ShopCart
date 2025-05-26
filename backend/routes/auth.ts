@@ -6,14 +6,14 @@ import db from "../db";
 import { loginSchema } from "../../schemas/loginSchema";
 import { signupSchema } from "../../schemas/signupSchema";
 import { validate } from "./../middleware/validate";
-import { requireAuth } from "./../middleware/requireAuth";
+import { date } from "zod";
 import { v4 as uuidv4 } from 'uuid';
 const router = express.Router();
 
 // POST /api/login
 router.post("/login", validate(loginSchema), async (req: Request, res: Response) => {
   const { email, password, role } = req.body;
-  const QUERY = "SELECT BIN_TO_UUID(id, 1) as id, name, email, password, picture, role, status, created_at FROM users WHERE (email = ? AND role= ?)";
+  const QUERY = "SELECT * FROM users WHERE (email = ? AND role= ?)";
   try {
     const [results] = await db.execute(QUERY, [email, role]) as [any[], any];
     const user = results[0];
@@ -80,38 +80,6 @@ router.post("/signup", validate(signupSchema), async (req: Request, res: Respons
   } catch(error){
     console.error("Signup error: ", error);
     res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-router.get("/status", requireAuth, async (req: Request, res: Response) => {
-  try {
-    const QUERY = "SELECT BIN_TO_UUID(id, 1), name, email, picture, role, status, created_at FROM users WHERE id = UUID_TO_BIN(?, 1)";
-    const [results] = await db.execute(QUERY, [req.user!.userId]) as [any[], any]; // Use non-null assertion as requireAuth ensures req.user exists
-    const user = results[0];
-
-    if (!user) {
-      return res.status(404).json({ isAuthenticated: false, message: "User not found for valid token." });
-    }
-
-    if (user.status !== 'active' && user.status !== 'pending') { // Allow 'pending' if admins can be pending
-      return res.status(403).json({ isAuthenticated: false, message: `User account is currently status: ${user.status}.` });
-    }
-
-    res.json({
-      isAuthenticated: true,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        picture: user.picture,
-        role: user.role,     
-        status: user.status,  
-        dateJoined: user.created_at,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching user status:", error);
-    res.status(500).json({ isAuthenticated: false, message: "Internal server error while fetching user status." });
   }
 });
 
