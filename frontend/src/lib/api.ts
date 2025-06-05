@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
 import axiosInstance from '../utils/axiosInstance'; // Use the axiosInstance with interceptors
+import { Banner } from '../app/types'; 
 
 const API_URL= process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -88,8 +90,8 @@ export const addProduct = async (product: {
     name: string;
     category: string;
     price: string;
-    image: File | string; // This will be the main image File
-    images?: File[];      // Array of additional image Files
+    image: File | string; 
+    images?: File[];      
     rating?: string;
     stock: string;
     shortDescription: string;
@@ -107,23 +109,15 @@ export const addProduct = async (product: {
     formData.append('status', product.status);
     formData.append('rating', product.rating ?? "0.0");
 
-    // Handle the main image
     if (product.image instanceof File) {
         formData.append('mainImage', product.image, product.image.name);
     } else if (typeof product.image === 'string' && product.image) {
-        // If it's a string, it might be a URL of an existing image (e.g. during edit)
-        // For addProduct, we typically expect a new File.
-        // Depending on backend logic for handling string 'image' for new products,
-        // this might need adjustment or an error if a File is always expected.
-        // For now, assuming 'mainImage' field is for new file uploads.
         console.warn("addProduct called with a string for mainImage. Ensure backend handles this or send a File.");
     }
 
-    // Handle additional images
     if (product.images && Array.isArray(product.images)) {
         product.images.forEach((file) => {
             if (file instanceof File) {
-                // Ensure not to send the main image again if it's also in the images array
                 if (!(product.image instanceof File && file.name === product.image.name && file.size === product.image.size)) {
                     formData.append('additionalImages', file, file.name);
                 }
@@ -133,7 +127,6 @@ export const addProduct = async (product: {
 
     try {
         const response = await axios.post(URL, formData, {
-            // Ensure headers are set for multipart/form-data if not default
         });
         return response.data; 
     } catch (error) {
@@ -228,14 +221,6 @@ export const getOrderProducts= async(orderId: string)=>{
         console.error("Error while fetching order products: ", err);
         return;
     }
-}
-
-export interface Banner {
-    id: string; 
-    title: string;
-    image_url: string; 
-    active: string;
-    created_at?: string; 
 }
 
 export const getBanners = async () => {

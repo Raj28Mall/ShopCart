@@ -2,10 +2,10 @@
 "use client";
 import * as React from 'react';
 import Fuse from 'fuse.js';
+import Footer from '@/components/footer';
+import Image from "next/image";
 import { useState, useEffect, useRef } from 'react';
 import { Navbar } from "@/components/navbar";
-import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronDown, X } from "lucide-react";
@@ -17,8 +17,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import Footer from '@/components/footer';
 import { Product } from "@/store/productStore"; 
+import { categories } from '../constants';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const FILTERS=["Clothes", "Electronics", "Kitchen Appliances", "Sports", "Beauty"];
@@ -28,13 +28,15 @@ export default function Products(){
     const [sortOption, setSortOption] = useState<string>();
     const [displayCount, setDisplayCount]=useState<number>(15);
     const [displayProducts, setDisplayProducts]= useState<Product[]>([]);
+    const [selected, setSelected]=useState<string[]>([]);
     const [loading, setLoading]= useState<boolean>(true);
     const initializedRef = useRef(false);
     const products= useProductStore((state) => state.products);
     const searchQuery= useSearchStore((state) => state.searchQuery);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
     useEffect(() => {
-      // Remove artificial loading delay
       setLoading(false);
     }, [products]);
 
@@ -44,8 +46,24 @@ export default function Products(){
       console.log(products);
     }, [products]);
     
+    useEffect(() => {
+      if (initializedRef.current || !searchParams) return;
     
-    const [selected, setSelected]=useState<string[]>([]);
+      const categorySlugFromQuery = searchParams.get('category');
+    
+      if (categorySlugFromQuery) {
+        const matchedCategory = categories.find(cat => cat.slug === categorySlugFromQuery);
+    
+        if (matchedCategory) {
+          if (FILTERS.includes(matchedCategory.name)) {
+            setSelected([matchedCategory.name]);
+          } else {
+            console.warn(`Category name "${matchedCategory.name}" for slug "${categorySlugFromQuery}" not found in FILTERS.`);
+          }
+        }
+      }
+      initializedRef.current = true;
+    }, [searchParams]);
 
     const toggleSelection = (value: string) => {
       setSelected((prev) =>
@@ -53,34 +71,8 @@ export default function Products(){
       );
     };
 
-    const handleSort=(sortMethod : string)=>{
-      if( !sortMethod ){
-        setDisplayProducts(products);
-        return;
-      }
-
-      if (sortMethod === 'price-low') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(a.price) - Number(b.price)));
-      } else if (sortMethod === 'price-high') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(b.price) - Number(a.price)));
-      } else if (sortMethod === 'rating') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(b.rating) - Number(a.rating)));
-      }
-      else if (sortMethod === 'newest') {
-        setDisplayProducts((prev) => [...prev].sort((a, b) => Number(b.id) - Number(a.id)));
-      }
-    }
-
-    useEffect(() => {
-      if (!sortOption) return;
-      handleSort(sortOption);
-    }, [sortOption]);
-
-
     useEffect(() => {
       let updatedProducts = [...products];
-    
-      // Semantic Search with memoization
       if (searchQuery.trim() !== '') {
         const fuse = new Fuse(updatedProducts, {
           keys: ['name', 'category', 'shortDescription'],
@@ -96,7 +88,6 @@ export default function Products(){
         );
       }
   
-      // Apply sorting only once at the end
       if (sortOption) {
         if (sortOption === 'price-low') {
           updatedProducts.sort((a, b) => Number(a.price) - Number(b.price));
@@ -110,23 +101,7 @@ export default function Products(){
       }
     
       setDisplayProducts(updatedProducts);
-      // Remove the duplicate dependencies that trigger redundant calculations
     }, [selected, products, sortOption, searchQuery]);
-
-
-    const searchParams = useSearchParams();
-
-
-    useEffect(() => {
-      if (initializedRef.current) return; // prevent re-running
-    
-      const categoryFromQuery = searchParams.get('category');
-      if (categoryFromQuery && FILTERS.includes(categoryFromQuery)) {
-        setSelected([categoryFromQuery]);
-      }
-    
-      initializedRef.current = true;
-    }, []);
 
     return(
       <div className='overflow-x-hidden min-h-screen bg-white'>

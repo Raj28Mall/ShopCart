@@ -218,7 +218,7 @@ export default function Home() {
           <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed px-4">Browse our wide selection of products across different categories</p>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 lg:gap-8 mt-8 w-[80vw] lg:w-[100vw] justify-center sm:px-10 lg:px-15 lg:mx-auto">
             {(categories.slice(0,CATEGORY_COUNT)).map((category) => ( // to limit to 6
-              <Link key={category.id} href={`/products?category=${category.slug}`} className=''>
+              <Link key={category.id} href={`/products?category=${encodeURIComponent(category.name)}`} className=''>
                 <Card className="shrink-0 overflow-hidden transition-all hover:shadow-lg pt-0 bg-white w-full sm:w-[18vw] md:w-[31vw] xl:w-[23vw] 2xl:w-[21vw] cursor-pointer">
 
                   <div className="relative h-[200px] w-full">
