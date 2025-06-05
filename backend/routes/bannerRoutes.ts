@@ -98,4 +98,26 @@ router.delete('/:id', async (req: Request, res: Response) => {
     }
 });
 
+// PUT (update) a banner by ID
+router.put('/:id' , async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { active } = req.body;
+    const dbActive= String(active);
+    const QUERY1=`SELECT * FROM banner_images WHERE id = ?`;
+    const [banner]= await db.execute(QUERY1, [id]);
+    if(dbActive=="true" || dbActive=="false"){
+        const QUERY2= `UPDATE banner_images SET active = ? WHERE id = ?`;
+        try {
+            await db.execute(QUERY2, [dbActive, id]);
+            res.status(200).json({ message: "Banner updated successfully." });
+        }
+        catch (error) {
+            console.error(`Error updating banner ${id}:`, error);
+            res.status(500).json({ message: "Error updating banner in database." });
+        }
+    } else{
+        res.status(400).json({ message: `Invalid active status. It should be 'true' or 'false'. Received ${typeof(dbActive)} ${dbActive}.` });
+    }
+});
+
 export default router;

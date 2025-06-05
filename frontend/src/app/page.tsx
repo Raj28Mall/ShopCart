@@ -31,7 +31,7 @@ export default function Home() {
       try {
         const apiBanners = await fetchBannersFromAPI();
         if (apiBanners && apiBanners.length > 0) {
-          setBanners(apiBanners.filter(banner => banner.active)); 
+            setBanners(apiBanners.filter((banner: BannerType) => (banner.active)=="true")); 
         } else {
           setBanners([{ id: 'placeholder', title: 'Placeholder Banner', image_url: '/placeholder.svg', active: true }]);
         }

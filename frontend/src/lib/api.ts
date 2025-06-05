@@ -234,7 +234,7 @@ export interface Banner {
     id: string; 
     title: string;
     image_url: string; 
-    active: boolean;
+    active: string;
     created_at?: string; 
 }
 
@@ -249,7 +249,7 @@ export const getBanners = async () => {
     }
 };
 
-export const addBanner = async (bannerData: { title: string; image: File; active: boolean }) => {
+export const addBanner = async (bannerData: { title: string; image: File; active: string }) => {
     const URL = `${API_URL}/banner_api`;
     const formData = new FormData();
     formData.append('title', bannerData.title);
@@ -261,6 +261,17 @@ export const addBanner = async (bannerData: { title: string; image: File; active
         return response.data;
     } catch (error) {
         console.error("Error adding banner:", error);
+        throw error;
+    }
+};
+
+export const updateBanner = async (bannerId: string, active: string) => {
+    const URL = `${API_URL}/banner_api/${bannerId}`;
+    try {
+        const response = await axiosInstance.put(URL, { active: active });
+        return response.data;
+    } catch (error) {
+        console.error(`Error updating banner ${bannerId}:`, error);
         throw error;
     }
 };

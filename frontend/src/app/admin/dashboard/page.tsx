@@ -1,10 +1,10 @@
 "use client";
 import Fuse from "fuse.js";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Search, Edit, Trash2, ChevronLeft, ChevronRight, LogOut, LayoutDashboard, Settings, ShoppingBag,} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,10 +20,9 @@ import { useProductStore } from "@/store/productStore";
 import { useAuthStore } from "@/store/authStore";
 import { useUserStore } from "@/store/userStore";
 import toast from "react-hot-toast";
-import { RequireAdminAuth } from "@/components/requireAdminAuth";
 
 export default function AdminDashboard() {
-  const router = useRouter();
+  const router= useRouter();
   const products = useProductStore((state) => state.products);
   const setProducts = useProductStore((state) => state.setProducts);
   const logout= useAuthStore((state)=>state.logout);
@@ -35,18 +34,37 @@ export default function AdminDashboard() {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   useEffect(() => {
+    if(!(user.role)){
+      return;
+    }
+  
+    const redirectUnauthorizedUser = () => {
+      const role = user.role;
+      if(role==='superadmin'){
+        toast.error("You are not authorized to access this page");
+        router.push("/admin/super/dashboard");
+      } else if(role==='user'){
+        toast.error("You are not authorized to access this page");
+        router.push("/");
+      } else if(role==='admin'){
+        fetchProducts();
+      } else {
+        toast.error("Unknown user role error");
+        router.push("/");
+      }
+    }
+  
     const fetchProducts = async () => {
-        try {
-          const response = await getProducts();
-          setProducts(response);
-        } catch (error) {
+      try {
+        const response = await getProducts();
+        setProducts(response);
+      } catch (error) {
         console.error("Error fetching products:", error);
-        } finally{
-          // console.log(products);
-        }
+      }
     };
-    fetchProducts();
-  }, [setProducts]);
+  
+    redirectUnauthorizedUser();
+  }, [router, user, setProducts]);
 
   const confirmDelete = (productId: string) => {
     setProductToDelete(productId);

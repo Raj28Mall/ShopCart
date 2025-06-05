@@ -18,7 +18,7 @@ import { AdminSidebar } from "@/components/adminSidebar"
 import { useUserStore } from "@/store/userStore"
 import { useAuthStore } from "@/store/authStore"
 import { toast } from "react-hot-toast"
-import { getAdmins, adminApproval, getBanners, addBanner, Banner as BannerType, deleteBanner as deleteBannerApi, updateBanner as updateBannerApi } from "@/lib/api" // MODIFIED: Added updateBannerApi and ensured deleteBanner is aliased
+import { getAdmins, adminApproval, getBanners, addBanner, Banner as BannerType, deleteBanner as deleteBannerApi, updateBanner } from "@/lib/api" 
 import Fuse from "fuse.js"
 import type { User } from "@/store/userStore"
 
@@ -48,7 +48,6 @@ export default function SuperAdminDashboard() {
     if (!user || !(user.role === "superadmin")) {
       if (user.role === "admin") {
         router.push("/admin/dashboard")
-        toast.error("You are not authorized to access this page")
       } else if (user.role === "user") {
         router.push("/")
         toast.error("You are not authorized to access this page")
@@ -170,11 +169,11 @@ export default function SuperAdminDashboard() {
   const toggleBannerActive = async (bannerId: string) => {
     const banner = bannerImages.find(b => b.id === bannerId);
     if (!banner) return;
-
+    const activeStatus = banner.active === "true" ? "false" : "true";
     try {
-      const updatedBanner = await updateBannerApi(bannerId, { active: !banner.active });
+      await updateBanner(bannerId, activeStatus);
       setBannerImages(prevBanners => 
-        prevBanners.map(b => b.id === bannerId ? { ...b, active: !banner.active } : b)
+        prevBanners.map(b => b.id === bannerId ? { ...b, active: activeStatus } : b)
       );
       toast.success(`Banner ${!banner.active ? 'activated' : 'deactivated'} successfully`);
     } catch (error) {
@@ -344,17 +343,16 @@ export default function SuperAdminDashboard() {
                                   <p className="font-medium">{banner.title}</p>
                                   <div className="flex items-center mt-1">
                                     <Badge
-                                      variant={banner.active ? "default" : "secondary"}
-                                      className={`text-xs ${banner.active ? "bg-green-100 text-green-800" : ""}`}
+                                      className={`text-xs ${(banner.active=="true") ? "bg-green-100 text-green-800" : "bg-red-200"}`}
                                     >
-                                      {banner.active ? "Active" : "Inactive"}
+                                      {(banner.active=="true") ? "Active" : "Inactive"}
                                     </Badge>
                                   </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Button variant="outline" size="sm" onClick={() => toggleBannerActive(banner.id)}>
-                                  {banner.active ? "Deactivate" : "Activate"}
+                                  {(banner.active=="true") ? "Deactivate" : "Activate"}
                                 </Button>
                                 <Button
                                   variant="ghost"
