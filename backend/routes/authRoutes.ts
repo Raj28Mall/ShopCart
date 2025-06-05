@@ -12,9 +12,14 @@ const router = express.Router();
 // POST /api/login
 router.post("/login", validate(loginSchema), async (req: Request, res: Response) => {
   const { email, password, role } = req.body;
-  const QUERY = "SELECT * FROM users WHERE (email = ? AND role= ?)";
+  let QUERY = "SELECT * FROM users WHERE email = ?";
+  if (role === "user") {
+    QUERY += " AND role = 'user'";
+  } else if (role === "admins") {
+    QUERY += " AND (role = 'admin' OR role = 'superadmin')";
+  }
   try {
-    const [results] = await db.execute(QUERY, [email, role]) as [any[], any];
+    const [results] = await db.execute(QUERY, [email]) as any[];
     const user = results[0];
     if (!user) {
       res.status(401).json({ message: "Invalid credentials" });

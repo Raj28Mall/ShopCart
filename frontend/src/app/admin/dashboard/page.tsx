@@ -41,7 +41,6 @@ export default function AdminDashboard() {
     const redirectUnauthorizedUser = () => {
       const role = user.role;
       if(role==='superadmin'){
-        toast.error("You are not authorized to access this page");
         router.push("/admin/super/dashboard");
       } else if(role==='user'){
         toast.error("You are not authorized to access this page");

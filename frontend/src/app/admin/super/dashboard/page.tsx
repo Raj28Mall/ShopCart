@@ -47,10 +47,11 @@ export default function SuperAdminDashboard() {
   useEffect(() => {
     if (!user || !(user.role === "superadmin")) {
       if (user.role === "admin") {
-        router.push("/admin/dashboard")
+        toast.error("You are not authorized to access this page");
+        router.push("/admin/dashboard");
       } else if (user.role === "user") {
         router.push("/")
-        toast.error("You are not authorized to access this page")
+        toast.error("You are not authorized to access this page");
       }
     } else if (user.role === "superadmin") {
       const fetchInitialData = async () => {
