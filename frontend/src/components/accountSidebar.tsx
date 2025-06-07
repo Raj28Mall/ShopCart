@@ -8,8 +8,8 @@ import { useAuthStore } from '@/store/authStore';
 export default function AccountSidebar() {
     const router = useRouter();
     const handleLogOut=()=>{
+        useAuthStore.getState().logout();
         router.push('/');
-        useAuthStore.getState().logout(); //will like to redirect to home page instead of login page in this case
     }
 
     return(
