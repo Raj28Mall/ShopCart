@@ -11,10 +11,16 @@ export interface Product{
     status: string; 
   }
   
-  export interface Banner {
+export interface Banner {
     id: string; 
     title: string;
     image_url: string; 
     active: string;
     created_at?: string; 
 }
+
+export interface ProductDetails {
+  parameter: string;
+  detail: string;
+}
+

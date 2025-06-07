@@ -75,6 +75,17 @@ export const getProductImages= async(productId: string)=>{
     }
 }
 
+export const getProductDetails = async(productId: string) =>{
+    const URL=`${API_URL}/product_api/products/details/${productId}`;
+    try{
+        const response = await axios.get(URL);
+        return response.data;
+    } catch(err){
+        console.error("Error while fetching product details in backend: ", err);
+        return;
+    }
+}
+
 export const getProducts = async()=>{
     const URL=`${API_URL}/product_api/products`;
     try{

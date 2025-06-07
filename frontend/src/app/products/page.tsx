@@ -15,7 +15,6 @@ import { ProductCard } from '@/components/productCard';
 import { useSearchStore } from '@/store/searchStore';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
-import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Product } from "@/store/productStore"; 
 import { categories } from '../constants';
@@ -32,8 +31,7 @@ export default function Products(){
     const [loading, setLoading]= useState<boolean>(true);
     const initializedRef = useRef(false);
     const products= useProductStore((state) => state.products);
-    const searchQuery= useSearchStore((state) => state.searchQuery);
-    const router = useRouter();
+    const searchQuery= useSearchStore((state) => state.searchQuery)
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -43,7 +41,6 @@ export default function Products(){
 
     useEffect(() => {
       setDisplayProducts(products);
-      console.log(products);
     }, [products]);
     
     useEffect(() => {

@@ -346,7 +346,6 @@ export default function Cart(){
         </Dialog>
 
         </div>
-              
       </RequireAuth>
     );
 }

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import * as React from "react";
+import Footer from "@/components/footer";
+import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, use, useRef } from "react";
 import { useProductStore } from "@/store/productStore";
 import { Navbar } from "@/components/navbar";
-import Link from "next/link";
-import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Star, Minus, Plus, ShoppingBag, Heart, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,9 +16,9 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from 'react-hot-toast';
 import { useCartStore } from "@/store/cartStore";
 import { RequireAuth } from "@/components/requireAuth";
-import Footer from "@/components/footer";
 import { zoomFactor } from "@/app/constants";
-import { getProductImages } from "@/lib/api";
+import { getProductImages, getProductDetails } from "@/lib/api";
+import { ProductDetails } from "@/app/types";
 import { Badge } from "@/components/ui/badge";
 
 export default function ProductPage() {
@@ -30,7 +31,7 @@ export default function ProductPage() {
     const [quantity, setQuantity] = useState<number>(cartItems.find((item)=>item.id===Number(id))?.quantity || 0);
     const [productNotFound, setProductNotFound] = useState<boolean>(false);
     const [wishList, setWishList] = useState<boolean>(false);
-    
+    const [productDetails, setProductDetails] = useState<ProductDetails[]>([]);
     const [productImages, setProductImages] = useState<string[]>([]); 
     const [activeImage, setActiveImage] = useState(0);
     
@@ -68,14 +69,30 @@ export default function ProductPage() {
         }
       } catch (error) {
         console.error("Error fetching additional product images:", error);
-      
       }
       
       setProductImages(currentImageUrls);
       setActiveImage(0);
     };
 
+    const fetchProductDetails = async () => {
+      if (!product || !id) {
+        setProductDetails([]);
+        return;
+      }
+      try{
+        const detailsResult = await getProductDetails(id); 
+        if (detailsResult && detailsResult.length > 0) {
+          setProductDetails(detailsResult);
+          console.log(detailsResult);
+        }
+      }catch (error) {
+        console.error("Error fetching additional product details:", error);
+      }
+    }
+      
     fetchAndSetImages();
+    fetchProductDetails();
   }, [id, product]); 
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -344,18 +361,20 @@ export default function ProductPage() {
                 <p className="p-1">{product.longDescription}</p>
               </TabsContent>
 
-              <TabsContent value="details" className="mt-4 text-sm text-muted-foreground">
-                <div className="flex flex-col space-y-3">
-                  {product.details && product.details.length > 0 ? (
-                    product.details.map((detail, index) => (
-                      <div key={index} className="flex flex-row items-center">
-                        <p className="text-2xl">•</p>
-                        <p className="my-1">{detail}</p>
-                      </div>
+              <TabsContent value="details" className="mt-4 text-sm ">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                  {productDetails && productDetails.length > 0 ? (
+                    productDetails.map((productInfo, index) => (
+                      <div key={index} className="flex flex-col space-y-1">
+                        <span className="text-sm font-semibold">{productInfo.parameter}</span>
+                        <span className="text-sm text-muted-foreground">{productInfo.detail}</span>
+                    </div>
                     ))
                   ) : (
-                    <p>No details available</p>
+                    <p className="text-muted-foreground">No details available</p>
                   )}
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

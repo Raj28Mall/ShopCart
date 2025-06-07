@@ -75,6 +75,27 @@ router.get('/products/images/:id', async(req: Request, res: Response)=>{
     }
 });
 
+//route for getting the details of a single product by id
+router.get('/products/details/:id', async(req: Request, res: Response)=>{
+    const productId = req.params["id"];
+    const QUERY="SELECT * FROM product_details WHERE product_id=?";
+    try{
+        const [results]: any = await db.query(QUERY, [productId]);
+        if (results.length === 0) {
+            res.status(200).send([]);
+            return;
+        }
+        const productDetails = results.map((row: any) => ({
+            parameter: row.parameter,
+            detail: row.detail
+        }));
+        res.status(200).send(productDetails);
+    } catch(err){
+        console.error("Error while fetching product details by ID: ", err);
+        res.status(500).send("Database error while fetching product details by ID");
+    } 
+});
+
 //route for getting all current products
 router.get('/products', async(req: Request, res: Response)=>{
     const QUERY="SELECT * FROM products";
@@ -193,7 +214,7 @@ router.put('/products/:id', upload.single('image'), async (req: Request, res: Re
 
 router.post('/products/', productUploads, async (req: Request, res: Response) => {
     const pricePattern = /^\d+(\.\d{1,2})?$/;
-    const ratingPattern = /^\d(\.\d{1})?$/; 
+    const ratingPattern = /^\d(\.\d{1})?$/ 
     
     const { name, category, price, rating, stock, shortDescription, longDescription, status } = req.body;
     
