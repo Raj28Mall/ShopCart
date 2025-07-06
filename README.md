@@ -13,7 +13,7 @@
 - 🔄 Persistent cart using local storage
 - 🧾 View past orders and ordered items (Order History)
 - 📦 Product details modal/page
-- 💳 Checkout flow (dummy or integrated)
+- 💳 Checkout flow (dummy)
 
 ---
 
